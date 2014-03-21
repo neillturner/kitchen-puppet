@@ -117,7 +117,7 @@ module Kitchen
               sudo('cp -r'), File.join(config[:root_path], 'hiera'), '/var/lib/'
             ].join(' ')
           end
-          command = commands.join( ' && ')
+          command = commands.join(' && ')
           debug(command)
           command
         end
@@ -194,9 +194,11 @@ module Kitchen
         end
 
         def custom_facts
-          return nil unless config[:custom_facts]
-          facts_array = config[:custom_facts].split(',').map { |f| f = "export FACTER_#{f}"  }
-          return facts_array.join("; ")+";"
+          return nil if config[:custom_facts].none?
+          bash_vars = config[:custom_facts].map { |k,v| "FACTER_#{k}=#{v}" }.join(" ")
+          bash_vars = "export #{bash_vars};"
+          debug(bash_vars)
+          bash_vars
         end
 
         def puppet_apt_repo
