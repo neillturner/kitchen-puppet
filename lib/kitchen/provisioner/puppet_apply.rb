@@ -174,7 +174,7 @@ module Kitchen
         end
 
         def puppet_version
-          config[:puppet_version] == nil ? nil : "=#{config[:puppet_version]}"
+          config[:puppet_version] ? "=#{config[:puppet_version]}" : nil
         end
 
         def puppet_noop_flag
