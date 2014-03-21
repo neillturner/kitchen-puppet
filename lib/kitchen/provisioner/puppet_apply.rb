@@ -117,21 +117,22 @@ module Kitchen
               sudo('cp -r'), File.join(config[:root_path], 'hiera'), '/var/lib/'
             ].join(' ')
           end
-          debug(commands.join(' && '))
-          commands.join(' && ')
+          command = commands.join( ' && ')
+          debug(command)
+          command
         end
 
         def run_command
           [
-            "#{custom_facts}",
+            custom_facts,
             sudo('puppet'),
             'apply',
             File.join(config[:root_path], 'manifests', manifest),
             "--modulepath=#{File.join(config[:root_path], 'modules')}",
             "--manifestdir=#{File.join(config[:root_path], 'manifests')}",
-            "#{puppet_noop}",
-              "#{puppet_verbose}",
-              "#{puppet_debug}",
+            puppet_noop_flag,
+            puppet_verbose_flag,
+            puppet_debug_flag,
           ].join(" ")
         end
 
@@ -149,7 +150,7 @@ module Kitchen
         end
 
         def puppetfile
-          File.join(config[:kitchen_root], "Puppetfile")
+          File.join(config[:kitchen_root], 'Puppetfile')
         end
 
         def manifest
@@ -176,24 +177,24 @@ module Kitchen
           config[:puppet_version] == nil ? nil : "=#{config[:puppet_version]}"
         end
 
-        def puppet_noop
-          config[:puppet_noop].to_s.downcase == 'true' ?  "--noop" : nil
+        def puppet_noop_flag
+          config[:puppet_noop] ? '--noop' : nil
         end
 
-        def puppet_debug
-          config[:puppet_debug].to_s.downcase == 'true' ?  "-d" : nil
+        def puppet_debug_flag
+          config[:puppet_debug] ? '-d' : nil
         end
 
-        def puppet_verbose
-          config[:puppet_verbose].to_s.downcase == 'true' ?  "-v" : nil
+        def puppet_verbose_flag
+          config[:puppet_verbose] ? '-v' : nil
         end
 
         def update_packages_cmd
-          config[:update_packages].to_s.downcase == 'false' ?  nil : "#{sudo('apt-get')} update"
+          config[:update_packages] ? nil : "#{sudo('apt-get')} update"
         end
 
         def custom_facts
-          return nil if config[:custom_facts] == nil
+          return nil unless config[:custom_facts]
           facts_array = config[:custom_facts].split(',').map { |f| f = "export FACTER_#{f}"  }
           return facts_array.join("; ")+";"
         end
