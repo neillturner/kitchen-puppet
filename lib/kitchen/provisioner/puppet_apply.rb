@@ -38,12 +38,12 @@ module Kitchen
 
       default_config :manifests_path do |provisioner|
         provisioner.calculate_path('manifests') or
-        raise 'No manifests_path detected. Please specify one in .kitchen.yml'
+          raise 'No manifests_path detected. Please specify one in .kitchen.yml'
       end
 
       default_config :modules_path do |provisioner|
         provisioner.calculate_path('modules') or
-        raise 'No modules_path detected. Please specify one in .kitchen.yml'
+          raise 'No modules_path detected. Please specify one in .kitchen.yml'
       end
 
       default_config :hiera_data_path do |provisioner|
