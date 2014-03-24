@@ -34,6 +34,7 @@ module Kitchen
       default_config :puppet_version, nil
       default_config :puppet_apt_repo, "http://apt.puppetlabs.com/puppetlabs-release-precise.deb"
 	  default_config :puppet_yum_repo, "https://yum.puppetlabs.com/puppetlabs-release-el-6.noarch.rpm"
+	  default_config :chef_bootstrap_url, "https://www.getchef.com/chef/install.sh"
 
       default_config :manifest, 'site.pp'
 
@@ -58,32 +59,80 @@ module Kitchen
       default_config :puppet_debug, false
       default_config :puppet_verbose, false
       default_config :puppet_noop, false
-	  default_config :puppet_platform, 'ubuntu'
+	  default_config :puppet_platform, ''
       default_config :update_packages, true
 	  default_config :custom_facts, {}
 
       def install_command
-        info('installing puppet')
+	    chef_url = config[:chef_bootstrap_url]
         case puppet_platform
         when "debian", "ubuntu"
+		  info("Installing puppet on #{puppet_platform}")
           <<-INSTALL
           if [ ! $(which puppet) ]; then
             #{sudo('wget')} #{puppet_apt_repo}
             #{sudo('dpkg')} -i #{puppet_apt_repo_file}
             #{update_packages_debian_cmd}
-            #{sudo('apt-get')} -y install puppet#{puppet_version}
+            #{sudo('apt-get')} -y install puppet#{puppet_debian_version}
           fi
-         INSTALL
+          # install chef omnibus so that busser works as this is needed to run tests :(
+          # TODO: work out how to install enough ruby
+          # and set busser: { :ruby_bindir => '/usr/bin/ruby' } so that we dont need the
+          # whole chef client
+          if [ ! -d "/opt/chef" ]
+          then
+            echo "-----> Installing Chef Omnibus"
+            curl -o /tmp/install.sh #{chef_url} 
+            #{sudo('sh')} /tmp/install.sh
+          fi
+          INSTALL
 		when "redhat", "centos", "fedora"
+		  info("Installing puppet on #{puppet_platform}")
           <<-INSTALL		
           if [ ! $(which puppet) ]; then
             #{sudo('rpm')} -ivh #{puppet_yum_repo}
  		    #{update_packages_redhat_cmd}           
-            #{sudo('yum')} -y install puppet#{puppet_version}
+            #{sudo('yum')} -y install puppet#{puppet_redhat_version}
           fi
-         INSTALL
-         end		
-     end
+          # install chef omnibus so that busser works as this is needed to run tests :(
+          # TODO: work out how to install enough ruby
+          # and set busser: { :ruby_bindir => '/usr/bin/ruby' } so that we dont need the
+          # whole chef client
+          if [ ! -d "/opt/chef" ]
+          then
+            echo "-----> Installing Chef Omnibus"
+            curl -o /tmp/install.sh #{chef_url} 
+            #{sudo('sh')} /tmp/install.sh
+          fi
+          INSTALL
+        else
+		  info("Installing puppet, will try to determine platform os")
+          <<-INSTALL
+          if [ ! $(which puppet) ]; then
+		    if [ -f /etc/centos-release ] || [ -f /etc/redhat-release ]; then   
+               #{sudo('rpm')} -ivh #{puppet_yum_repo}
+ 		       #{update_packages_redhat_cmd}           
+               #{sudo('yum')} -y install puppet#{puppet_redhat_version}
+			else
+               #{sudo('wget')} #{puppet_apt_repo}
+               #{sudo('dpkg')} -i #{puppet_apt_repo_file}
+               #{update_packages_debian_cmd}
+               #{sudo('apt-get')} -y install puppet#{puppet_debian_version}
+            fi			
+          fi
+          # install chef omnibus so that busser works as this is needed to run tests :(
+          # TODO: work out how to install enough ruby
+          # and set busser: { :ruby_bindir => '/usr/bin/ruby' } so that we dont need the
+          # whole chef client
+          if [ ! -d "/opt/chef" ]
+          then
+            echo "-----> Installing Chef Omnibus"
+            curl -o /tmp/install.sh #{chef_url} 
+            #{sudo('sh')} /tmp/install.sh
+          fi
+          INSTALL
+		end  
+      end
 
         def init_command
           dirs = %w{modules manifests hiera hiera.yaml}.
@@ -187,13 +236,12 @@ module Kitchen
           config[:hiera_data_path]
         end
 
-        def puppet_version
-          case puppet_platform
-          when "debian", "ubuntu"
-            config[:puppet_version] ? "=#{config[:puppet_version]}" : nil
- 		  when "redhat", "centos", "fedora"
-            config[:puppet_version] ? "-#{config[:puppet_version]}" : nil
- 		  end	 
+        def puppet_debian_version
+          config[:puppet_version] ? "=#{config[:puppet_version]}" : nil
+		end
+		  
+ 		def puppet_redhat_version
+          config[:puppet_version] ? "-#{config[:puppet_version]}" : nil
         end
 
         def puppet_noop_flag
