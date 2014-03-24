@@ -33,6 +33,7 @@ module Kitchen
       default_config :puppet_omnibus_url, nil
       default_config :puppet_version, nil
       default_config :puppet_apt_repo, "http://apt.puppetlabs.com/puppetlabs-release-precise.deb"
+	  default_config :puppet_yum_repo, "https://yum.puppetlabs.com/puppetlabs-release-el-6.noarch.rpm"
 
       default_config :manifest, 'site.pp'
 
@@ -57,19 +58,32 @@ module Kitchen
       default_config :puppet_debug, false
       default_config :puppet_verbose, false
       default_config :puppet_noop, false
+	  default_config :puppet_platform, 'ubuntu'
       default_config :update_packages, true
+	  default_config :custom_facts, {}
 
       def install_command
         info('installing puppet')
-        <<-INSTALL
-        if [ ! $(which puppet) ]; then
-          #{sudo('wget')} #{puppet_apt_repo}
-          #{sudo('dpkg')} -i #{puppet_apt_repo_file}
-          #{update_packages_cmd}
-          #{sudo('apt-get')} install -y puppet#{puppet_version}
+        case puppet_platform
+        when "debian", "ubuntu"
+          <<-INSTALL
+          if [ ! $(which puppet) ]; then
+            #{sudo('wget')} #{puppet_apt_repo}
+            #{sudo('dpkg')} -i #{puppet_apt_repo_file}
+            #{update_packages_debian_cmd}
+            #{sudo('apt-get')} -y install puppet#{puppet_version}
           fi
-          INSTALL
-        end
+         INSTALL
+		when "redhat", "centos", "fedora"
+          <<-INSTALL		
+          if [ ! $(which puppet) ]; then
+            #{sudo('rpm')} -ivh #{puppet_yum_repo}
+ 		    #{update_packages_redhat_cmd}           
+            #{sudo('yum')} -y install puppet#{puppet_version}
+          fi
+         INSTALL
+         end		
+     end
 
         def init_command
           dirs = %w{modules manifests hiera hiera.yaml}.
@@ -174,7 +188,12 @@ module Kitchen
         end
 
         def puppet_version
-          config[:puppet_version] ? "=#{config[:puppet_version]}" : nil
+          case puppet_platform
+          when "debian", "ubuntu"
+            config[:puppet_version] ? "=#{config[:puppet_version]}" : nil
+ 		  when "redhat", "centos", "fedora"
+            config[:puppet_version] ? "-#{config[:puppet_version]}" : nil
+ 		  end	 
         end
 
         def puppet_noop_flag
@@ -188,10 +207,18 @@ module Kitchen
         def puppet_verbose_flag
           config[:puppet_verbose] ? '-v' : nil
         end
+		
+        def puppet_platform
+          config[:puppet_platform].to_s.downcase
+        end		
 
-        def update_packages_cmd
-          config[:update_packages] ? nil : "#{sudo('apt-get')} update"
+        def update_packages_debian_cmd
+          config[:update_packages] ? "#{sudo('apt-get')} -y update" : nil  
         end
+		
+		def update_packages_redhat_cmd
+          config[:update_packages] ? "#{sudo('yum')} -y update" : nil
+ 		end
 
         def custom_facts
           return nil if config[:custom_facts].none?
@@ -207,6 +234,10 @@ module Kitchen
 
         def puppet_apt_repo_file
           config[:puppet_apt_repo].split('/').last
+        end
+
+        def puppet_yum_repo
+          config[:puppet_yum_repo]
         end
 
         def prepare_manifests

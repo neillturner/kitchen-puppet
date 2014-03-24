@@ -4,7 +4,9 @@
 key | default value | Notes
 ----|---------------|--------
 puppet_version | "latest"| desired version, affects apt installs
+puppet_platform | "ubuntu"| OS platform of server 
 puppet_apt_repo | "http://apt.puppetlabs.com/puppetlabs-release-precise.deb"| apt repo
+puppet_yum_repo | "https://yum.puppetlabs.com/puppetlabs-release-el-6.noarch.rpm"| yum repo
 manifests_path | | puppet repo manifests directory
 manifest | 'site.pp' | manifest for puppet apply to run
 modules_path | | puppet repo manifests directory
