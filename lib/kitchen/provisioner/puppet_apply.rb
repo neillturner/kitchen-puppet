@@ -75,7 +75,7 @@ module Kitchen
 		if config[:require_puppet_omnibus]
 		  info("Installing puppet using puppet omnibus")
           version = if !config[:puppet_version].nil?
-            "-v #{config[:puppet_version].downcase}"
+            "-v #{config[:puppet_version]}"
           else
             ""
           end		  
