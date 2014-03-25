@@ -28,8 +28,7 @@ module Kitchen
       # Puppet module resolver that uses Librarian-Puppet and a Puppetfile to
       # calculate # dependencies.
       #
-      # @author Fletcher Nichol <fnichol@nichol.ca>
-      class Librarian
+       class Librarian
 
         include Logging
 
@@ -46,7 +45,7 @@ module Kitchen
 
         def resolve
           version = ::Librarian::Puppet::VERSION
-          info("Resolving cookbook dependencies with Librarian-Puppet #{version}...")
+          info("Resolving module dependencies with Librarian-Puppet #{version}...")
           debug("Using Puppetfile from #{puppetfile}")
 
           env = ::Librarian::Puppet::Environment.new(

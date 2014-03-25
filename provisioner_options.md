@@ -5,16 +5,21 @@ key | default value | Notes
 ----|---------------|--------
 puppet_version | "latest"| desired version, affects apt installs
 puppet_platform | naively tries to determine | OS platform of server 
+require_puppet_repo | true | Set if using a puppet install from yum or apt repo
 puppet_apt_repo | "http://apt.puppetlabs.com/puppetlabs-release-precise.deb"| apt repo
 puppet_yum_repo | "https://yum.puppetlabs.com/puppetlabs-release-el-6.noarch.rpm"| yum repo
+require_puppet_omnibus | false | Set if using omnibus puppet install
+puppet_omnibus_url | | omnibus puppet install location.
+puppet_omnibus_remote_path | "/opt/puppet" | Server Installation location of an omnibus puppet install.
 manifests_path | | puppet repo manifests directory
 manifest | 'site.pp' | manifest for puppet apply to run
 modules_path | | puppet repo manifests directory
-hiera_data_path | | puppet repo manifests directory
+hiera_data_path | | puppet repo hiera data directory
+hiera_data_remote_path | "/var/lib/hiera" | Hiera data directory on server
 puppet_debug| false| Enable full debugging logging
 puppet_verbose| false| Extra information logging
 puppet_noop| false| puppet runs in a no-op or dry-run mode
-update_packages| true| update OS packages before installing puppet
+update_package_repos| true| update OS repository metadata
 custom_facts| Hash.new | Hash to set the puppet facts before running puppet apply
 chef_bootstrap_url |"https://www.getchef.com/chef/install.sh"| the chef (needed for busser to run tests)
 
@@ -42,4 +47,4 @@ The provisioner can be configured globally or per suite, global settings act as 
      - name: default
 
 
-in this example, vagrant will download a box for ubuntu 1204 with no configuration management installed, then install the latest puppet and puppet apply against the puppet repo from the /repository/puppet_repo directory using the defailt manifest site.pp
+in this example, vagrant will download a box for ubuntu 1204 with no configuration management installed, then install the latest puppet and puppet apply against a puppet repo from the /repository/puppet_repo directory using the defailt manifest site.pp
