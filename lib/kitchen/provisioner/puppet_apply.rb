@@ -63,12 +63,28 @@ module Kitchen
         provisioner.calculate_path('hiera.yaml', :file)
       end
 
+      default_config :puppetfile_path do |provisioner|
+        provisioner.calculate_path('Puppetfile', :file)
+      end
+
       default_config :puppet_debug, false
       default_config :puppet_verbose, false
       default_config :puppet_noop, false
       default_config :puppet_platform, ''
       default_config :update_package_repos, true
       default_config :custom_facts, {}
+
+      def calculate_path(path, type = :directory)
+        base = File.join(config[:kitchen_root], 'puppet')
+        candidates = []
+        candidates << File.join(base, instance.suite.name, path)
+        candidates << File.join(base, path)
+        candidates << File.join(Dir.pwd, path)
+
+        candidates.find do |c|
+          type == :directory ? File.directory?(c) : File.file?(c)
+        end
+      end
 
       def install_command
         return unless config[:require_puppet_omnibus] or config[:require_puppet_repo]
@@ -236,7 +252,7 @@ module Kitchen
         end
 
         def puppetfile
-          File.join(config[:kitchen_root], 'Puppetfile')
+          config[:puppetfile_path] or ''
         end
 
         def manifest
