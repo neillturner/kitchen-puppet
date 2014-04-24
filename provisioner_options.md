@@ -55,7 +55,7 @@ To override a setting at the suite-level, specify the setting name under the sui
 
     suites:
      - name: default
-       manifest: default.yaml
+       manifest: foobar.pp
 
 ### Per-suite Structure
 
