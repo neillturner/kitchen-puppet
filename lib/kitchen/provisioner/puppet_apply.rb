@@ -353,7 +353,8 @@ module Kitchen
 
           tmp_modules_dir = File.join(sandbox_path, 'modules')
           FileUtils.mkdir_p(tmp_modules_dir)
-          FileUtils.cp_r(Dir.glob("#{modules}/*"), tmp_modules_dir)
+          FileUtils.cp_r(Dir.glob("#{modules}/*"), tmp_modules_dir,
+            :remove_destination => true)
         end
 
         def prepare_hiera_config
