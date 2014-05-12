@@ -58,7 +58,8 @@ module Kitchen
         attr_reader :puppetfile, :path, :logger
 
         def self.load_librarian!(logger)
-          first_load = require 'librarian/puppet/environment'
+          first_load = require 'librarian/puppet'
+          require 'librarian/puppet/environment'
           require 'librarian/action/resolve'
           require 'librarian/action/install'
 
