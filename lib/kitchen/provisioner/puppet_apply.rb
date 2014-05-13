@@ -55,12 +55,20 @@ module Kitchen
           raise 'No modules_path detected. Please specify one in .kitchen.yml'
       end
 
+      default_config :files_path do |provisioner|
+        provisioner.calculate_path('files')
+      end
+
       default_config :hiera_data_path do |provisioner|
         provisioner.calculate_path('hiera')
       end
 
       default_config :hiera_config_path do |provisioner|
         provisioner.calculate_path('hiera.yaml', :file)
+      end
+
+      default_config :fileserver_config_path do |provisioner|
+        provisioner.calculate_path('fileserver.conf', :file)
       end
 
       default_config :puppetfile_path do |provisioner|
@@ -163,9 +171,9 @@ module Kitchen
           end
 
         def init_command
-          dirs = %w{modules manifests hiera hiera.yaml}.
+          dirs = %w{modules manifests files hiera hiera.yaml}.
             map { |dir| File.join(config[:root_path], dir) }.join(" ")
-          cmd = "#{sudo('rm')} -rf #{dirs} #{hiera_data_remote_path} /etc/hiera.yaml /etc/puppet/hiera.yaml;"
+          cmd = "#{sudo('rm')} -rf #{dirs} #{hiera_data_remote_path} /etc/hiera.yaml /etc/puppet/hiera.yaml /etc/puppet/fileserver.conf;"
           cmd = cmd+" mkdir -p #{config[:root_path]}"
           debug(cmd)
           cmd
@@ -179,7 +187,9 @@ module Kitchen
 
           prepare_modules
           prepare_manifests
+          prepare_files
           prepare_hiera_config
+          prepare_fileserver_config
           prepare_hiera_data
           info('Finished Preparing files for transfer')
 
@@ -201,6 +211,14 @@ module Kitchen
 
             commands << [
               sudo('cp'), File.join(config[:root_path],'hiera.yaml'), '/etc/puppet/',
+            ].join(' ')
+          end
+
+          if fileserver_config
+            commands << [
+              sudo('cp'),
+              File.join(config[:root_path], 'fileserver.conf'),
+              '/etc/puppet',
             ].join(' ')
           end
 
@@ -232,6 +250,7 @@ module Kitchen
             File.join(config[:root_path], 'manifests', manifest),
             "--modulepath=#{File.join(config[:root_path], 'modules')}",
             "--manifestdir=#{File.join(config[:root_path], 'manifests')}",
+            "--fileserverconfig=#{File.join(config[:root_path], 'fileserver.conf')}",
             puppet_noop_flag,
             puppet_verbose_flag,
             puppet_debug_flag,
@@ -267,8 +286,16 @@ module Kitchen
           config[:modules_path]
         end
 
+        def files
+          config[:files_path]
+        end
+
         def hiera_config
           config[:hiera_config_path]
+        end
+
+        def fileserver_config
+          config[:fileserver_config_path]
         end
 
         def hiera_data
@@ -344,6 +371,15 @@ module Kitchen
           FileUtils.cp_r(Dir.glob("#{manifests}/*"), tmp_manifests_dir)
         end
 
+        def prepare_files
+          info('Preparing files')
+          debug("Using files from #{files}")
+
+          tmp_files_dir = File.join(sandbox_path, 'files')
+          FileUtils.mkdir_p(tmp_files_dir)
+          FileUtils.cp_r(Dir.glob("#{files}/*"), tmp_files_dir)
+        end
+
         def prepare_modules
           info('Preparing modules')
           if File.exists?(puppetfile)
@@ -364,6 +400,15 @@ module Kitchen
           debug("Using hiera from #{hiera_config}")
 
           FileUtils.cp_r(hiera_config, File.join(sandbox_path, 'hiera.yaml'))
+        end
+
+        def prepare_fileserver_config
+          return unless fileserver_config
+
+          info('Preparing fileserver')
+          debug("Using fileserver config from #{fileserver_config}")
+
+          FileUtils.cp_r(fileserver_config, File.join(sandbox_path, 'fileserver.conf'))
         end
 
         def prepare_hiera_data
