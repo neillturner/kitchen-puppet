@@ -14,6 +14,8 @@ puppet_omnibus_remote_path | "/opt/puppet" | Server Installation location of an 
 manifests_path | | puppet repo manifests directory
 manifest | 'site.pp' | manifest for puppet apply to run
 modules_path | | puppet repo manifests directory
+files_path | | directory to place at /tmp/kitchen/files
+fileserver_config_path | | file to place fileserver.conf
 hiera_data_path | | puppet repo hiera data directory
 hiera_data_remote_path | "/var/lib/hiera" | Hiera data directory on server
 puppet_debug| false| Enable full debugging logging
