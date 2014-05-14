@@ -104,9 +104,11 @@ module Kitchen
             ""
           end
           <<-INSTALL
+          #{Util.shell_helpers}
+
           if [ ! -d "#{config[:puppet_omnibus_remote_path]}" ]; then
             echo "-----> Installing Puppet Omnibus"
-            curl -o /tmp/puppet_install.sh #{config[:puppet_omnibus_url]}
+            do_download #{config[:puppet_omnibus_url]} /tmp/puppet_install.sh
             #{sudo('sh')} /tmp/puppet_install.sh #{version}
           fi
           #{install_busser}
@@ -157,6 +159,7 @@ module Kitchen
 
       def install_busser
           <<-INSTALL
+          #{Util.shell_helpers}
           # install chef omnibus so that busser works as this is needed to run tests :(
           # TODO: work out how to install enough ruby
           # and set busser: { :ruby_bindir => '/usr/bin/ruby' } so that we dont need the
@@ -164,7 +167,7 @@ module Kitchen
           if [ ! -d "/opt/chef" ]
           then
             echo "-----> Installing Chef Omnibus to install busser to run tests"
-            curl -o /tmp/install.sh #{chef_url}
+            do_download #{chef_url} /tmp/install.sh
             #{sudo('sh')} /tmp/install.sh
           fi
           INSTALL
