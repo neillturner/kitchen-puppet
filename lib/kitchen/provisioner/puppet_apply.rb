@@ -20,6 +20,7 @@
 # for documentation configuration parameters with puppet_apply provisioner.
 #
 
+require 'json'
 require 'kitchen/provisioner/base'
 require 'kitchen/provisioner/puppet/librarian'
 
@@ -73,6 +74,14 @@ module Kitchen
 
       default_config :puppetfile_path do |provisioner|
         provisioner.calculate_path('Puppetfile', :file)
+      end
+
+      default_config :modulefile_path do |provisioner|
+        provisioner.calculate_path('Modulefile', :file)
+      end
+
+      default_config :metadata_json_path do |provisioner|
+        provisioner.calculate_path('metadata.json', :file)
       end
 
       default_config :puppet_debug, false
@@ -277,6 +286,14 @@ module Kitchen
           config[:puppetfile_path] or ''
         end
 
+        def modulefile
+          config[:modulefile_path] or ''
+        end
+
+        def metadata_json
+          config[:metadata_json_path] or ''
+        end
+
         def manifest
           config[:manifest]
         end
@@ -388,12 +405,34 @@ module Kitchen
           if File.exists?(puppetfile)
             resolve_with_librarian
           end
+
           debug("Using modules from #{modules}")
 
           tmp_modules_dir = File.join(sandbox_path, 'modules')
           FileUtils.mkdir_p(tmp_modules_dir)
           FileUtils.cp_r(Dir.glob("#{modules}/*"), tmp_modules_dir,
             :remove_destination => true)
+
+          if File.exists?(modulefile)
+            warn("Modulefile found but this is depricated, ignoring it, see https://tickets.puppetlabs.com/browse/PUP-1188")
+          end
+
+          if File.exists?(metadata_json)
+            module_name = nil
+            begin
+              module_name = JSON.parse( IO.read(metadata_json) )['name'].split("/").last
+            rescue
+              error("not able to load or parse #{metadata_json_path} for the name of the module")
+            end
+
+            if module_name
+              module_target_path = File.join(tmp_modules_dir,module_name)
+              FileUtils.mkdir_p(module_target_path)
+              FileUtils.cp_r(Dir.glob("*").reject{|entry| entry =~ /modules/}, module_target_path,
+                :remove_destination => true)
+
+            end
+          end
         end
 
         def prepare_hiera_config
