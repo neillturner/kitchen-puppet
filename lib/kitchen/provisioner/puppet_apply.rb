@@ -107,8 +107,9 @@ module Kitchen
       default_config :custom_facts, {}
 
       def calculate_path(path, type = :directory)
-        base = File.join(config[:kitchen_root], 'puppet')
+        base = config[:test_base_path]
         candidates = []
+        candidates << File.join(base, instance.suite.name, 'puppet', path)
         candidates << File.join(base, instance.suite.name, path)
         candidates << File.join(base, path)
         candidates << File.join(Dir.pwd, path)
