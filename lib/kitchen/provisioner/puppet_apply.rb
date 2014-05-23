@@ -94,6 +94,11 @@ module Kitchen
         provisioner.calculate_path('metadata.json', :file)
       end
 
+      default_config :manifests_path do |provisioner|
+        provisioner.calculate_path('manifests', :directory)
+      end
+
+
       default_config :puppet_debug, false
       default_config :puppet_verbose, false
       default_config :puppet_noop, false
