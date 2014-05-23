@@ -424,11 +424,7 @@ module Kitchen
 
         def prepare_modules
           info('Preparing modules')
-          if File.exists?(puppetfile)
-            resolve_with_librarian
-          end
-
-          debug("Using modules from #{modules}")
+          resolve_with_librarian if File.exists?(puppetfile)
 
           tmp_modules_dir = File.join(sandbox_path, 'modules')
           FileUtils.mkdir_p(tmp_modules_dir)
