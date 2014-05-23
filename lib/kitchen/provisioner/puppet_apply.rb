@@ -26,6 +26,13 @@ require 'kitchen/provisioner/puppet/librarian'
 
 module Kitchen
 
+  class Busser
+
+    def non_suite_dirs
+      %w{data data_bags environments nodes roles puppet}
+    end
+  end
+
   module Provisioner
     #
     # Puppet Apply provisioner.
