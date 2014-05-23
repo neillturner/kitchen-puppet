@@ -64,7 +64,7 @@ module Kitchen
       end
 
       default_config :files_path do |provisioner|
-        provisioner.calculate_path('files')
+        provisioner.calculate_path('files') || 'files'
       end
 
       default_config :hiera_data_path do |provisioner|
@@ -314,7 +314,7 @@ module Kitchen
         end
 
         def files
-          config[:files_path]
+          config[:files_path] || 'files'
         end
 
         def hiera_config
@@ -400,6 +400,12 @@ module Kitchen
 
         def prepare_files
           info('Preparing files')
+
+          unless File.directory?(files)
+            info 'nothing to do for files'
+            return
+          end
+
           debug("Using files from #{files}")
 
           tmp_files_dir = File.join(sandbox_path, 'files')
