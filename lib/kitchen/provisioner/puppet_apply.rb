@@ -59,8 +59,11 @@ module Kitchen
       end
 
       default_config :modules_path do |provisioner|
-        provisioner.calculate_path('modules') or
+        modules_path = provisioner.calculate_path('modules')
+        if modules_path.nil? && provisioner.calculate_path('Puppetfile', :file).nil?
           raise 'No modules_path detected. Please specify one in .kitchen.yml'
+        end
+        modules_path
       end
 
       default_config :files_path do |provisioner|
