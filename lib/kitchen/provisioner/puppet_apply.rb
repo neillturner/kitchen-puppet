@@ -26,6 +26,13 @@ require 'kitchen/provisioner/puppet/librarian'
 
 module Kitchen
 
+  class Busser
+
+    def non_suite_dirs
+      %w{data data_bags environments nodes roles puppet}
+    end
+  end
+
   module Provisioner
     #
     # Puppet Apply provisioner.
@@ -52,12 +59,15 @@ module Kitchen
       end
 
       default_config :modules_path do |provisioner|
-        provisioner.calculate_path('modules') or
+        modules_path = provisioner.calculate_path('modules')
+        if modules_path.nil? && provisioner.calculate_path('Puppetfile', :file).nil?
           raise 'No modules_path detected. Please specify one in .kitchen.yml'
+        end
+        modules_path
       end
 
       default_config :files_path do |provisioner|
-        provisioner.calculate_path('files')
+        provisioner.calculate_path('files') || 'files'
       end
 
       default_config :hiera_data_path do |provisioner|
@@ -84,6 +94,11 @@ module Kitchen
         provisioner.calculate_path('metadata.json', :file)
       end
 
+      default_config :manifests_path do |provisioner|
+        provisioner.calculate_path('manifests', :directory)
+      end
+
+
       default_config :puppet_debug, false
       default_config :puppet_verbose, false
       default_config :puppet_noop, false
@@ -92,8 +107,9 @@ module Kitchen
       default_config :custom_facts, {}
 
       def calculate_path(path, type = :directory)
-        base = File.join(config[:kitchen_root], 'puppet')
+        base = config[:test_base_path]
         candidates = []
+        candidates << File.join(base, instance.suite.name, 'puppet', path)
         candidates << File.join(base, instance.suite.name, path)
         candidates << File.join(base, path)
         candidates << File.join(Dir.pwd, path)
@@ -307,7 +323,7 @@ module Kitchen
         end
 
         def files
-          config[:files_path]
+          config[:files_path] || 'files'
         end
 
         def hiera_config
@@ -393,6 +409,12 @@ module Kitchen
 
         def prepare_files
           info('Preparing files')
+
+          unless File.directory?(files)
+            info 'nothing to do for files'
+            return
+          end
+
           debug("Using files from #{files}")
 
           tmp_files_dir = File.join(sandbox_path, 'files')
@@ -402,35 +424,42 @@ module Kitchen
 
         def prepare_modules
           info('Preparing modules')
-          if File.exists?(puppetfile)
-            resolve_with_librarian
-          end
-
-          debug("Using modules from #{modules}")
+          resolve_with_librarian if File.exists?(puppetfile)
 
           tmp_modules_dir = File.join(sandbox_path, 'modules')
           FileUtils.mkdir_p(tmp_modules_dir)
-          FileUtils.cp_r(Dir.glob("#{modules}/*"), tmp_modules_dir,
-            :remove_destination => true)
 
+          if modules && File.directory?(modules)
+            debug("Using modules from #{modules}")
+            FileUtils.cp_r(Dir.glob("#{modules}/*"), tmp_modules_dir, remove_destination: true)
+          else
+            info 'nothing to do for modules'
+          end
+
+          copy_self_as_module
+        end
+
+        def copy_self_as_module
           if File.exists?(modulefile)
-            warn("Modulefile found but this is depricated, ignoring it, see https://tickets.puppetlabs.com/browse/PUP-1188")
+            warn('Modulefile found but this is depricated, ignoring it, see https://tickets.puppetlabs.com/browse/PUP-1188')
           end
 
           if File.exists?(metadata_json)
             module_name = nil
             begin
-              module_name = JSON.parse( IO.read(metadata_json) )['name'].split("/").last
+              module_name = JSON.parse(IO.read(metadata_json))['name'].split('/').last
             rescue
               error("not able to load or parse #{metadata_json_path} for the name of the module")
             end
 
             if module_name
-              module_target_path = File.join(tmp_modules_dir,module_name)
+              module_target_path = File.join(sandbox_path, 'modules', module_name)
               FileUtils.mkdir_p(module_target_path)
-              FileUtils.cp_r(Dir.glob("*").reject{|entry| entry =~ /modules/}, module_target_path,
-                :remove_destination => true)
-
+              FileUtils.cp_r(
+                Dir.glob(File.join(config[:kitchen_root], '*')).reject { |entry| entry =~ /modules/ },
+                module_target_path,
+                remove_destination: true
+              )
             end
           end
         end
