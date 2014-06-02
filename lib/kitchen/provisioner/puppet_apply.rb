@@ -424,7 +424,6 @@ module Kitchen
 
         def prepare_modules
           info('Preparing modules')
-          resolve_with_librarian if File.exists?(puppetfile)
 
           FileUtils.mkdir_p(tmpmodules_dir)
 
@@ -434,6 +433,8 @@ module Kitchen
           else
             info 'nothing to do for modules'
           end
+
+          resolve_with_librarian if File.exists?(puppetfile)
 
           copy_self_as_module
         end
