@@ -426,12 +426,11 @@ module Kitchen
           info('Preparing modules')
           resolve_with_librarian if File.exists?(puppetfile)
 
-          tmp_modules_dir = File.join(sandbox_path, 'modules')
-          FileUtils.mkdir_p(tmp_modules_dir)
+          FileUtils.mkdir_p(tmpmodules_dir)
 
           if modules && File.directory?(modules)
             debug("Using modules from #{modules}")
-            FileUtils.cp_r(Dir.glob("#{modules}/*"), tmp_modules_dir, remove_destination: true)
+            FileUtils.cp_r(Dir.glob("#{modules}/*"), tmpmodules_dir, remove_destination: true)
           else
             info 'nothing to do for modules'
           end
