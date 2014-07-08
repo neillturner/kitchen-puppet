@@ -74,6 +74,10 @@ module Kitchen
         provisioner.calculate_path('hiera')
       end
 
+      default_config :puppet_config_path do |provisioner|
+        provisioner.calculate_path('puppet.conf', :file)
+      end
+
       default_config :hiera_config_path do |provisioner|
         provisioner.calculate_path('hiera.yaml', :file)
       end
@@ -216,6 +220,7 @@ module Kitchen
           prepare_modules
           prepare_manifests
           prepare_files
+          prepare_puppet_config
           prepare_hiera_config
           prepare_fileserver_config
           prepare_hiera_data
@@ -231,6 +236,14 @@ module Kitchen
 
         def prepare_command
           commands = []
+
+          if puppet_config
+            commands << [
+              sudo('cp'),
+              File.join(config[:root_path], 'puppet.conf'),
+              '/etc/puppet',
+            ].join(' ')
+          end
 
           if hiera_config
             commands << [
@@ -324,6 +337,10 @@ module Kitchen
 
         def files
           config[:files_path] || 'files'
+        end
+
+        def puppet_config
+          config[:puppet_config_path]
         end
 
         def hiera_config
@@ -462,6 +479,15 @@ module Kitchen
               )
             end
           end
+        end
+
+        def prepare_puppet_config
+          return unless puppet_config
+
+          info('Preparing puppet.conf')
+          debug("Using puppet config from #{puppet_config}")
+
+          FileUtils.cp_r(puppet_config, File.join(sandbox_path, 'puppet.conf'))
         end
 
         def prepare_hiera_config
