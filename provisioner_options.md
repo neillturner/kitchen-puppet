@@ -16,6 +16,7 @@ manifest | 'site.pp' | manifest for puppet apply to run
 modules_path | | puppet repo manifests directory
 files_path | | directory to place at /tmp/kitchen/files
 fileserver_config_path | | file to place fileserver.conf
+hiera_config_path | | path to hiera.yaml
 hiera_data_path | | puppet repo hiera data directory
 hiera_data_remote_path | "/var/lib/hiera" | Hiera data directory on server
 puppet_debug| false| Enable full debugging logging
