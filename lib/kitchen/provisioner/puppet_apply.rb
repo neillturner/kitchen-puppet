@@ -50,6 +50,8 @@ module Kitchen
       default_config :puppet_yum_repo, "https://yum.puppetlabs.com/puppetlabs-release-el-6.noarch.rpm"
       default_config :chef_bootstrap_url, "https://www.getchef.com/chef/install.sh"
 
+      default_config :puppet_apply_command, nil
+
       default_config :hiera_data_remote_path, '/var/lib/hiera'
       default_config :manifest, 'site.pp'
 
@@ -271,18 +273,22 @@ module Kitchen
         end
 
         def run_command
-          [
-            custom_facts,
-            sudo('puppet'),
-            'apply',
-            File.join(config[:root_path], 'manifests', manifest),
-            "--modulepath=#{File.join(config[:root_path], 'modules')}",
-            "--manifestdir=#{File.join(config[:root_path], 'manifests')}",
-            "--fileserverconfig=#{File.join(config[:root_path], 'fileserver.conf')}",
-            puppet_noop_flag,
-            puppet_verbose_flag,
-            puppet_debug_flag,
-          ].join(" ")
+          if !config[:puppet_apply_command].nil?
+             return config[:puppet_apply_command]
+          else
+            [
+              custom_facts,
+              sudo('puppet'),
+              'apply',
+              File.join(config[:root_path], 'manifests', manifest),
+              "--modulepath=#{File.join(config[:root_path], 'modules')}",
+              "--manifestdir=#{File.join(config[:root_path], 'manifests')}",
+              "--fileserverconfig=#{File.join(config[:root_path], 'fileserver.conf')}",
+              puppet_noop_flag,
+              puppet_verbose_flag,
+              puppet_debug_flag,
+            ].join(" ")
+          end
         end
 
         protected
