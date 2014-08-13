@@ -200,6 +200,17 @@ module Kitchen
               #{install_busser}
               #{custom_install_command}
             INSTALL
+          when "windows"
+            info("Installing puppet on #{puppet_platform}")
+          <<-INSTALL
+            $webclient = New-Object System.Net.WebClient;  $webclient.DownloadFile('http://downloads.puppetlabs.com/windows/puppet-#{puppet_windows_version}.msi','puppet-#{puppet_windows_version}.msi')
+            msiexec /qn /i puppet-#{puppet_windows_version}.msi
+            Start-Sleep -s 60
+
+            cmd.exe /C "SET PATH=%PATH%;`"C:\\Program Files (x86)\\Puppet Labs\\Puppet\\bin`""
+
+            #{install_busser}
+          INSTALL
           else
             info('Installing puppet, will try to determine platform os')
             <<-INSTALL
@@ -228,6 +239,14 @@ module Kitchen
             INSTALL
           end
         end
+      end
+
+      def install_command_posh
+        install_command
+      end
+
+      def init_command_posh
+
       end
 
       def install_command_collections
@@ -315,6 +334,18 @@ module Kitchen
 
       def install_busser
         return unless config[:require_chef_for_busser]
+        info("Install busser on #{puppet_platform}")
+        case puppet_platform
+        when 'windows'
+          #https://raw.githubusercontent.com/opscode/knife-windows/master/lib/chef/knife/bootstrap/windows-chef-client-msi.erb
+          <<-INSTALL
+           $webclient = New-Object System.Net.WebClient;  $webclient.DownloadFile('https://opscode-omnibus-packages.s3.amazonaws.com/windows/2008r2/x86_64/chef-windows-11.12.8-1.windows.msi','chef-windows-11.12.8-1.windows.msi')
+           msiexec /qn /i chef-windows-11.12.8-1.windows.msi
+
+           cmd.exe /C "SET PATH=%PATH%;`"C:\\opscode\\chef\\embedded\\bin`";`"C:\\tmp\\busser\\gems\\bin`""
+
+          INSTALL
+        else
         <<-INSTALL
           #{Util.shell_helpers}
           # install chef omnibus so that busser works as this is needed to run tests :(
@@ -330,6 +361,7 @@ module Kitchen
             #{sudo('sh')} /tmp/install.sh
           fi
         INSTALL
+      end
       end
 
       def install_hiera
@@ -539,7 +571,7 @@ module Kitchen
             puppet_noop_flag,
             puppet_detailed_exitcodes_flag,
             puppet_verbose_flag,
-            puppet_debug_flag,
+            puppet_debug_flag
             puppet_logdest_flag,
             puppet_whitelist_exit_code
           ].join(' ')
@@ -574,6 +606,9 @@ module Kitchen
       end
 
       def manifest
+          info("LBENNETT test")
+          info(config[:manifest])
+          info(diagnose)
         config[:manifest]
       end
 
@@ -704,6 +739,10 @@ module Kitchen
       def custom_options
         config[:custom_options] || ''
       end
+
+        def puppet_windows_version
+          config[:puppet_version] ? "#{config[:puppet_version]}" : nil
+        end
 
       def puppet_noop_flag
         config[:puppet_noop] ? '--noop' : nil
