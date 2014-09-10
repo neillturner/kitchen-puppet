@@ -151,6 +151,7 @@ module Kitchen
             #{sudo('wget')} #{puppet_apt_repo}
             #{sudo('dpkg')} -i #{puppet_apt_repo_file}
             #{update_packages_debian_cmd}
+            #{sudo('apt-get')} -y install puppet-common#{puppet_debian_version}
             #{sudo('apt-get')} -y install puppet#{puppet_debian_version}
           fi
           #{install_busser}
@@ -177,6 +178,7 @@ module Kitchen
                #{sudo('wget')} #{puppet_apt_repo}
                #{sudo('dpkg')} -i #{puppet_apt_repo_file}
                #{update_packages_debian_cmd}
+               #{sudo('apt-get')} -y install puppet-common#{puppet_debian_version}
                #{sudo('apt-get')} -y install puppet#{puppet_debian_version}
             fi
           fi

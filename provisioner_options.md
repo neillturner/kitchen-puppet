@@ -3,7 +3,7 @@
 
 key | default value | Notes
 ----|---------------|--------
-puppet_version | "latest"| desired version, affects apt installs
+puppet_version | "latest"| desired version, affects apt installs.
 puppet_platform | naively tries to determine | OS platform of server
 require_puppet_repo | true | Set if using a puppet install from yum or apt repo
 puppet_apt_repo | "http://apt.puppetlabs.com/puppetlabs-release-precise.deb"| apt repo
@@ -69,3 +69,8 @@ It can be beneficial to keep different Puppet layouts for different suites. Rath
     $kitchen_root/puppet/$suite_name/hiera
     $kitchen_root/puppet/$suite_name/hiera.yaml
     $kitchen_root/puppet/$suite_name/Puppetfile
+
+### Puppet Version
+When specifying a puppet version, you must use this format: "3.6.2-1puppetlabs1". I have
+no idea why Puppet versioned their repository with a trailing
+"-1puppetlabs1", but there it is. 

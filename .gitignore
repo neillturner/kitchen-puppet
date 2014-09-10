@@ -2,6 +2,9 @@
 
 Gemfile.lock
 
+# Also ignore any locally built gems
+*.gem
+
 # And because this is Ruby, ignore the following
 #  (source: https://github.com/github/gitignore/blob/master/Ruby.gitignore):
 
