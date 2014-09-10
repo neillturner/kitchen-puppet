@@ -19,14 +19,16 @@ fileserver_config_path | | file to place fileserver.conf
 hiera_config_path | | path to hiera.yaml
 hiera_data_path | | puppet repo hiera data directory
 hiera_data_remote_path | "/var/lib/hiera" | Hiera data directory on server
-puppet_debug| false| Enable full debugging logging
-puppet_verbose| false| Extra information logging
+puppet_debug| false| Enable full debugging logging on puppet run
+puppet_verbose| false| Extra information logging on puppet run
 puppet_noop| false| puppet runs in a no-op or dry-run mode
 update_package_repos| true| update OS repository metadata
 custom_facts| Hash.new | Hash to set the puppet facts before running puppet apply
 chef_bootstrap_url |"https://www.getchef.com/chef/install.sh"| the chef (needed for busser to run tests)
 puppetfile_path | | Path to Puppetfile
 puppet_apply_command | nil | Overwrite the puppet apply command. Needs "sudo -E puppet apply" as a prefix. 
+require_chef_for_busser | true | Install chef as currently needed by busser to run tests 
+resolve_with_librarian_puppet | true | Use librarian_puppet to resolve modules if a Puppetfile is found 
 
 ## Configuring Provisioner Options
 

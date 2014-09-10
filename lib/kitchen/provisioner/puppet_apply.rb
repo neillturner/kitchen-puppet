@@ -46,6 +46,8 @@ module Kitchen
       default_config :puppet_omnibus_remote_path, '/opt/puppet'
       default_config :puppet_version, nil
       default_config :require_puppet_repo, true
+      default_config :require_chef_for_busser, true
+	  default_config :resolve_with_librarian_puppet, true	  
       default_config :puppet_apt_repo, "http://apt.puppetlabs.com/puppetlabs-release-precise.deb"
       default_config :puppet_yum_repo, "https://yum.puppetlabs.com/puppetlabs-release-el-6.noarch.rpm"
       default_config :chef_bootstrap_url, "https://www.getchef.com/chef/install.sh"
@@ -191,6 +193,7 @@ module Kitchen
       end
 
       def install_busser
+	    if config[:require_chef_for_busser]
           <<-INSTALL
           #{Util.shell_helpers}
           # install chef omnibus so that busser works as this is needed to run tests :(
@@ -204,7 +207,10 @@ module Kitchen
             #{sudo('sh')} /tmp/install.sh
           fi
           INSTALL
-          end
+        end
+	  end	
+		  
+		  
 
         def init_command
           dirs = %w{modules manifests files hiera hiera.yaml}.
@@ -309,7 +315,7 @@ module Kitchen
         protected
 
         def load_needed_dependencies!
-          if File.exists?(puppetfile)
+          if File.exists?(puppetfile) and config[:resolve_with_librarian_puppet]
             debug("Puppetfile found at #{puppetfile}, loading Librarian-Puppet")
             Puppet::Librarian.load!(logger)
           end
@@ -451,15 +457,15 @@ module Kitchen
           info('Preparing modules')
 
           FileUtils.mkdir_p(tmpmodules_dir)
+		  
+		  resolve_with_librarian if File.exists?(puppetfile) and config[:resolve_with_librarian_puppet]
 
           if modules && File.directory?(modules)
-            debug("Using modules from #{modules}")
+            debug("Copying modules from #{modules} to #{tmpmodules_dir}")
             FileUtils.cp_r(Dir.glob("#{modules}/*"), tmpmodules_dir, remove_destination: true)
           else
             info 'nothing to do for modules'
           end
-
-          resolve_with_librarian if File.exists?(puppetfile)
 
           copy_self_as_module
         end
@@ -519,9 +525,9 @@ module Kitchen
         def prepare_hiera_data
           return unless hiera_data
           info('Preparing hiera data')
-          debug("Using hiera data from #{hiera_data}")
-
-          tmp_hiera_dir = File.join(sandbox_path, 'hiera')
+		  
+		  tmp_hiera_dir = File.join(sandbox_path, 'hiera')
+		  debug("Copying hiera data from #{hiera_data} to #{tmp_hiera_dir}")
           FileUtils.mkdir_p(tmp_hiera_dir)
           FileUtils.cp_r(Dir.glob("#{hiera_data}/*"), tmp_hiera_dir)
         end
