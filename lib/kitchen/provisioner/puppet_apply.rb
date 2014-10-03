@@ -47,7 +47,8 @@ module Kitchen
       default_config :puppet_version, nil
       default_config :require_puppet_repo, true
       default_config :require_chef_for_busser, true
-	  default_config :resolve_with_librarian_puppet, true	  
+      default_config :resolve_with_librarian_puppet, true
+      default_config :puppet_environment, nil
       default_config :puppet_apt_repo, "http://apt.puppetlabs.com/puppetlabs-release-precise.deb"
       default_config :puppet_yum_repo, "https://yum.puppetlabs.com/puppetlabs-release-el-6.noarch.rpm"
       default_config :chef_bootstrap_url, "https://www.getchef.com/chef/install.sh"
@@ -305,6 +306,7 @@ module Kitchen
               "--modulepath=#{File.join(config[:root_path], 'modules')}",
               "--manifestdir=#{File.join(config[:root_path], 'manifests')}",
               "--fileserverconfig=#{File.join(config[:root_path], 'fileserver.conf')}",
+              puppet_environment_flag,
               puppet_noop_flag,
               puppet_verbose_flag,
               puppet_debug_flag,
@@ -356,7 +358,11 @@ module Kitchen
         def puppet_config
           config[:puppet_config_path]
         end
-
+        
+        def puppet_environment
+          config[:puppet_environment]
+        end
+        
         def hiera_config
           config[:hiera_config_path]
         end
@@ -379,6 +385,10 @@ module Kitchen
 
         def puppet_redhat_version
           config[:puppet_version] ? "-#{config[:puppet_version]}" : nil
+        end
+
+        def puppet_environment_flag
+          config[:puppet_environment] ? "--environment=#{config[:puppet_environment]}" : nil
         end
 
         def puppet_noop_flag

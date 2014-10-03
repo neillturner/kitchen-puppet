@@ -29,6 +29,8 @@ puppetfile_path | | Path to Puppetfile
 puppet_apply_command | nil | Overwrite the puppet apply command. Needs "sudo -E puppet apply" as a prefix. 
 require_chef_for_busser | true | Install chef as currently needed by busser to run tests 
 resolve_with_librarian_puppet | true | Use librarian_puppet to resolve modules if a Puppetfile is found 
+puppet_config_path | | path of custom puppet.conf file 
+puppet_environment | nil | puppet environment for running puppet apply 
 
 ## Configuring Provisioner Options
 
