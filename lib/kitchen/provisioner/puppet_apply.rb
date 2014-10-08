@@ -502,7 +502,7 @@ module Kitchen
           if File.exists?(metadata_json)
             module_name = nil
             begin
-              module_name = JSON.parse(IO.read(metadata_json))['name'].split('/').last
+              module_name = JSON.parse(IO.read(metadata_json))['name'].split('-').last
             rescue
               error("not able to load or parse #{metadata_json_path} for the name of the module")
             end
