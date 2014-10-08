@@ -31,6 +31,7 @@ require_chef_for_busser | true | Install chef as currently needed by busser to r
 resolve_with_librarian_puppet | true | Use librarian_puppet to resolve modules if a Puppetfile is found 
 puppet_config_path | | path of custom puppet.conf file 
 puppet_environment | nil | puppet environment for running puppet apply 
+remove_puppet_repo | false | remove copy of puppet repository on server after running puppet
 
 ## Configuring Provisioner Options
 

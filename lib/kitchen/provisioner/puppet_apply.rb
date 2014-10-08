@@ -113,6 +113,7 @@ module Kitchen
       default_config :puppet_noop, false
       default_config :puppet_platform, ''
       default_config :update_package_repos, true
+      default_config :remove_puppet_repo, false
       default_config :custom_facts, {}
 
       def calculate_path(path, type = :directory)
@@ -244,7 +245,7 @@ module Kitchen
           debug("Cleaning up local sandbox in #{sandbox_path}")
           FileUtils.rmtree(sandbox_path)
         end
-
+        
         def prepare_command
           commands = []
 
@@ -310,6 +311,7 @@ module Kitchen
               puppet_noop_flag,
               puppet_verbose_flag,
               puppet_debug_flag,
+              remove_repo
             ].join(" ")
           end
         end
@@ -414,7 +416,11 @@ module Kitchen
         def update_packages_redhat_cmd
           config[:update_package_repos] ? "#{sudo('yum')} makecache" : nil
         end
-
+        
+        def remove_puppet_repo
+          config[:remove_puppet_repo]
+        end
+        
         def custom_facts
           return nil if config[:custom_facts].none?
           bash_vars = config[:custom_facts].map { |k,v| "FACTER_#{k}=#{v}" }.join(" ")
@@ -423,6 +429,14 @@ module Kitchen
           bash_vars
         end
 
+        def remove_repo
+          if remove_puppet_repo
+            '; rm -rf /tmp/kitchen' 
+          else 
+            nil
+          end
+        end
+        
         def puppet_apt_repo
           config[:puppet_apt_repo]
         end
