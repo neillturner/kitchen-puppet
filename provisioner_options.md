@@ -115,7 +115,7 @@ require_chef_for_busser | true | Install chef as currently needed by busser to r
 puppet_config_path | | path of custom puppet.conf file 
 
 
-## Puppet Apply Configuring Provisioner Options
+## Puppet Agent Configuring Provisioner Options
 
 The provisioner can be configured globally or per suite, global settings act as defaults for all suites, you can then customise per suite, for example:
 

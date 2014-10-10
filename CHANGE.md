@@ -1,3 +1,10 @@
+v0.0.15
+* Add Puppet Agent support 
+
+v0.0.14
+* Add Puppet environment option 
+
+
 v0.0.13
 * Resolve with librarian-puppet moved back to *before* copying modules directory as librarian-puppet was clobbering the copied modules.
   Note: you should adopt a naming convention where the modules in the modules directory are prefix with a company prefix so they don't 
