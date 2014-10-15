@@ -143,11 +143,17 @@ module Kitchen
                #{update_packages_redhat_cmd}
                #{sudo('yum')} -y install puppet#{puppet_redhat_version}
             else
-               #{sudo('wget')} #{puppet_apt_repo}
-               #{sudo('dpkg')} -i #{puppet_apt_repo_file}
-               #{update_packages_debian_cmd}
-               #{sudo('apt-get')} -y install puppet-common#{puppet_debian_version}
-               #{sudo('apt-get')} -y install puppet#{puppet_debian_version}
+               if [ -f /etc/system-release ] || grep -q 'Amazon Linux' /etc/system-release; then 
+                  #{sudo('rpm')} -ivh #{puppet_yum_repo}
+                  #{update_packages_redhat_cmd}
+                  #{sudo('yum')} -y install puppet#{puppet_redhat_version}            
+               else
+                  #{sudo('wget')} #{puppet_apt_repo}
+                  #{sudo('dpkg')} -i #{puppet_apt_repo_file}
+                  #{update_packages_debian_cmd}
+                  #{sudo('apt-get')} -y install puppet-common#{puppet_debian_version}
+                  #{sudo('apt-get')} -y install puppet#{puppet_debian_version}
+               fi   
             fi
           fi
           #{install_busser}
