@@ -29,9 +29,13 @@ puppetfile_path | | Path to Puppetfile
 puppet_apply_command | nil | Overwrite the puppet apply command. Needs "sudo -E puppet apply" as a prefix. 
 require_chef_for_busser | true | Install chef as currently needed by busser to run tests 
 resolve_with_librarian_puppet | true | Use librarian_puppet to resolve modules if a Puppetfile is found 
+librarian_puppet_ssl_file | nil | ssl certificate file for librarian-puppet
 puppet_config_path | | path of custom puppet.conf file 
 puppet_environment | nil | puppet environment for running puppet apply 
-remove_puppet_repo | false | remove copy of puppet repository on server after running puppet
+remove_puppet_repo | false | remove copy of puppet repository and puppet configuration on server after running puppet
+hiera_eyaml | false | use hiera-eyaml to encrypt hiera data
+hiera_eyaml_key_remote_path | "/etc/puppet/secure/keys" | directory of hiera-eyaml keys on server
+hiera_eyaml_key_path  | "hiera_keys" | directory of hiera-eyaml keys on workstation
 
 ## Puppet Apply Configuring Provisioner Options
 

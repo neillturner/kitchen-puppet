@@ -1,9 +1,13 @@
+v0.0.16
+* Add hiera-eyaml support for encrypted hiera data
+* improve removed repo option to remove puppet configuration
+* Add option to configured SSL certificate when calling librarian-puppet
+
 v0.0.15
 * Add Puppet Agent support 
 
 v0.0.14
 * Add Puppet environment option 
-
 
 v0.0.13
 * Resolve with librarian-puppet moved back to *before* copying modules directory as librarian-puppet was clobbering the copied modules.

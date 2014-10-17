@@ -78,7 +78,7 @@ module Kitchen
       default_config :hiera_data_path do |provisioner|
         provisioner.calculate_path('hiera')
       end
-
+      
       default_config :puppet_config_path do |provisioner|
         provisioner.calculate_path('puppet.conf', :file)
       end
@@ -115,6 +115,14 @@ module Kitchen
       default_config :update_package_repos, true
       default_config :remove_puppet_repo, false
       default_config :custom_facts, {}
+      default_config :librarian_puppet_ssl_file, nil
+      
+      default_config :hiera_eyaml, false
+      default_config :hiera_eyaml_key_remote_path, '/etc/puppet/secure/keys'
+      
+      default_config :hiera_eyaml_key_path do |provisioner|
+         provisioner.calculate_path('hiera_keys')
+      end 
 
       def calculate_path(path, type = :directory)
         base = config[:test_base_path]
@@ -181,7 +189,7 @@ module Kitchen
                #{update_packages_redhat_cmd}
                #{sudo('yum')} -y install puppet#{puppet_redhat_version}
             else
-               if [ -f /etc/system-release ] || grep -q 'Amazon Linux' /etc/system-release; then 
+               if [ -f /etc/system-release ] || [ grep -q 'Amazon Linux' /etc/system-release ]; then 
                   #{sudo('rpm')} -ivh #{puppet_yum_repo}
                   #{update_packages_redhat_cmd}
                   #{sudo('yum')} -y install puppet#{puppet_redhat_version}            
@@ -194,11 +202,24 @@ module Kitchen
                fi   
             fi
           fi
+          #{install_eyaml}
           #{install_busser}
           INSTALL
          end
         end
       end
+      
+     def install_eyaml
+	if config[:hiera_eyaml]
+          <<-INSTALL
+          # A backend for Hiera that provides per-value asymmetric encryption of sensitive data
+          if [[ $(#{sudo('gem')} list hiera-eyaml -i) == 'false' ]]; then 
+            echo "-----> Installing hiera-eyaml to provide encryption of hiera data"
+            #{sudo('gem')} install --no-ri --no-rdoc hiera-eyaml
+          fi 
+          INSTALL
+        end
+      end            
 
       def install_busser
 	    if config[:require_chef_for_busser]
@@ -222,7 +243,7 @@ module Kitchen
 
         def init_command
           dirs = %w{modules manifests files hiera hiera.yaml}.
-            map { |dir| File.join(config[:root_path], dir) }.join(" ")
+          map { |dir| File.join(config[:root_path], dir) }.join(" ")
           cmd = "#{sudo('rm')} -rf #{dirs} #{hiera_data_remote_path} /etc/hiera.yaml /etc/puppet/hiera.yaml /etc/puppet/fileserver.conf;"
           cmd = cmd+" mkdir -p #{config[:root_path]}"
           debug(cmd)
@@ -291,8 +312,17 @@ module Kitchen
             commands << [
               sudo('mkdir -p'), hiera_data_remote_path
             ].join(' ')
-                        commands << [
+            commands << [
               sudo('cp -r'), File.join(config[:root_path], 'hiera/*'), hiera_data_remote_path
+            ].join(' ')
+          end
+
+          if hiera_eyaml 
+            commands << [
+              sudo('mkdir -p'), hiera_eyaml_key_remote_path
+            ].join(' ')
+            commands << [
+              sudo('cp -r'), File.join(config[:root_path], 'hiera_keys/*'), hiera_eyaml_key_remote_path
             ].join(' ')
           end
 
@@ -386,6 +416,22 @@ module Kitchen
         def hiera_data_remote_path
           config[:hiera_data_remote_path]
         end
+        
+        def hiera_eyaml
+	  config[:hiera_eyaml]
+	end        
+        
+        def hiera_eyaml_key_path
+	  config[:hiera_eyaml_key_path]
+	end
+
+        def hiera_eyaml_key_remote_path
+	  config[:hiera_eyaml_key_remote_path]
+	end
+
+        def librarian_puppet_ssl_file
+	  config[:librarian_puppet_ssl_file]
+	end
 
         def puppet_debian_version
           config[:puppet_version] ? "=#{config[:puppet_version]}" : nil
@@ -437,8 +483,8 @@ module Kitchen
 
         def remove_repo
           if remove_puppet_repo
-            '; rm -rf /tmp/kitchen' 
-          else 
+            "; #{sudo('rm')} -rf /tmp/kitchen #{hiera_data_remote_path} #{hiera_eyaml_key_remote_path} /etc/puppet/* " 
+          else  
             nil
           end
         end
@@ -488,7 +534,7 @@ module Kitchen
 
           FileUtils.mkdir_p(tmpmodules_dir)
 		  
-		  resolve_with_librarian if File.exists?(puppetfile) and config[:resolve_with_librarian_puppet]
+	  resolve_with_librarian if File.exists?(puppetfile) and config[:resolve_with_librarian_puppet]
 
           if modules && File.directory?(modules)
             debug("Copying modules from #{modules} to #{tmpmodules_dir}")
@@ -555,16 +601,22 @@ module Kitchen
         def prepare_hiera_data
           return unless hiera_data
           info('Preparing hiera data')
-		  
-		  tmp_hiera_dir = File.join(sandbox_path, 'hiera')
-		  debug("Copying hiera data from #{hiera_data} to #{tmp_hiera_dir}")
+	  tmp_hiera_dir = File.join(sandbox_path, 'hiera')
+	  debug("Copying hiera data from #{hiera_data} to #{tmp_hiera_dir}")
           FileUtils.mkdir_p(tmp_hiera_dir)
           FileUtils.cp_r(Dir.glob("#{hiera_data}/*"), tmp_hiera_dir)
+          return unless hiera_eyaml_key_path
+          tmp_hiera_key_dir = File.join(sandbox_path, 'hiera_keys')
+	  debug("Copying hiera eyaml keys from #{hiera_eyaml_key_path} to #{tmp_hiera_key_dir}")
+	  FileUtils.mkdir_p(tmp_hiera_key_dir)
+          FileUtils.cp_r(Dir.glob("#{hiera_eyaml_key_path}/*"), tmp_hiera_key_dir)
         end
 
         def resolve_with_librarian
           Kitchen.mutex.synchronize do
+            ENV["SSL_CERT_FILE"]=librarian_puppet_ssl_file if librarian_puppet_ssl_file
             Puppet::Librarian.new(puppetfile, tmpmodules_dir, logger).resolve
+            ENV["SSL_CERT_FILE"]='' if librarian_puppet_ssl_file
           end
         end
     end
