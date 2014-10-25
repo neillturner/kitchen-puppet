@@ -36,6 +36,7 @@ remove_puppet_repo | false | remove copy of puppet repository and puppet configu
 hiera_eyaml | false | use hiera-eyaml to encrypt hiera data
 hiera_eyaml_key_remote_path | "/etc/puppet/secure/keys" | directory of hiera-eyaml keys on server
 hiera_eyaml_key_path  | "hiera_keys" | directory of hiera-eyaml keys on workstation
+facter_file | nil | yaml file of custom facter_files to be provided to the puppet-apply command
 
 ## Puppet Apply Configuring Provisioner Options
 

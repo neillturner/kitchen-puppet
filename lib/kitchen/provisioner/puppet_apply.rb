@@ -115,6 +115,7 @@ module Kitchen
       default_config :update_package_repos, true
       default_config :remove_puppet_repo, false
       default_config :custom_facts, {}
+      default_config :facter_file, nil
       default_config :librarian_puppet_ssl_file, nil
       
       default_config :hiera_eyaml, false
@@ -337,6 +338,7 @@ module Kitchen
           else
             [
               custom_facts,
+              facter_facts,
               sudo('puppet'),
               'apply',
               File.join(config[:root_path], 'manifests', manifest),
@@ -479,6 +481,17 @@ module Kitchen
           bash_vars = "export #{bash_vars};"
           debug(bash_vars)
           bash_vars
+        end
+
+        def facter_facts
+          return nil unless config[:facter_file]
+          fact_vars = "export "
+          fact_hash = YAML.load_file(config[:facter_file])
+          fact_hash.each do |key, value|
+            fact_vars << "FACTER_#{key}=#{value} "
+          end
+          fact_vars << ";"
+          fact_vars
         end
 
         def remove_repo
