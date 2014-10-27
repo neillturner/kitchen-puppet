@@ -1,5 +1,5 @@
 AllCops:
-  Excludes:
+  Exclude:
     - vendor/**
 
 Documentation:
@@ -13,6 +13,8 @@ HashSyntax:
 LineLength:
   Enabled: false
 MethodLength:
-  Max: 30
+  Enabled: false
+ClassLength:
+  Enabled: false
 NumericLiterals:
   MinDigits: 10
