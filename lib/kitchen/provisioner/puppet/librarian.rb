@@ -20,18 +20,13 @@ require 'kitchen/errors'
 require 'kitchen/logging'
 
 module Kitchen
-
   module Provisioner
-
     module Puppet
-
       # Puppet module resolver that uses Librarian-Puppet and a Puppetfile to
       # calculate # dependencies.
       #
-       class Librarian
-
+      class Librarian
         include Logging
-
 
         def initialize(puppetfile, path, logger = Kitchen.logger)
           @puppetfile   = puppetfile
@@ -49,8 +44,8 @@ module Kitchen
           debug("Using Puppetfile from #{puppetfile}")
 
           env = ::Librarian::Puppet::Environment.new(
-            :project_path => File.dirname(puppetfile))
-          env.config_db.local["path"] = path
+            project_path: File.dirname(puppetfile))
+          env.config_db.local['path'] = path
           ::Librarian::Action::Resolve.new(env).run
           ::Librarian::Action::Install.new(env).run
         end
@@ -70,12 +65,12 @@ module Kitchen
             logger.debug("Librarian-Puppet #{version} previously loaded")
           end
         rescue LoadError => e
-          logger.fatal("The `librarian-puppet' gem is missing and must be installed" +
-            " or cannot be properly activated. Run" +
-            " `gem install librarian-puppet` or add the following to your" +
+          logger.fatal("The `librarian-puppet' gem is missing and must be installed" \
+            ' or cannot be properly activated. Run' \
+            ' `gem install librarian-puppet` or add the following to your' \
             " Gemfile if you are using Bundler: `gem 'librarian-puppet'`.")
           raise UserError,
-            "Could not load or activate Librarian-Puppet (#{e.message})"
+                "Could not load or activate Librarian-Puppet (#{e.message})"
         end
       end
     end

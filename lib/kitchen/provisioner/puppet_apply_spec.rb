@@ -24,10 +24,10 @@ require 'kitchen/provisioner/puppet_apply'
 
 describe Kitchen::Provisioner::PuppetApply do
   let(:provisioner) do
-    Kitchen::Provisioner.for_plugin("puppet_apply", {})
+    Kitchen::Provisioner.for_plugin('puppet_apply', {})
   end
 
-  it "should give a sane run_command" do
-    provisioner.run_command.must_match /puppet apply/
+  it 'should give a sane run_command' do
+    provisioner.run_command.must_match 'puppet apply'
   end
 end

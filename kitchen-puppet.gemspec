@@ -1,16 +1,16 @@
 # encoding: utf-8
 
-$:.unshift File.expand_path('../lib', __FILE__)
+$LOAD_PATH.unshift File.expand_path('../lib', __FILE__)
 require 'kitchen-puppet/version'
 
 Gem::Specification.new do |s|
-  s.name          = "kitchen-puppet"
+  s.name          = 'kitchen-puppet'
   s.version       = Kitchen::Puppet::VERSION
-  s.authors       = ["Neill Turner"]
-  s.email         = ["neillwturner@gmail.com"]
-  s.homepage      = "https://github.com/neillturner/kitchen-puppet"
-  s.summary       = "puppet provisioner for test-kitchen"
-  candidates = Dir.glob("{lib}/**/*") +  ['README.md', 'provisioner_options.md', 'kitchen-puppet.gemspec']
+  s.authors       = ['Neill Turner']
+  s.email         = ['neillwturner@gmail.com']
+  s.homepage      = 'https://github.com/neillturner/kitchen-puppet'
+  s.summary       = 'puppet provisioner for test-kitchen'
+  candidates = Dir.glob('{lib}/**/*') +  ['README.md', 'provisioner_options.md', 'kitchen-puppet.gemspec']
   s.files = candidates.sort
   s.platform      = Gem::Platform::RUBY
   s.require_paths = ['lib']
