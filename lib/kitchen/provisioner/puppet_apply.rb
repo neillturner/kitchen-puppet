@@ -351,7 +351,7 @@ module Kitchen
       protected
 
       def load_needed_dependencies!
-        return unless File.exist(puppetfile)
+        return unless File.exist?(puppetfile)
         return unless config[:resolve_with_librarian_puppet]
         debug("Puppetfile found at #{puppetfile}, loading Librarian-Puppet")
         Puppet::Librarian.load!(logger)
@@ -556,7 +556,7 @@ module Kitchen
           warn('Modulefile found but this is depricated, ignoring it, see https://tickets.puppetlabs.com/browse/PUP-1188')
         end
 
-        return unless File.exist(metadata_json)
+        return unless File.exist?(metadata_json)
         module_name = nil
         begin
           module_name = JSON.parse(IO.read(metadata_json))['name'].split('-').last
