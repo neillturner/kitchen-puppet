@@ -1,3 +1,12 @@
+v0.0.18
+* Add http_proxy support 
+
+v0.0.17
+* Syntax fix with file resource
+* Update and Fix all syntax errors
+* Adds facter_file config parameter to puppet_apply
+* Regex fix when testing module in kitchen_root
+
 v0.0.16
 * Add hiera-eyaml support for encrypted hiera data
 * improve removed repo option to remove puppet configuration

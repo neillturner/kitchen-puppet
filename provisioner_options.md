@@ -37,6 +37,7 @@ hiera_eyaml | false | use hiera-eyaml to encrypt hiera data
 hiera_eyaml_key_remote_path | "/etc/puppet/secure/keys" | directory of hiera-eyaml keys on server
 hiera_eyaml_key_path  | "hiera_keys" | directory of hiera-eyaml keys on workstation
 facter_file | nil | yaml file of custom facter_files to be provided to the puppet-apply command
+http_proxy | nil | use http proxy when installing puppet and packages 
 
 ## Puppet Apply Configuring Provisioner Options
 
@@ -118,6 +119,7 @@ chef_bootstrap_url |"https://www.getchef.com/chef/install.sh"| the chef (needed 
 puppet_agent_command | nil | Overwrite the puppet agent command. Needs "sudo -E puppet agent" as a prefix. 
 require_chef_for_busser | true | Install chef as currently needed by busser to run tests 
 puppet_config_path | | path of custom puppet.conf file 
+http_proxy | nil | use http proxy when installing puppet and packages 
 
 
 ## Puppet Agent Configuring Provisioner Options

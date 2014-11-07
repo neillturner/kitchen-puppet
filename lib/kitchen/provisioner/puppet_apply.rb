@@ -20,6 +20,7 @@
 # for documentation configuration parameters with puppet_apply provisioner.
 #
 
+require 'uri'
 require 'json'
 require 'kitchen/provisioner/base'
 require 'kitchen/provisioner/puppet/librarian'
@@ -52,6 +53,8 @@ module Kitchen
       default_config :chef_bootstrap_url, 'https://www.getchef.com/chef/install.sh'
 
       default_config :puppet_apply_command, nil
+      
+      default_config :http_proxy, nil
 
       default_config :hiera_data_remote_path, '/var/lib/hiera'
       default_config :manifest, 'site.pp'
@@ -162,21 +165,21 @@ module Kitchen
             info("Installing puppet on #{puppet_platform}")
             <<-INSTALL
               if [ ! $(which puppet) ]; then
-                #{sudo('wget')} #{puppet_apt_repo}
+                #{sudo('wget')} #{wget_proxy_parm} #{puppet_apt_repo}
                 #{sudo('dpkg')} -i #{puppet_apt_repo_file}
                 #{update_packages_debian_cmd}
-                #{sudo('apt-get')} -y install puppet-common#{puppet_debian_version}
-                #{sudo('apt-get')} -y install puppet#{puppet_debian_version}
+                #{sudo_env('apt-get')} -y install puppet-common#{puppet_debian_version}
+                #{sudo_env('apt-get')} -y install puppet#{puppet_debian_version}
               fi
               #{install_busser}
             INSTALL
-          when 'redhat', 'centos', 'fedora'
+          when 'redhat', 'centos', 'fedora', 'oracle', 'amazon'
             info("Installing puppet on #{puppet_platform}")
             <<-INSTALL
               if [ ! $(which puppet) ]; then
-                #{sudo('rpm')} -ivh #{puppet_yum_repo}
+                #{sudo('rpm')} -ivh #{proxy_parm} #{puppet_yum_repo}
                 #{update_packages_redhat_cmd}
-                #{sudo('yum')} -y install puppet#{puppet_redhat_version}
+                #{sudo_env('yum')} -y install puppet#{puppet_redhat_version}
               fi
               #{install_busser}
             INSTALL
@@ -185,20 +188,20 @@ module Kitchen
             <<-INSTALL
               if [ ! $(which puppet) ]; then
                 if [ -f /etc/centos-release ] || [ -f /etc/redhat-release ] || [ -f /etc/oracle-release ]; then
-                  #{sudo('rpm')} -ivh #{puppet_yum_repo}
+                  #{sudo('rpm')} -ivh #{proxy_parm} #{puppet_yum_repo}
                   #{update_packages_redhat_cmd}
-                  #{sudo('yum')} -y install puppet#{puppet_redhat_version}
+                  #{sudo_env('yum')} -y install puppet#{puppet_redhat_version}
                 else
                   if [ -f /etc/system-release ] || [ grep -q 'Amazon Linux' /etc/system-release ]; then
-                    #{sudo('rpm')} -ivh #{puppet_yum_repo}
+                    #{sudo('rpm')} -ivh #{proxy_parm} #{puppet_yum_repo}
                     #{update_packages_redhat_cmd}
-                    #{sudo('yum')} -y install puppet#{puppet_redhat_version}
+                    #{sudo_env('yum')} -y install puppet#{puppet_redhat_version}
                   else
-                    #{sudo('wget')} #{puppet_apt_repo}
+                    #{sudo('wget')} #{wget_proxy_parm} #{puppet_apt_repo}
                     #{sudo('dpkg')} -i #{puppet_apt_repo_file}
                     #{update_packages_debian_cmd}
-                    #{sudo('apt-get')} -y install puppet-common#{puppet_debian_version}
-                    #{sudo('apt-get')} -y install puppet#{puppet_debian_version}
+                    #{sudo_env('apt-get')} -y install puppet-common#{puppet_debian_version}
+                    #{sudo_env('apt-get')} -y install puppet#{puppet_debian_version}
                   fi
                 fi
               fi
@@ -216,7 +219,7 @@ module Kitchen
           # A backend for Hiera that provides per-value asymmetric encryption of sensitive data
           if [[ $(#{sudo('gem')} list hiera-eyaml -i) == 'false' ]]; then
             echo "-----> Installing hiera-eyaml to provide encryption of hiera data"
-            #{sudo('gem')} install --no-ri --no-rdoc hiera-eyaml
+            #{sudo('gem')} install #{gem_proxy_parm} --no-ri --no-rdoc hiera-eyaml
           fi
         INSTALL
       end
@@ -333,7 +336,7 @@ module Kitchen
           [
             custom_facts,
             facter_facts,
-            sudo('puppet'),
+            sudo_env('puppet'),
             'apply',
             File.join(config[:root_path], 'manifests', manifest),
             "--modulepath=#{File.join(config[:root_path], 'modules')}",
@@ -469,12 +472,17 @@ module Kitchen
       end
 
       def update_packages_debian_cmd
-        config[:update_package_repos] ? "#{sudo('apt-get')} update" : nil
+        config[:update_package_repos] ? "#{sudo_env('apt-get')} update" : nil
       end
 
       def update_packages_redhat_cmd
-        config[:update_package_repos] ? "#{sudo('yum')} makecache" : nil
+      # #{sudo('yum')} 
+        config[:update_package_repos] ? "#{sudo_env('yum')} makecache" : nil
       end
+      
+      def sudo_env(pm)
+        http_proxy ? "#{sudo('env')} http_proxy=#{http_proxy} #{pm}" : "#{sudo(pm)}"
+      end 
 
       def remove_puppet_repo
         config[:remove_puppet_repo]
@@ -489,11 +497,7 @@ module Kitchen
       end
 
       def remove_repo
-        if remove_puppet_repo
-          "; #{sudo('rm')} -rf /tmp/kitchen #{hiera_data_remote_path} #{hiera_eyaml_key_remote_path} /etc/puppet/* "
-        else
-          nil
-        end
+        remove_puppet_repo ? "; #{sudo('rm')} -rf /tmp/kitchen #{hiera_data_remote_path} #{hiera_eyaml_key_remote_path} /etc/puppet/* " : nil
       end
 
       def puppet_apt_repo
@@ -507,6 +511,22 @@ module Kitchen
       def puppet_yum_repo
         config[:puppet_yum_repo]
       end
+      
+      def proxy_parm 
+         http_proxy ?  "--httpproxy #{URI.parse(http_proxy).host.downcase} --httpport #{URI.parse(http_proxy).port} " : nil
+      end 
+      
+      def gem_proxy_parm 
+         http_proxy ?  "--http-proxy #{http_proxy}" : nil
+      end  
+  
+      def wget_proxy_parm 
+         http_proxy ?  "-e use_proxy=yes -e http_proxy=#{http_proxy}" : nil
+      end
+      
+      def http_proxy
+        config[:http_proxy]
+      end      
 
       def chef_url
         config[:chef_bootstrap_url]
