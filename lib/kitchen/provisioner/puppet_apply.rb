@@ -115,6 +115,7 @@ module Kitchen
       default_config :update_package_repos, true
       default_config :remove_puppet_repo, false
       default_config :custom_facts, {}
+      default_config :puppet_detailed_exitcodes, nil
       default_config :facter_file, nil
       default_config :librarian_puppet_ssl_file, nil
 
@@ -344,6 +345,7 @@ module Kitchen
             "--fileserverconfig=#{File.join(config[:root_path], 'fileserver.conf')}",
             puppet_environment_flag,
             puppet_noop_flag,
+            puppet_detailed_exitcodes_flag,
             puppet_verbose_flag,
             puppet_debug_flag,
             remove_repo
@@ -494,6 +496,10 @@ module Kitchen
         bash_vars = "export #{bash_vars};"
         debug(bash_vars)
         bash_vars
+      end
+
+      def puppet_detailed_exitcodes_flag
+        config[:puppet_detailed_exitcodes] ? '--detailed-exitcodes' : nil
       end
 
       def remove_repo
