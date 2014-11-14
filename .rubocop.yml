@@ -18,3 +18,7 @@ ClassLength:
   Enabled: false
 NumericLiterals:
   MinDigits: 10
+AbcSize:
+  Enabled: false
+MultilineOperationIndentation:
+  Enabled: false
