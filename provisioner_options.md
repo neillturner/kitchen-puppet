@@ -11,6 +11,7 @@ puppet_yum_repo | "https://yum.puppetlabs.com/puppetlabs-release-el-6.noarch.rpm
 require_puppet_omnibus | false | Set if using omnibus puppet install
 puppet_omnibus_url | | omnibus puppet install location.
 puppet_omnibus_remote_path | "/opt/puppet" | Server Installation location of an omnibus puppet install.
+puppet_detailed_exitcodes | nil | Provide transaction information via exit codes.
 manifests_path | | puppet repo manifests directory
 manifest | 'site.pp' | manifest for puppet apply to run
 modules_path | | puppet repo manifests directory
