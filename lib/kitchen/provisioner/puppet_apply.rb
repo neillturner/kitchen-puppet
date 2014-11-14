@@ -53,7 +53,7 @@ module Kitchen
       default_config :chef_bootstrap_url, 'https://www.getchef.com/chef/install.sh'
 
       default_config :puppet_apply_command, nil
-      
+
       default_config :http_proxy, nil
 
       default_config :hiera_data_remote_path, '/var/lib/hiera'
@@ -464,12 +464,12 @@ module Kitchen
 
       def facter_facts
         return nil unless config[:facter_file]
-        fact_vars = "export "
+        fact_vars = 'export '
         fact_hash = YAML.load_file(config[:facter_file])
         fact_hash.each do |key, value|
           fact_vars << "FACTER_#{key}=#{value} "
         end
-        fact_vars << ";"
+        fact_vars << ';'
         fact_vars
       end
 
@@ -478,13 +478,13 @@ module Kitchen
       end
 
       def update_packages_redhat_cmd
-      # #{sudo('yum')} 
+        # #{sudo('yum')}
         config[:update_package_repos] ? "#{sudo_env('yum')} makecache" : nil
       end
-      
+
       def sudo_env(pm)
         http_proxy ? "#{sudo('env')} http_proxy=#{http_proxy} #{pm}" : "#{sudo(pm)}"
-      end 
+      end
 
       def remove_puppet_repo
         config[:remove_puppet_repo]
@@ -517,22 +517,22 @@ module Kitchen
       def puppet_yum_repo
         config[:puppet_yum_repo]
       end
-      
-      def proxy_parm 
-         http_proxy ?  "--httpproxy #{URI.parse(http_proxy).host.downcase} --httpport #{URI.parse(http_proxy).port} " : nil
-      end 
-      
-      def gem_proxy_parm 
-         http_proxy ?  "--http-proxy #{http_proxy}" : nil
-      end  
-  
-      def wget_proxy_parm 
-         http_proxy ?  "-e use_proxy=yes -e http_proxy=#{http_proxy}" : nil
+
+      def proxy_parm
+        http_proxy ?  "--httpproxy #{URI.parse(http_proxy).host.downcase} --httpport #{URI.parse(http_proxy).port} " : nil
       end
-      
+
+      def gem_proxy_parm
+        http_proxy ?  "--http-proxy #{http_proxy}" : nil
+      end
+
+      def wget_proxy_parm
+        http_proxy ?  "-e use_proxy=yes -e http_proxy=#{http_proxy}" : nil
+      end
+
       def http_proxy
         config[:http_proxy]
-      end      
+      end
 
       def chef_url
         config[:chef_bootstrap_url]
