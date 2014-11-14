@@ -1,5 +1,10 @@
+v0.0.19
+*  travis Ci support
+*  puppet_detailed_exitcodes to puppet_apply
+
+
 v0.0.18
-* Add http_proxy support 
+* Add http_proxy support
 
 v0.0.17
 * Syntax fix with file resource
@@ -13,26 +18,26 @@ v0.0.16
 * Add option to configured SSL certificate when calling librarian-puppet
 
 v0.0.15
-* Add Puppet Agent support 
+* Add Puppet Agent support
 
 v0.0.14
-* Add Puppet environment option 
+* Add Puppet environment option
 
 v0.0.13
 * Resolve with librarian-puppet moved back to *before* copying modules directory as librarian-puppet was clobbering the copied modules.
-  Note: you should adopt a naming convention where the modules in the modules directory are prefix with a company prefix so they don't 
+  Note: you should adopt a naming convention where the modules in the modules directory are prefix with a company prefix so they don't
   conflict with the librarian puppet module names. ie mycompany-module.
 
-* Added require_chef_for_busser provisioner option that defaults to true. Currently chef is required by the busser to run tests. 
-  If you just want to setup a server with puppet and converge it and don't want chef install then set to false. 
+* Added require_chef_for_busser provisioner option that defaults to true. Currently chef is required by the busser to run tests.
+  If you just want to setup a server with puppet and converge it and don't want chef install then set to false.
 
-* Added resolve_with_librarian provisioner option that defaults to true. This will cause librarian_puppet to resolve modules if a Puppetfile is found.   
+* Added resolve_with_librarian provisioner option that defaults to true. This will cause librarian_puppet to resolve modules if a Puppetfile is found.
 
 * Allow custom puppet apply command
 
 * Fix Dependency Issue with Puppet Version
 
-* Enable usage of custom puppet.conf 
+* Enable usage of custom puppet.conf
 
 * Update documentation with hiera_config_path
 
