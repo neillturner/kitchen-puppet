@@ -1,3 +1,7 @@
+# Kitchen Puppet
+
+[![Gem Version](https://badge.fury.io/rb/kitchen-puppet.svg)](http://badge.fury.io/rb/kitchen-puppet)
+
 # kitchen-puppet
 A Test Kitchen Provisioner for Puppet
 
