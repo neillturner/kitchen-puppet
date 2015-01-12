@@ -566,9 +566,9 @@ module Kitchen
         return unless config[:install_custom_facts]
         return unless config[:custom_facts]
         info 'installing custom facts'
-        facter_dir = File.join('/etc/facter/facts.d/')
+        facter_dir = File.join(sandbox_path, 'facter')
         FileUtils.mkdir_p(facter_dir)
-        tmp_facter_file = File.join(tmp_facter_dir, 'kitchen.yaml')
+        tmp_facter_file = File.join(facter_dir, 'kitchen.yaml')
         facter_facts = config[:custom_facts]
         File.open(tmp_facter_file, 'w') do |out|
           YAML.dump(facter_facts, out)
