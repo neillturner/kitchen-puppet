@@ -25,6 +25,7 @@ puppet_verbose| false| Extra information logging on puppet run
 puppet_noop| false| puppet runs in a no-op or dry-run mode
 update_package_repos| true| update OS repository metadata
 custom_facts| Hash.new | Hash to set the puppet facts before running puppet apply
+install_custom_facts| false | Install custom facts to yaml file at "/tmp/kitchen/facter/kitchen.yaml"
 chef_bootstrap_url |"https://www.getchef.com/chef/install.sh"| the chef (needed for busser to run tests)
 puppetfile_path | | Path to Puppetfile
 puppet_apply_command | nil | Overwrite the puppet apply command. Needs "sudo -E puppet apply" as a prefix. 
