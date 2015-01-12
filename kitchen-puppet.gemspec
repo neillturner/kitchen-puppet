@@ -25,5 +25,4 @@ Puppet Provisioner for Test Kitchen
 Supports puppet apply, puppet agent, hiera, hiera-eyaml, custom facts, librarian-puppet
 
 EOF
-
 end

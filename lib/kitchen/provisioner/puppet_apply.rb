@@ -48,6 +48,7 @@ module Kitchen
       default_config :require_chef_for_busser, true
       default_config :resolve_with_librarian_puppet, true
       default_config :puppet_environment, nil
+      default_config :install_custom_facts, false
       default_config :puppet_apt_repo, 'http://apt.puppetlabs.com/puppetlabs-release-precise.deb'
       default_config :puppet_yum_repo, 'https://yum.puppetlabs.com/puppetlabs-release-el-6.noarch.rpm'
       default_config :chef_bootstrap_url, 'https://www.getchef.com/chef/install.sh'
@@ -91,7 +92,6 @@ module Kitchen
       default_config :fileserver_config_path do |provisioner|
         provisioner.calculate_path('fileserver.conf', :file)
       end
-
       default_config :puppetfile_path do |provisioner|
         provisioner.calculate_path('Puppetfile', :file)
       end
@@ -258,6 +258,7 @@ module Kitchen
         prepare_modules
         prepare_manifests
         prepare_files
+        prepare_facts
         prepare_puppet_config
         prepare_hiera_config
         prepare_fileserver_config
@@ -559,6 +560,19 @@ module Kitchen
         tmp_files_dir = File.join(sandbox_path, 'files')
         FileUtils.mkdir_p(tmp_files_dir)
         FileUtils.cp_r(Dir.glob("#{files}/*"), tmp_files_dir)
+      end
+
+      def prepare_facts
+        return unless config[:install_custom_facts]
+        return unless config[:custom_facts]
+        info 'installing custom facts'
+        facter_dir = File.join('/etc/facter/facts.d/')
+        FileUtils.mkdir_p(facter_dir)
+        tmp_facter_file = File.join(tmp_facter_dir, 'kitchen.yaml')
+        facter_facts = config[:custom_facts]
+        File.open(tmp_facter_file, 'w') do |out|
+          YAML.dump(facter_facts, out)
+        end
       end
 
       def prepare_modules
