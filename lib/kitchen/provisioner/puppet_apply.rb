@@ -565,11 +565,11 @@ module Kitchen
       def prepare_facts
         return unless config[:install_custom_facts]
         return unless config[:custom_facts]
-        info 'installing custom facts'
+        info 'Installing custom facts'
         facter_dir = File.join(sandbox_path, 'facter')
         FileUtils.mkdir_p(facter_dir)
         tmp_facter_file = File.join(facter_dir, 'kitchen.yaml')
-        facter_facts = config[:custom_facts]
+        facter_facts = Hash[config[:custom_facts].map { |k, v| [k.to_s, v.to_s] }]
         File.open(tmp_facter_file, 'w') do |out|
           YAML.dump(facter_facts, out)
         end
