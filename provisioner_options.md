@@ -28,18 +28,19 @@ custom_facts| Hash.new | Hash to set the puppet facts before running puppet appl
 install_custom_facts| false | Install custom facts to yaml file at "/tmp/kitchen/facter/kitchen.yaml"
 chef_bootstrap_url |"https://www.getchef.com/chef/install.sh"| the chef (needed for busser to run tests)
 puppetfile_path | | Path to Puppetfile
-puppet_apply_command | nil | Overwrite the puppet apply command. Needs "sudo -E puppet apply" as a prefix. 
-require_chef_for_busser | true | Install chef as currently needed by busser to run tests 
-resolve_with_librarian_puppet | true | Use librarian_puppet to resolve modules if a Puppetfile is found 
+puppet_apply_command | nil | Overwrite the puppet apply command. Needs "sudo -E puppet apply" as a prefix.
+require_chef_for_busser | true | Install chef as currently needed by busser to run tests
+resolve_with_librarian_puppet | true | Use librarian_puppet to resolve modules if a Puppetfile is found
 librarian_puppet_ssl_file | nil | ssl certificate file for librarian-puppet
-puppet_config_path | | path of custom puppet.conf file 
-puppet_environment | nil | puppet environment for running puppet apply 
+puppet_config_path | | path of custom puppet.conf file
+puppet_environment | nil | puppet environment for running puppet apply
 remove_puppet_repo | false | remove copy of puppet repository and puppet configuration on server after running puppet
 hiera_eyaml | false | use hiera-eyaml to encrypt hiera data
 hiera_eyaml_key_remote_path | "/etc/puppet/secure/keys" | directory of hiera-eyaml keys on server
 hiera_eyaml_key_path  | "hiera_keys" | directory of hiera-eyaml keys on workstation
 facter_file | nil | yaml file of custom facter_files to be provided to the puppet-apply command
-http_proxy | nil | use http proxy when installing puppet and packages 
+http_proxy | nil | use http proxy when installing puppet and packages
+puppet_logdest | nil | _Array_ of log destinations. Include 'console' if wanted
 
 ## Puppet Apply Configuring Provisioner Options
 
@@ -87,7 +88,7 @@ It can be beneficial to keep different Puppet layouts for different suites. Rath
 ### Puppet Version
 When specifying a puppet version, you must use this format: "3.6.2-1puppetlabs1". I have
 no idea why Puppet versioned their repository with a trailing
-"-1puppetlabs1", but there it is. 
+"-1puppetlabs1", but there it is.
 
 
 # Puppet Agent Provisioner Options
@@ -104,24 +105,24 @@ puppet_omnibus_url | | omnibus puppet install location.
 puppet_omnibus_remote_path | "/opt/puppet" | Server Installation location of an omnibus puppet install.
 puppet_detailed_exitcodes | nil | Provide transaction information via exit codes.
 puppet_logdest | nil | Where to send messages. Choose between syslog, the console, and a log file.
-puppet_masterport | nil | The port on which to contact the puppet master. 
+puppet_masterport | nil | The port on which to contact the puppet master.
 puppet_test | false | Enable the most common options used for testing.
 puppet_onetime | true | Run the configuration once.
-puppet_no_daemonize | true | Do not send the process into the background. 
-puppet_server | nil | will default to 'puppet'. Useful for interactively running when used with the --no-daemonize option. 
-puppet_waitforcert | '0' | Time to wait for certificate if agent does not yet have certificates  
+puppet_no_daemonize | true | Do not send the process into the background.
+puppet_server | nil | will default to 'puppet'. Useful for interactively running when used with the --no-daemonize option.
+puppet_waitforcert | '0' | Time to wait for certificate if agent does not yet have certificates
 puppet_certname | nil | Set the certname (unique ID) of the client
-puppet_digest | nil | Change the certificate fingerprinting digest algorithm. The default is SHA256 
+puppet_digest | nil | Change the certificate fingerprinting digest algorithm. The default is SHA256
 puppet_debug| false| Enable full debugging logging on puppet run
 puppet_verbose| false| Extra information logging on puppet run
 puppet_noop| false| puppet runs in a no-op or dry-run mode
 update_package_repos| true| update OS repository metadata
 custom_facts| Hash.new | Hash to set the puppet facts before running puppet apply
 chef_bootstrap_url |"https://www.getchef.com/chef/install.sh"| the chef (needed for busser to run tests)
-puppet_agent_command | nil | Overwrite the puppet agent command. Needs "sudo -E puppet agent" as a prefix. 
-require_chef_for_busser | true | Install chef as currently needed by busser to run tests 
-puppet_config_path | | path of custom puppet.conf file 
-http_proxy | nil | use http proxy when installing puppet and packages 
+puppet_agent_command | nil | Overwrite the puppet agent command. Needs "sudo -E puppet agent" as a prefix.
+require_chef_for_busser | true | Install chef as currently needed by busser to run tests
+puppet_config_path | | path of custom puppet.conf file
+http_proxy | nil | use http proxy when installing puppet and packages
 
 
 ## Puppet Agent Configuring Provisioner Options
@@ -137,7 +138,7 @@ The provisioner can be configured globally or per suite, global settings act as 
       puppet_debug: true
       puppet_verbose: true
       puppet_server:  puppetmaster-nocm-ubuntu-1204
-      
+
     platforms:
     - name: nocm_ubuntu-12.04
       driver_plugin: vagrant
@@ -152,8 +153,8 @@ The provisioner can be configured globally or per suite, global settings act as 
 In this example, vagrant will download a box for ubuntu 1204 with no configuration management installed, then install the latest puppet and run puppet agent against a puppet master at puppetmaster-nocm-ubuntu-1204
 
 NOTE: It is important that the server can resolve the hostname ip address of the puppetmaster, in this case puppetmaster-nocm-ubuntu-1204
-and the puppetmaster must be able to resolve the hostname ip address address of the hostname of the node running puppet agent. 
-This can be done by settings in the /etc/hosts files before running puppet. 
+and the puppetmaster must be able to resolve the hostname ip address address of the hostname of the node running puppet agent.
+This can be done by settings in the /etc/hosts files before running puppet.
 
 NOTE: For testing it is possible to set the puppetmaster to autosign the certificate of a node by created a file /etc/puppet/autosign.conf that contains an *.
 

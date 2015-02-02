@@ -52,6 +52,7 @@ module Kitchen
       default_config :puppet_apt_repo, 'http://apt.puppetlabs.com/puppetlabs-release-precise.deb'
       default_config :puppet_yum_repo, 'https://yum.puppetlabs.com/puppetlabs-release-el-6.noarch.rpm'
       default_config :chef_bootstrap_url, 'https://www.getchef.com/chef/install.sh'
+      default_config :puppet_logdest, nil
 
       default_config :puppet_apply_command, nil
 
@@ -349,6 +350,7 @@ module Kitchen
             puppet_detailed_exitcodes_flag,
             puppet_verbose_flag,
             puppet_debug_flag,
+            puppet_logdest_flag,
             remove_repo
           ].join(' ')
         end
@@ -457,6 +459,15 @@ module Kitchen
 
       def puppet_verbose_flag
         config[:puppet_verbose] ? '-v' : nil
+      end
+
+      def puppet_logdest_flag
+        return nil unless config[:puppet_logdest]
+        destinations = ''
+        config[:puppet_logdest].each do |dest|
+          destinations << "--logdest #{dest} "
+        end
+        destinations
       end
 
       def puppet_platform
