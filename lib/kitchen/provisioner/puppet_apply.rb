@@ -173,6 +173,7 @@ module Kitchen
                 #{sudo_env('apt-get')} -y install puppet-common#{puppet_debian_version}
                 #{sudo_env('apt-get')} -y install puppet#{puppet_debian_version}
               fi
+              #{install_eyaml}
               #{install_busser}
             INSTALL
           when 'redhat', 'centos', 'fedora', 'oracle', 'amazon'
@@ -183,6 +184,7 @@ module Kitchen
                 #{update_packages_redhat_cmd}
                 #{sudo_env('yum')} -y install puppet#{puppet_redhat_version}
               fi
+              #{install_eyaml}
               #{install_busser}
             INSTALL
           else
