@@ -127,6 +127,8 @@ module Kitchen
         provisioner.calculate_path('hiera_keys')
       end
 
+      default_config :hiera_deep_merge, false
+
       def calculate_path(path, type = :directory)
         base = config[:test_base_path]
         candidates = []
@@ -159,6 +161,7 @@ module Kitchen
             do_download #{config[:puppet_omnibus_url]} /tmp/puppet_install.sh
             #{sudo('sh')} /tmp/puppet_install.sh #{version}
           fi
+          #{install_deep_merge}
           #{install_busser}
           INSTALL
         else
@@ -173,6 +176,7 @@ module Kitchen
                 #{sudo_env('apt-get')} -y install puppet-common#{puppet_debian_version}
                 #{sudo_env('apt-get')} -y install puppet#{puppet_debian_version}
               fi
+              #{install_deep_merge}
               #{install_busser}
             INSTALL
           when 'redhat', 'centos', 'fedora', 'oracle', 'amazon'
@@ -183,6 +187,7 @@ module Kitchen
                 #{update_packages_redhat_cmd}
                 #{sudo_env('yum')} -y install puppet#{puppet_redhat_version}
               fi
+              #{install_deep_merge}
               #{install_busser}
             INSTALL
           else
@@ -208,12 +213,23 @@ module Kitchen
                 fi
               fi
               #{install_eyaml}
+              #{install_deep_merge}
               #{install_busser}
             INSTALL
           end
         end
       end
       # rubocop:enable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
+      def install_deep_merge
+        return unless config[:hiera_deep_merge]
+        <<-INSTALL
+          # Support for hash merge lookups to recursively merge hash keys
+          if [[ $(#{sudo('gem')} list deep_merge -i) == 'false' ]]; then
+            echo "-----> Installing deep_merge to provide deep_merge of hiera hashes"
+            #{sudo('gem')} install #{gem_proxy_parm} --no-ri --no-rdoc deep_merge
+          fi
+        INSTALL
+      end
 
       def install_eyaml
         return unless config[:hiera_eyaml]
@@ -431,6 +447,10 @@ module Kitchen
 
       def hiera_eyaml_key_remote_path
         config[:hiera_eyaml_key_remote_path]
+      end
+
+      def hiera_deep_merge
+        config[:hiera_deep_merge]
       end
 
       def librarian_puppet_ssl_file
