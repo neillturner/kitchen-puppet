@@ -239,6 +239,7 @@ module Kitchen
           # A backend for Hiera that provides per-value asymmetric encryption of sensitive data
           if [[ $(#{sudo('gem')} list hiera-eyaml -i) == 'false' ]]; then
             echo '-----> Installing hiera-eyaml to provide encryption of hiera data'
+            #{sudo('gem')} install #{gem_proxy_parm} --no-ri --no-rdoc highline -v 1.6.21
             #{sudo('gem')} install #{gem_proxy_parm} --no-ri --no-rdoc hiera-eyaml
           fi
         INSTALL
