@@ -38,6 +38,7 @@ remove_puppet_repo | false | remove copy of puppet repository and puppet configu
 hiera_eyaml | false | use hiera-eyaml to encrypt hiera data
 hiera_eyaml_key_remote_path | "/etc/puppet/secure/keys" | directory of hiera-eyaml keys on server
 hiera_eyaml_key_path  | "hiera_keys" | directory of hiera-eyaml keys on workstation
+hiera_deep_merge | false | install the deep_merge gem to support hiera deep merge mode
 facter_file | nil | yaml file of custom facter_files to be provided to the puppet-apply command
 http_proxy | nil | use http proxy when installing puppet and packages
 puppet_logdest | nil | _Array_ of log destinations. Include 'console' if wanted
