@@ -116,6 +116,7 @@ module Kitchen
             info("Installing puppet on #{puppet_platform}")
             <<-INSTALL
               if [ ! $(which puppet) ]; then
+                #{sudo('apt-get')} -y install wget
                 #{sudo('wget')} #{wget_proxy_parm} #{puppet_apt_repo}
                 #{sudo('dpkg')} -i #{puppet_apt_repo_file}
                 #{update_packages_debian_cmd}
@@ -148,6 +149,7 @@ module Kitchen
                     #{update_packages_redhat_cmd}
                     #{sudo('yum')} -y install puppet#{puppet_redhat_version}
                   else
+                    #{sudo('apt-get')} -y install wget
                     #{sudo('wget')} #{wget_proxy_parm} #{puppet_apt_repo}
                     #{sudo('dpkg')} -i #{puppet_apt_repo_file}
                     #{update_packages_debian_cmd}
