@@ -9,8 +9,8 @@ require_puppet_repo | true | Set if using a puppet install from yum or apt repo
 puppet_apt_repo | "http://apt.puppetlabs.com/puppetlabs-release-precise.deb"| apt repo
 puppet_yum_repo | "https://yum.puppetlabs.com/puppetlabs-release-el-6.noarch.rpm"| yum repo
 require_puppet_aio | false | Set if using all in one puppet install (Puppet v4)
-puppet_aio_redhat_url | 'http://nightlies.puppetlabs.com/puppet-agent-latest/repos/el/6/PC1/x86_64/puppet-agent-1.0.0-1.el6.x86_64.rpm' | aio puppet install location for redhat.
-puppet_aio_ubuntu_url | 'http://nightlies.puppetlabs.com/puppet-agent-latest/repos/apt/trusty/dists/trusty/PC1/binary-amd64/Packages.gz' | aio puppet install location for ubuntu.
+puppet_aio_redhat_url | see below | aio puppet install location for redhat.
+puppet_aio_ubuntu_url | nil | aio puppet install location for ubuntu.
 puppet_aio_remote_path | "/opt/puppetlabs" | Server Installation location of an aio puppet install.
 puppet_detailed_exitcodes | nil | Provide transaction information via exit codes.
 manifests_path | | puppet repo manifests directory
@@ -43,6 +43,9 @@ hiera_deep_merge | false | install the deep_merge gem to support hiera deep merg
 facter_file | nil | yaml file of custom facter_files to be provided to the puppet-apply command
 http_proxy | nil | use http proxy when installing puppet and packages
 puppet_logdest | nil | _Array_ of log destinations. Include 'console' if wanted
+
+Currently puppet_aio_redhat_url is defaulted to 'http://nightlies.puppetlabs.com/puppet-agent-latest/repos/el/6/PC1/x86_64/puppet-agent-1.0.0-1.el6.x86_64.rpm'
+but this will need to change when Puppet 4 has new nightlies builds or goes general release.   
 
 ## Puppet Apply Configuring Provisioner Options
 
