@@ -22,7 +22,7 @@ Puppet Provisioner for Test Kitchen
 
 == FEATURES:
 
-Supports puppet apply, puppet agent, hiera, hiera-eyaml, custom facts, librarian-puppet
+Supports puppet apply, puppet agent, hiera, hiera-eyaml, custom facts, librarian-puppet, puppet 4 aio 
 
 EOF
 end
