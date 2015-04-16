@@ -8,9 +8,10 @@ puppet_platform | naively tries to determine | OS platform of server
 require_puppet_repo | true | Set if using a puppet install from yum or apt repo
 puppet_apt_repo | "http://apt.puppetlabs.com/puppetlabs-release-precise.deb"| apt repo
 puppet_yum_repo | "https://yum.puppetlabs.com/puppetlabs-release-el-6.noarch.rpm"| yum repo
-require_puppet_omnibus | false | Set if using omnibus puppet install
-puppet_omnibus_url | | omnibus puppet install location.
-puppet_omnibus_remote_path | "/opt/puppet" | Server Installation location of an omnibus puppet install.
+require_puppet_aio | false | Set if using all in one puppet install (Puppet v4)
+puppet_aio_redhat_url | 'http://nightlies.puppetlabs.com/puppet-agent-latest/repos/el/6/PC1/x86_64/puppet-agent-1.0.0-1.el6.x86_64.rpm' | aio puppet install location for redhat.
+puppet_aio_ubuntu_url | 'http://nightlies.puppetlabs.com/puppet-agent-latest/repos/apt/trusty/dists/trusty/PC1/binary-amd64/Packages.gz' | aio puppet install location for ubuntu.
+puppet_aio_remote_path | "/opt/puppetlabs" | Server Installation location of an aio puppet install.
 puppet_detailed_exitcodes | nil | Provide transaction information via exit codes.
 manifests_path | | puppet repo manifests directory
 manifest | 'site.pp' | manifest for puppet apply to run
@@ -33,7 +34,7 @@ require_chef_for_busser | true | Install chef as currently needed by busser to r
 resolve_with_librarian_puppet | true | Use librarian_puppet to resolve modules if a Puppetfile is found
 librarian_puppet_ssl_file | nil | ssl certificate file for librarian-puppet
 puppet_config_path | | path of custom puppet.conf file
-puppet_environment | nil | puppet environment for running puppet apply
+puppet_environment | nil | puppet environment for running puppet apply (Must set if using Puppet v4)
 remove_puppet_repo | false | remove copy of puppet repository and puppet configuration on server after running puppet
 hiera_eyaml | false | use hiera-eyaml to encrypt hiera data
 hiera_eyaml_key_remote_path | "/etc/puppet/secure/keys" | directory of hiera-eyaml keys on server

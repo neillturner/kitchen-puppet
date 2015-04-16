@@ -39,10 +39,10 @@ module Kitchen
     class PuppetApply < Base
       attr_accessor :tmp_dir
 
-      default_config :require_puppet_omnibus, false
+      default_config :require_puppet_aio, false
       # TODO: use something like https://github.com/fnichol/omnibus-puppet
-      default_config :puppet_omnibus_url, nil
-      default_config :puppet_omnibus_remote_path, '/opt/puppet'
+      default_config :puppet_aio_redhat_url, 'http://nightlies.puppetlabs.com/puppet-agent-latest/repos/el/6/PC1/x86_64/puppet-agent-1.0.0-1.el6.x86_64.rpm'
+      default_config :puppet_aio_remote_path, '/opt/puppetlabs'
       default_config :puppet_version, nil
       default_config :require_puppet_repo, true
       default_config :require_chef_for_busser, true
@@ -141,32 +141,16 @@ module Kitchen
           type == :directory ? File.directory?(c) : File.file?(c)
         end
       end
-
+      
       # TODO: refactor for smaller cyclomatic complexity and perceived complexity
       # rubocop:disable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       def install_command
-        return unless config[:require_puppet_omnibus] || config[:require_puppet_repo]
-        if config[:require_puppet_omnibus]
-          info('Installing puppet using puppet omnibus')
-          if !config[:puppet_version].nil?
-            version = "-v #{config[:puppet_version]}"
-          else
-            version = ''
-          end
-          <<-INSTALL
-          #{Util.shell_helpers}
-
-          if [ ! -d "#{config[:puppet_omnibus_remote_path]}" ]; then
-            echo "-----> Installing Puppet Omnibus"
-            do_download #{config[:puppet_omnibus_url]} /tmp/puppet_install.sh
-            #{sudo('sh')} /tmp/puppet_install.sh #{version}
-          fi
-          #{install_deep_merge}
-          #{install_busser}
-          INSTALL
+        return unless config[:require_puppet_aio] || config[:require_puppet_repo]
+        if config[:require_puppet_aio]
+           install_command_aio
         else
-          case puppet_platform
-          when 'debian', 'ubuntu'
+           case puppet_platform
+           when 'debian', 'ubuntu'
             info("Installing puppet on #{puppet_platform}")
             <<-INSTALL
               if [ ! $(which puppet) ]; then
@@ -182,30 +166,32 @@ module Kitchen
               #{install_busser}
             INSTALL
           when 'redhat', 'centos', 'fedora', 'oracle', 'amazon'
-            info("Installing puppet on #{puppet_platform}")
-            <<-INSTALL
-              if [ ! $(which puppet) ]; then
-                #{sudo('rpm')} -ivh #{proxy_parm} #{puppet_yum_repo}
-                #{update_packages_redhat_cmd}
-                #{sudo_env('yum')} -y install puppet#{puppet_redhat_version}
-              fi
-              #{install_eyaml}
-              #{install_deep_merge}
-              #{install_busser}
-            INSTALL
+            if config[:require_puppet_aio]
+            info("Installing puppet from yum on #{puppet_platform}")
+             <<-INSTALL
+               if [ ! $(which puppet) ]; then
+                 #{sudo('rpm')} -ivh #{proxy_parm} #{puppet_yum_repo}
+                 #{update_packages_redhat_cmd}
+                 #{sudo_env('yum')} -y install puppet#{puppet_redhat_version}
+               fi
+               #{install_eyaml}
+               #{install_deep_merge}
+               #{install_busser}
+             INSTALL
+            end 
           else
             info('Installing puppet, will try to determine platform os')
             <<-INSTALL
               if [ ! $(which puppet) ]; then
                 if [ -f /etc/centos-release ] || [ -f /etc/redhat-release ] || [ -f /etc/oracle-release ]; then
-                  #{sudo('rpm')} -ivh #{proxy_parm} #{puppet_yum_repo}
-                  #{update_packages_redhat_cmd}
-                  #{sudo_env('yum')} -y install puppet#{puppet_redhat_version}
-                else
-                  if [ -f /etc/system-release ] || [ grep -q 'Amazon Linux' /etc/system-release ]; then
                     #{sudo('rpm')} -ivh #{proxy_parm} #{puppet_yum_repo}
                     #{update_packages_redhat_cmd}
                     #{sudo_env('yum')} -y install puppet#{puppet_redhat_version}
+                else
+                  if [ -f /etc/system-release ] || [ grep -q 'Amazon Linux' /etc/system-release ]; then
+                     #{sudo('rpm')} -ivh #{proxy_parm} #{puppet_yum_repo}
+                     #{update_packages_redhat_cmd}
+                     #{sudo_env('yum')} -y install puppet#{puppet_redhat_version}
                   else
                     #{sudo('apt-get')} -y install wget
                     #{sudo('wget')} #{wget_proxy_parm} #{puppet_apt_repo}
@@ -221,9 +207,57 @@ module Kitchen
               #{install_busser}
             INSTALL
           end
-        end
+        end  
       end
-      # rubocop:enable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
+      
+      def install_command_aio
+         case puppet_platform
+         when 'debian', 'ubuntu'  
+              info("Installing Puppet All In One not supported yet on #{puppet_platform}")
+              ''
+          when 'redhat', 'centos', 'fedora', 'oracle', 'amazon'
+              info("Installing Puppet All In One on #{puppet_platform}")
+              <<-INSTALL
+              #{Util.shell_helpers}
+              if [ ! -d "#{config[:puppet_aio_remote_path]}" ]; then
+                echo "-----> Installing Puppet All In One"
+                #{sudo_env('yum')} -y install dmidecode
+                echo "-----> #{sudo('rpm')} -ivh #{proxy_parm} #{config[:puppet_aio_redhat_url]}"
+                #{sudo('rpm')} -ivh #{proxy_parm} #{config[:puppet_aio_redhat_url]}          
+             fi
+             #{install_eyaml("#{config[:puppet_aio_remote_path]}/puppet/bin/gem")}
+             #{install_deep_merge}
+             #{install_busser}
+             INSTALL
+         else
+            info('Installing puppet, will try to determine platform os')
+            <<-INSTALL
+              if [ ! -d "#{config[:puppet_aio_remote_path]}" ]; then
+                if [ -f /etc/centos-release ] || [ -f /etc/redhat-release ] || [ -f /etc/oracle-release ]; then
+                    #{Util.shell_helpers}
+                      echo "-----> Installing Puppet All In One"
+                      #{sudo_env('yum')} -y install dmidecode
+                      echo "-----> #{sudo('rpm')} -ivh #{proxy_parm} #{config[:puppet_aio_redhat_url]}"
+                      #{sudo('rpm')} -ivh #{proxy_parm} #{config[:puppet_aio_redhat_url]}          
+                else
+                  if [ -f /etc/system-release ] || [ grep -q 'Amazon Linux' /etc/system-release ]; then
+                     #{Util.shell_helpers}
+                      echo "-----> Installing Puppet All In One"
+                      #{sudo_env('yum')} -y install dmidecode
+                      echo "-----> #{sudo('rpm')} -ivh #{proxy_parm} #{config[:puppet_aio_redhat_url]}"
+                      #{sudo('rpm')} -ivh #{proxy_parm} #{config[:puppet_aio_redhat_url]}          
+                  else
+                    echo "-----> Installing Puppet All In One not yet supported on ubuntu"
+                  fi
+                fi
+              fi
+              #{install_eyaml("#{config[:puppet_aio_remote_path]}/puppet/bin/gem")}
+              #{install_deep_merge}
+              #{install_busser}                        
+            INSTALL
+         end
+      end 
+      
       def install_deep_merge
         return unless config[:hiera_deep_merge]
         <<-INSTALL
@@ -235,14 +269,14 @@ module Kitchen
         INSTALL
       end
 
-      def install_eyaml
+      def install_eyaml(gem_cmd='gem') 
         return unless config[:hiera_eyaml]
         <<-INSTALL
           # A backend for Hiera that provides per-value asymmetric encryption of sensitive data
-          if [[ $(#{sudo('gem')} list hiera-eyaml -i) == 'false' ]]; then
+          if [[ $(#{sudo(gem_cmd)} list hiera-eyaml -i) == 'false' ]]; then
             echo '-----> Installing hiera-eyaml to provide encryption of hiera data'
-            #{sudo('gem')} install #{gem_proxy_parm} --no-ri --no-rdoc highline -v 1.6.21
-            #{sudo('gem')} install #{gem_proxy_parm} --no-ri --no-rdoc hiera-eyaml
+            #{sudo(gem_cmd)} install #{gem_proxy_parm} --no-ri --no-rdoc highline -v 1.6.21
+            #{sudo(gem_cmd)} install #{gem_proxy_parm} --no-ri --no-rdoc hiera-eyaml
           fi
         INSTALL
       end
@@ -267,8 +301,9 @@ module Kitchen
       def init_command
         dirs = %w(modules manifests files hiera hiera.yaml)
         .map { |dir| File.join(config[:root_path], dir) }.join(' ')
-        cmd = "#{sudo('rm')} -rf #{dirs} #{hiera_data_remote_path} /etc/hiera.yaml /etc/puppet/hiera.yaml /etc/puppet/fileserver.conf;"
-        cmd += " mkdir -p #{config[:root_path]}"
+        cmd = "#{sudo('rm')} -rf #{dirs} #{hiera_data_remote_path} /etc/hiera.yaml #{puppet_dir}/hiera.yaml #{puppet_dir}/fileserver.conf;"
+        cmd += config[:puppet_environment] ? "#{sudo('rm')} -f #{File.join(puppet_dir, config[:puppet_environment])};" : ''
+        cmd += " mkdir -p #{config[:root_path]} #{puppet_dir}"
         debug(cmd)
         cmd
       end
@@ -301,7 +336,7 @@ module Kitchen
           commands << [
             sudo('cp'),
             File.join(config[:root_path], 'puppet.conf'),
-            '/etc/puppet'
+            puppet_dir
           ].join(' ')
         end
 
@@ -311,7 +346,7 @@ module Kitchen
           ].join(' ')
 
           commands << [
-            sudo('cp'), File.join(config[:root_path], 'hiera.yaml'), '/etc/puppet/'
+            sudo('cp'), File.join(config[:root_path], 'hiera.yaml'), puppet_dir
           ].join(' ')
         end
 
@@ -319,7 +354,7 @@ module Kitchen
           commands << [
             sudo('cp'),
             File.join(config[:root_path], 'fileserver.conf'),
-            '/etc/puppet'
+            puppet_dir
           ].join(' ')
         end
 
@@ -347,6 +382,12 @@ module Kitchen
           ].join(' ')
         end
 
+        if puppet_environment
+          commands << [
+            sudo('ln -s '),  config[:root_path], File.join(puppet_dir, config[:puppet_environment])
+          ].join(' ')
+        end 
+        
         command = commands.join(' && ')
         debug(command)
         command
@@ -360,11 +401,11 @@ module Kitchen
           [
             custom_facts,
             facter_facts,
-            sudo_env('puppet'),
+            puppet_cmd,
             'apply',
             File.join(config[:root_path], 'manifests', manifest),
             "--modulepath=#{File.join(config[:root_path], 'modules')}",
-            "--manifestdir=#{File.join(config[:root_path], 'manifests')}",
+            puppet_manifestdir,
             "--fileserverconfig=#{File.join(config[:root_path], 'fileserver.conf')}",
             puppet_environment_flag,
             puppet_noop_flag,
@@ -462,6 +503,22 @@ module Kitchen
         config[:librarian_puppet_ssl_file]
       end
 
+      def puppet_cmd 
+       if config[:require_puppet_aio]
+         sudo_env("#{config[:puppet_aio_remote_path]}/bin/puppet")
+       else
+         sudo_env('puppet')
+       end
+      end 
+
+      def puppet_dir 
+       if config[:require_puppet_aio]
+         '/etc/puppetlabs/puppet'
+       else
+         '/etc/puppet'
+       end
+      end  
+      
       def puppet_debian_version
         config[:puppet_version] ? "=#{config[:puppet_version]}" : nil
       end
@@ -470,8 +527,12 @@ module Kitchen
         config[:puppet_version] ? "-#{config[:puppet_version]}" : nil
       end
 
-      def puppet_environment_flag
-        config[:puppet_environment] ? "--environment=#{config[:puppet_environment]}" : nil
+      def puppet_environment_flag        
+        config[:puppet_environment] ? "--environment=#{config[:puppet_environment]} --environmentpath=#{puppet_dir}" : nil
+      end
+
+      def puppet_manifestdir
+        config[:puppet_environment] ? nil : "--manifestdir=#{File.join(config[:root_path], 'manifests')}"
       end
 
       def puppet_noop_flag
@@ -540,7 +601,7 @@ module Kitchen
       end
 
       def remove_repo
-        remove_puppet_repo ? "; #{sudo('rm')} -rf /tmp/kitchen #{hiera_data_remote_path} #{hiera_eyaml_key_remote_path} /etc/puppet/* " : nil
+        remove_puppet_repo ? "; #{sudo('rm')} -rf /tmp/kitchen #{hiera_data_remote_path} #{hiera_eyaml_key_remote_path} #{puppet_dir}/* " : nil
       end
 
       def puppet_apt_repo
