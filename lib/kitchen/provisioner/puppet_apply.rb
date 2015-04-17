@@ -57,6 +57,7 @@ module Kitchen
       default_config :puppet_apply_command, nil
 
       default_config :http_proxy, nil
+      default_config :https_proxy, nil
 
       default_config :hiera_data_remote_path, '/var/lib/hiera'
       default_config :manifest, 'site.pp'
@@ -221,6 +222,7 @@ module Kitchen
               #{Util.shell_helpers}
               if [ ! -d "#{config[:puppet_aio_remote_path]}" ]; then
                 echo "-----> Installing Puppet All In One"
+                echo "-----> #{sudo_env('yum')} -y install dmidecode"
                 #{sudo_env('yum')} -y install dmidecode
                 echo "-----> #{sudo('rpm')} -ivh #{proxy_parm} #{config[:puppet_aio_redhat_url]}"
                 #{sudo('rpm')} -ivh #{proxy_parm} #{config[:puppet_aio_redhat_url]}          
@@ -581,7 +583,9 @@ module Kitchen
       end
 
       def sudo_env(pm)
-        http_proxy ? "#{sudo('env')} http_proxy=#{http_proxy} #{pm}" : "#{sudo(pm)}"
+        s = https_proxy ? "https_proxy=#{https_proxy}" : nil
+        p = http_proxy ? "http_proxy=#{http_proxy}" : nil
+        p || s  ? "#{sudo('env')} #{p} #{s} #{pm}" : "#{sudo(pm)}"
       end
 
       def remove_puppet_repo
@@ -625,11 +629,17 @@ module Kitchen
       end
 
       def wget_proxy_parm
-        http_proxy ?  "-e use_proxy=yes -e http_proxy=#{http_proxy}" : nil
+        p = http_proxy ?  "-e http_proxy=#{http_proxy}" : nil
+        s = https_proxy ? "-e http_proxy=#{http_proxy}" : nil
+        p || s  ? "-e use_proxy=yes #{p} #{s}" : nil
       end
 
       def http_proxy
         config[:http_proxy]
+      end
+      
+      def https_proxy
+        config[:https_proxy]
       end
 
       def chef_url
