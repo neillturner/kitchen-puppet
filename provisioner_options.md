@@ -8,10 +8,10 @@ puppet_platform | naively tries to determine | OS platform of server
 require_puppet_repo | true | Set if using a puppet install from yum or apt repo
 puppet_apt_repo | "http://apt.puppetlabs.com/puppetlabs-release-precise.deb"| apt repo
 puppet_yum_repo | "https://yum.puppetlabs.com/puppetlabs-release-el-6.noarch.rpm"| yum repo
-require_puppet_aio | false | Set if using all in one puppet install (Puppet v4)
-puppet_aio_redhat_url | see below | aio puppet install location for redhat.
-puppet_aio_ubuntu_url | nil | aio puppet install location for ubuntu.
-puppet_aio_remote_path | "/opt/puppetlabs" | Server Installation location of an aio puppet install.
+require_puppet_collections | false | Set if using puppet collections install (Puppet v4)
+puppet_yum_collections_repo | "http://yum.puppetlabs.com/puppetlabs-release-pc1-el-6.noarch.rpm" | yum collections repo
+puppet_apt_collections_repo | "http://apt.puppetlabs.com/puppetlabs-release-pc1-wheezy.deb" | apt collections repo
+puppet_coll_remote_path | "/opt/puppetlabs" | Server Installation location of a puppet collections install.
 puppet_detailed_exitcodes | nil | Provide transaction information via exit codes.
 manifests_path | | puppet repo manifests directory
 manifest | 'site.pp' | manifest for puppet apply to run

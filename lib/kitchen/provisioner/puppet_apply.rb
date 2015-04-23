@@ -39,10 +39,10 @@ module Kitchen
     class PuppetApply < Base
       attr_accessor :tmp_dir
 
-      default_config :require_puppet_aio, false
-      # TODO: use something like https://github.com/fnichol/omnibus-puppet
-      default_config :puppet_aio_redhat_url, 'http://nightlies.puppetlabs.com/puppet-agent-latest/repos/el/6/PC1/x86_64/puppet-agent-1.0.0-1.el6.x86_64.rpm'
-      default_config :puppet_aio_remote_path, '/opt/puppetlabs'
+      default_config :require_puppet_collections, false
+      default_config :puppet_yum_collections_repo, 'http://yum.puppetlabs.com/puppetlabs-release-pc1-el-6.noarch.rpm'
+      default_config :puppet_apt_collections_repo, 'http://apt.puppetlabs.com/puppetlabs-release-pc1-wheezy.deb'
+      default_config :puppet_coll_remote_path, '/opt/puppetlabs'
       default_config :puppet_version, nil
       default_config :require_puppet_repo, true
       default_config :require_chef_for_busser, true
@@ -146,9 +146,9 @@ module Kitchen
       # TODO: refactor for smaller cyclomatic complexity and perceived complexity
       # rubocop:disable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       def install_command
-        return unless config[:require_puppet_aio] || config[:require_puppet_repo]
-        if config[:require_puppet_aio]
-           install_command_aio
+        return unless config[:require_puppet_collections] || config[:require_puppet_repo]
+        if config[:require_puppet_collections]
+           install_command_collections
         else
            case puppet_platform
            when 'debian', 'ubuntu'
@@ -167,7 +167,6 @@ module Kitchen
               #{install_busser}
             INSTALL
           when 'redhat', 'centos', 'fedora', 'oracle', 'amazon'
-            if config[:require_puppet_aio]
             info("Installing puppet from yum on #{puppet_platform}")
              <<-INSTALL
                if [ ! $(which puppet) ]; then
@@ -179,7 +178,6 @@ module Kitchen
                #{install_deep_merge}
                #{install_busser}
              INSTALL
-            end 
           else
             info('Installing puppet, will try to determine platform os')
             <<-INSTALL
@@ -211,49 +209,53 @@ module Kitchen
         end  
       end
       
-      def install_command_aio
+      def install_command_collections
          case puppet_platform
          when 'debian', 'ubuntu'  
-              info("Installing Puppet All In One not supported yet on #{puppet_platform}")
-              ''
+              info("Installing Puppet Collections on #{puppet_platform}")
+              #{sudo('apt-get')} -y install wget
+              #{sudo('wget')} #{wget_proxy_parm} #{config[:puppet_apt_collections_repo]}
+              #{sudo('dpkg')} -i #{puppet_apt_coll_repo_file}
           when 'redhat', 'centos', 'fedora', 'oracle', 'amazon'
-              info("Installing Puppet All In One on #{puppet_platform}")
+              info("Installing Puppet Collections on #{puppet_platform}")
               <<-INSTALL
               #{Util.shell_helpers}
-              if [ ! -d "#{config[:puppet_aio_remote_path]}" ]; then
-                echo "-----> Installing Puppet All In One"
-                echo "-----> #{sudo_env('yum')} -y install dmidecode"
-                #{sudo_env('yum')} -y install dmidecode
-                echo "-----> #{sudo('rpm')} -ivh #{proxy_parm} #{config[:puppet_aio_redhat_url]}"
-                #{sudo('rpm')} -ivh #{proxy_parm} #{config[:puppet_aio_redhat_url]}          
+              if [ ! -d "#{config[:puppet_coll_remote_path]}" ]; then
+                echo "-----> #{sudo_env('yum')} -y localinstall #{config[:puppet_yum_collections_repo]}"
+                #{sudo_env('yum')} -y localinstall #{config[:puppet_yum_collections_repo]}
+                #{sudo_env('yum')} -y install puppet
              fi
-             #{install_eyaml("#{config[:puppet_aio_remote_path]}/puppet/bin/gem")}
+             #{install_eyaml("#{config[:puppet_coll_remote_path]}/puppet/bin/gem")}
              #{install_deep_merge}
              #{install_busser}
              INSTALL
          else
-            info('Installing puppet, will try to determine platform os')
+            info('Installing Puppet Collections, will try to determine platform os')
             <<-INSTALL
-              if [ ! -d "#{config[:puppet_aio_remote_path]}" ]; then
+              if [ ! -d "#{config[:puppet_coll_remote_path]}" ]; then
                 if [ -f /etc/centos-release ] || [ -f /etc/redhat-release ] || [ -f /etc/oracle-release ]; then
-                    #{Util.shell_helpers}
-                      echo "-----> Installing Puppet All In One"
-                      #{sudo_env('yum')} -y install dmidecode
-                      echo "-----> #{sudo('rpm')} -ivh #{proxy_parm} #{config[:puppet_aio_redhat_url]}"
-                      #{sudo('rpm')} -ivh #{proxy_parm} #{config[:puppet_aio_redhat_url]}          
+                   #{Util.shell_helpers}
+                   if [ ! -d "#{config[:puppet_coll_remote_path]}" ]; then
+                     echo "-----> #{sudo_env('yum')} -y localinstall #{config[:puppet_yum_collections_repo]}"
+                     #{sudo_env('yum')} -y localinstall #{config[:puppet_yum_collections_repo]}
+                     #{sudo_env('yum')} -y install puppet
+                   fi 
                 else
                   if [ -f /etc/system-release ] || [ grep -q 'Amazon Linux' /etc/system-release ]; then
-                     #{Util.shell_helpers}
-                      echo "-----> Installing Puppet All In One"
-                      #{sudo_env('yum')} -y install dmidecode
-                      echo "-----> #{sudo('rpm')} -ivh #{proxy_parm} #{config[:puppet_aio_redhat_url]}"
-                      #{sudo('rpm')} -ivh #{proxy_parm} #{config[:puppet_aio_redhat_url]}          
+                    #{Util.shell_helpers}
+                    if [ ! -d "#{config[:puppet_coll_remote_path]}" ]; then
+                      echo "-----> #{sudo_env('yum')} -y localinstall #{config[:puppet_yum_collections_repo]}"
+                      #{sudo_env('yum')} -y localinstall #{config[:puppet_yum_collections_repo]}
+                      #{sudo_env('yum')} -y install puppet
+                    fi         
                   else
-                    echo "-----> Installing Puppet All In One not yet supported on ubuntu"
+                    #{sudo('apt-get')} -y install wget
+                    #{sudo('wget')} #{wget_proxy_parm} #{config[:puppet_apt_collections_repo]}
+                    #{sudo('dpkg')} -i #{puppet_apt_coll_repo_file}
                   fi
                 fi
               fi
-              #{install_eyaml("#{config[:puppet_aio_remote_path]}/puppet/bin/gem")}
+              #{install_eyaml("#{config[:puppet_coll_remote_path]}/puppet/bin/gem")}
               #{install_deep_merge}
               #{install_busser}                        
             INSTALL
@@ -506,15 +508,15 @@ module Kitchen
       end
 
       def puppet_cmd 
-       if config[:require_puppet_aio]
-         sudo_env("#{config[:puppet_aio_remote_path]}/bin/puppet")
+       if config[:require_puppet_collections]
+         sudo_env("#{config[:puppet_coll_remote_path]}/bin/puppet")
        else
          sudo_env('puppet')
        end
       end 
 
       def puppet_dir 
-       if config[:require_puppet_aio]
+       if config[:require_puppet_collections]
          '/etc/puppetlabs/puppet'
        else
          '/etc/puppet'
@@ -615,6 +617,10 @@ module Kitchen
       def puppet_apt_repo_file
         config[:puppet_apt_repo].split('/').last
       end
+      
+      def puppet_apt_coll_repo_file
+        config[:puppet_apt_collections_repo].split('/').last
+      end      
 
       def puppet_yum_repo
         config[:puppet_yum_repo]
