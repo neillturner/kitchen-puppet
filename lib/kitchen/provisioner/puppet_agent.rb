@@ -356,11 +356,11 @@ module Kitchen
       end
 
       def gem_proxy_parm
-        http_proxy ?  "--http-proxy #{http_proxy}" : nil
+        http_proxy ? "--http-proxy #{http_proxy}" : nil
       end
 
       def wget_proxy_parm
-        http_proxy ?  "-e use_proxy=yes -e http_proxy=#{http_proxy}" : nil
+        http_proxy ? "-e use_proxy=yes -e http_proxy=#{http_proxy}" : nil
       end
 
       def http_proxy

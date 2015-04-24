@@ -145,16 +145,16 @@ module Kitchen
           type == :directory ? File.directory?(c) : File.file?(c)
         end
       end
-      
+
       # TODO: refactor for smaller cyclomatic complexity and perceived complexity
       # rubocop:disable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       def install_command
         return unless config[:require_puppet_collections] || config[:require_puppet_repo]
         if config[:require_puppet_collections]
-           install_command_collections
+          install_command_collections
         else
-           case puppet_platform
-           when 'debian', 'ubuntu'
+          case puppet_platform
+          when 'debian', 'ubuntu'
             info("Installing puppet on #{puppet_platform}")
             <<-INSTALL
               if [ ! $(which puppet) ]; then
@@ -171,16 +171,16 @@ module Kitchen
             INSTALL
           when 'redhat', 'centos', 'fedora', 'oracle', 'amazon'
             info("Installing puppet from yum on #{puppet_platform}")
-             <<-INSTALL
-               if [ ! $(which puppet) ]; then
-                 #{sudo('rpm')} -ivh #{proxy_parm} #{puppet_yum_repo}
-                 #{update_packages_redhat_cmd}
-                 #{sudo_env('yum')} -y install puppet#{puppet_redhat_version}
-               fi
-               #{install_eyaml}
-               #{install_deep_merge}
-               #{install_busser}
-             INSTALL
+            <<-INSTALL
+              if [ ! $(which puppet) ]; then
+                #{sudo('rpm')} -ivh #{proxy_parm} #{puppet_yum_repo}
+                #{update_packages_redhat_cmd}
+                #{sudo_env('yum')} -y install puppet#{puppet_redhat_version}
+              fi
+              #{install_eyaml}
+              #{install_deep_merge}
+              #{install_busser}
+            INSTALL
           else
             info('Installing puppet, will try to determine platform os')
             <<-INSTALL
@@ -209,62 +209,64 @@ module Kitchen
               #{install_busser}
             INSTALL
           end
-        end  
+        end
       end
-      
+
       def install_command_collections
-         case puppet_platform
-         when 'debian', 'ubuntu'  
-              info("Installing Puppet Collections on #{puppet_platform}")
-              #{sudo('apt-get')} -y install wget
-              #{sudo('wget')} #{wget_proxy_parm} #{config[:puppet_apt_collections_repo]}
-              #{sudo('dpkg')} -i #{puppet_apt_coll_repo_file}
-          when 'redhat', 'centos', 'fedora', 'oracle', 'amazon'
-              info("Installing Puppet Collections on #{puppet_platform}")
-              <<-INSTALL
-              #{Util.shell_helpers}
-              if [ ! -d "#{config[:puppet_coll_remote_path]}" ]; then
-                echo "-----> #{sudo_env('yum')} -y localinstall #{config[:puppet_yum_collections_repo]}"
-                #{sudo_env('yum')} -y localinstall #{config[:puppet_yum_collections_repo]}
-                #{sudo_env('yum')} -y install puppet
-             fi
-             #{install_eyaml("#{config[:puppet_coll_remote_path]}/puppet/bin/gem")}
-             #{install_deep_merge}
-             #{install_busser}
-             INSTALL
-         else
-            info('Installing Puppet Collections, will try to determine platform os')
-            <<-INSTALL
-              if [ ! -d "#{config[:puppet_coll_remote_path]}" ]; then
-                if [ -f /etc/centos-release ] || [ -f /etc/redhat-release ] || [ -f /etc/oracle-release ]; then
-                   #{Util.shell_helpers}
-                   if [ ! -d "#{config[:puppet_coll_remote_path]}" ]; then
-                     echo "-----> #{sudo_env('yum')} -y localinstall #{config[:puppet_yum_collections_repo]}"
-                     #{sudo_env('yum')} -y localinstall #{config[:puppet_yum_collections_repo]}
-                     #{sudo_env('yum')} -y install puppet
-                   fi 
-                else
-                  if [ -f /etc/system-release ] || [ grep -q 'Amazon Linux' /etc/system-release ]; then
-                    #{Util.shell_helpers}
-                    if [ ! -d "#{config[:puppet_coll_remote_path]}" ]; then
-                      echo "-----> #{sudo_env('yum')} -y localinstall #{config[:puppet_yum_collections_repo]}"
-                      #{sudo_env('yum')} -y localinstall #{config[:puppet_yum_collections_repo]}
-                      #{sudo_env('yum')} -y install puppet
-                    fi         
-                  else
-                    #{sudo('apt-get')} -y install wget
-                    #{sudo('wget')} #{wget_proxy_parm} #{config[:puppet_apt_collections_repo]}
-                    #{sudo('dpkg')} -i #{puppet_apt_coll_repo_file}
+        case puppet_platform
+        when 'debian', 'ubuntu'
+          info("Installing Puppet Collections on #{puppet_platform}")
+          <<-INSTALL
+          #{sudo('apt-get')} -y install wget
+          #{sudo('wget')} #{wget_proxy_parm} #{config[:puppet_apt_collections_repo]}
+          #{sudo('dpkg')} -i #{puppet_apt_coll_repo_file}
+          INSTALL
+        when 'redhat', 'centos', 'fedora', 'oracle', 'amazon'
+          info("Installing Puppet Collections on #{puppet_platform}")
+          <<-INSTALL
+          #{Util.shell_helpers}
+          if [ ! -d "#{config[:puppet_coll_remote_path]}" ]; then
+            echo "-----> #{sudo_env('yum')} -y localinstall #{config[:puppet_yum_collections_repo]}"
+            #{sudo_env('yum')} -y localinstall #{config[:puppet_yum_collections_repo]}
+            #{sudo_env('yum')} -y install puppet
+          fi
+          #{install_eyaml("#{config[:puppet_coll_remote_path]}/puppet/bin/gem")}
+          #{install_deep_merge}
+          #{install_busser}
+          INSTALL
+        else
+          info('Installing Puppet Collections, will try to determine platform os')
+          <<-INSTALL
+            if [ ! -d "#{config[:puppet_coll_remote_path]}" ]; then
+              if [ -f /etc/centos-release ] || [ -f /etc/redhat-release ] || [ -f /etc/oracle-release ]; then
+                 #{Util.shell_helpers}
+                 if [ ! -d "#{config[:puppet_coll_remote_path]}" ]; then
+                   echo "-----> #{sudo_env('yum')} -y localinstall #{config[:puppet_yum_collections_repo]}"
+                   #{sudo_env('yum')} -y localinstall #{config[:puppet_yum_collections_repo]}
+                   #{sudo_env('yum')} -y install puppet
+                 fi
+              else
+                if [ -f /etc/system-release ] || [ grep -q 'Amazon Linux' /etc/system-release ]; then
+                  #{Util.shell_helpers}
+                  if [ ! -d "#{config[:puppet_coll_remote_path]}" ]; then
+                    echo "-----> #{sudo_env('yum')} -y localinstall #{config[:puppet_yum_collections_repo]}"
+                    #{sudo_env('yum')} -y localinstall #{config[:puppet_yum_collections_repo]}
+                    #{sudo_env('yum')} -y install puppet
                   fi
+                else
+                  #{sudo('apt-get')} -y install wget
+                  #{sudo('wget')} #{wget_proxy_parm} #{config[:puppet_apt_collections_repo]}
+                  #{sudo('dpkg')} -i #{puppet_apt_coll_repo_file}
                 fi
               fi
-              #{install_eyaml("#{config[:puppet_coll_remote_path]}/puppet/bin/gem")}
-              #{install_deep_merge}
-              #{install_busser}                        
-            INSTALL
-         end
-      end 
-      
+            fi
+            #{install_eyaml("#{config[:puppet_coll_remote_path]}/puppet/bin/gem")}
+            #{install_deep_merge}
+            #{install_busser}
+          INSTALL
+        end
+      end
+
       def install_deep_merge
         return unless config[:hiera_deep_merge]
         <<-INSTALL
@@ -276,7 +278,7 @@ module Kitchen
         INSTALL
       end
 
-      def install_eyaml(gem_cmd='gem') 
+      def install_eyaml(gem_cmd = 'gem')
         return unless config[:hiera_eyaml]
         <<-INSTALL
           # A backend for Hiera that provides per-value asymmetric encryption of sensitive data
@@ -350,19 +352,18 @@ module Kitchen
         end
 
         if puppet_git_pr
-          commands << [
-            sudo('git'), '--git-dir=/etc/puppet/.git/',
-                         'fetch -f',
-                         'origin',
-                         "pull/#{puppet_git_pr}/head:pr_#{puppet_git_pr}"
-          ].join(' ')
+          commands << [sudo('git'),
+                       '--git-dir=/etc/puppet/.git/',
+                       'fetch -f',
+                       'origin',
+                       "pull/#{puppet_git_pr}/head:pr_#{puppet_git_pr}"
+                      ].join(' ')
 
-          commands << [
-            sudo('git'), '--git-dir=/etc/puppet/.git/',
-                         '--work-tree=/etc/puppet/',
-                         'checkout',
-                         "pr_#{puppet_git_pr}"
-          ].join(' ')
+          commands << [sudo('git'), '--git-dir=/etc/puppet/.git/',
+                       '--work-tree=/etc/puppet/',
+                       'checkout',
+                       "pr_#{puppet_git_pr}"
+                      ].join(' ')
         end
 
         if puppet_config
@@ -419,8 +420,8 @@ module Kitchen
           commands << [
             sudo('ln -s '),  config[:root_path], File.join(puppet_dir, config[:puppet_environment])
           ].join(' ')
-        end 
-        
+        end
+
         command = commands.join(' && ')
         debug(command)
         command
@@ -544,22 +545,22 @@ module Kitchen
         config[:librarian_puppet_ssl_file]
       end
 
-      def puppet_cmd 
-       if config[:require_puppet_collections]
-         sudo_env("#{config[:puppet_coll_remote_path]}/bin/puppet")
-       else
-         sudo_env('puppet')
-       end
-      end 
+      def puppet_cmd
+        if config[:require_puppet_collections]
+          sudo_env("#{config[:puppet_coll_remote_path]}/bin/puppet")
+        else
+          sudo_env('puppet')
+        end
+      end
 
-      def puppet_dir 
-       if config[:require_puppet_collections]
-         '/etc/puppetlabs/puppet'
-       else
-         '/etc/puppet'
-       end
-      end  
-      
+      def puppet_dir
+        if config[:require_puppet_collections]
+          '/etc/puppetlabs/puppet'
+        else
+          '/etc/puppet'
+        end
+      end
+
       def puppet_debian_version
         config[:puppet_version] ? "=#{config[:puppet_version]}" : nil
       end
@@ -568,7 +569,7 @@ module Kitchen
         config[:puppet_version] ? "-#{config[:puppet_version]}" : nil
       end
 
-      def puppet_environment_flag        
+      def puppet_environment_flag
         config[:puppet_environment] ? "--environment=#{config[:puppet_environment]} --environmentpath=#{puppet_dir}" : nil
       end
 
@@ -624,7 +625,7 @@ module Kitchen
       def sudo_env(pm)
         s = https_proxy ? "https_proxy=#{https_proxy}" : nil
         p = http_proxy ? "http_proxy=#{http_proxy}" : nil
-        p || s  ? "#{sudo('env')} #{p} #{s} #{pm}" : "#{sudo(pm)}"
+        p || s ? "#{sudo('env')} #{p} #{s} #{pm}" : "#{sudo(pm)}"
       end
 
       def remove_puppet_repo
@@ -654,33 +655,33 @@ module Kitchen
       def puppet_apt_repo_file
         config[:puppet_apt_repo].split('/').last
       end
-      
+
       def puppet_apt_coll_repo_file
         config[:puppet_apt_collections_repo].split('/').last
-      end      
+      end
 
       def puppet_yum_repo
         config[:puppet_yum_repo]
       end
 
       def proxy_parm
-        http_proxy ?  "--httpproxy #{URI.parse(http_proxy).host.downcase} --httpport #{URI.parse(http_proxy).port} " : nil
+        http_proxy ? "--httpproxy #{URI.parse(http_proxy).host.downcase} --httpport #{URI.parse(http_proxy).port} " : nil
       end
 
       def gem_proxy_parm
-        http_proxy ?  "--http-proxy #{http_proxy}" : nil
+        http_proxy ? "--http-proxy #{http_proxy}" : nil
       end
 
       def wget_proxy_parm
-        p = http_proxy ?  "-e http_proxy=#{http_proxy}" : nil
+        p = http_proxy ? "-e http_proxy=#{http_proxy}" : nil
         s = https_proxy ? "-e http_proxy=#{http_proxy}" : nil
-        p || s  ? "-e use_proxy=yes #{p} #{s}" : nil
+        p || s ? "-e use_proxy=yes #{p} #{s}" : nil
       end
 
       def http_proxy
         config[:http_proxy]
       end
-      
+
       def https_proxy
         config[:https_proxy]
       end
