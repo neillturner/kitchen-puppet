@@ -23,6 +23,8 @@ hiera_data_remote_path | "/var/lib/hiera" | Hiera data directory on server
 puppet_debug| false| Enable full debugging logging on puppet run
 puppet_verbose| false| Extra information logging on puppet run
 puppet_noop| false| puppet runs in a no-op or dry-run mode
+puppet_git_init | nil | initialize puppet from GIT repository, e.g. "git@github.com:example/puppet-repo.git"
+puppet_git_pr | nil | checkout specific Pull Request from repository specified in puppet_git_init, e.g. "324"
 update_package_repos| true| update OS repository metadata
 custom_facts| Hash.new | Hash to set the puppet facts before running puppet apply
 install_custom_facts| false | Install custom facts to yaml file at "/tmp/kitchen/facter/kitchen.yaml"
