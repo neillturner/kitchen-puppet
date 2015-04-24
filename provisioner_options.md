@@ -45,8 +45,6 @@ http_proxy | nil | use http proxy when installing puppet, packages and running p
 https_proxy | nil | use https proxy when installing puppet, packages and running puppet
 puppet_logdest | nil | _Array_ of log destinations. Include 'console' if wanted
 
-Currently puppet_aio_redhat_url is defaulted to 'http://nightlies.puppetlabs.com/puppet-agent-latest/repos/el/6/PC1/x86_64/puppet-agent-1.0.0-1.el6.x86_64.rpm'
-but this will need to change when Puppet 4 has new nightlies builds or goes general release.   
 
 ## Puppet Apply Configuring Provisioner Options
 
@@ -130,6 +128,8 @@ require_chef_for_busser | true | Install chef as currently needed by busser to r
 puppet_config_path | | path of custom puppet.conf file
 http_proxy | nil | use http proxy when installing puppet and packages
 
+
+NOTE: Puppet Collections Support not in puppet agent yet
 
 ## Puppet Agent Configuring Provisioner Options
 
