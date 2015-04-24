@@ -56,6 +56,9 @@ module Kitchen
 
       default_config :puppet_apply_command, nil
 
+      default_config :puppet_git_init, nil
+      default_config :puppet_git_pr, nil
+
       default_config :http_proxy, nil
       default_config :https_proxy, nil
 
@@ -336,6 +339,32 @@ module Kitchen
       # rubocop:disable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       def prepare_command
         commands = []
+        if puppet_git_init
+          commands << [
+            sudo('rm -rf'), '/etc/puppet'
+          ].join(' ')
+
+          commands << [
+            sudo('git clone'), puppet_git_init, '/etc/puppet'
+          ].join(' ')
+        end
+
+        if puppet_git_pr
+          commands << [
+            sudo('git'), '--git-dir=/etc/puppet/.git/',
+                         'fetch -f',
+                         'origin',
+                         "pull/#{puppet_git_pr}/head:pr_#{puppet_git_pr}"
+          ].join(' ')
+
+          commands << [
+            sudo('git'), '--git-dir=/etc/puppet/.git/',
+                         '--work-tree=/etc/puppet/',
+                         'checkout',
+                         "pr_#{puppet_git_pr}"
+          ].join(' ')
+        end
+
         if puppet_config
           commands << [
             sudo('cp'),
@@ -469,6 +498,14 @@ module Kitchen
 
       def puppet_environment
         config[:puppet_environment]
+      end
+
+      def puppet_git_init
+        config[:puppet_git_init]
+      end
+
+      def puppet_git_pr
+        config[:puppet_git_pr]
       end
 
       def hiera_config
