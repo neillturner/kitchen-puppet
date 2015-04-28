@@ -9,7 +9,7 @@ require_puppet_repo | true | Set if using a puppet install from yum or apt repo
 puppet_apt_repo | "http://apt.puppetlabs.com/puppetlabs-release-precise.deb"| apt repo
 puppet_yum_repo | "https://yum.puppetlabs.com/puppetlabs-release-el-6.noarch.rpm"| yum repo
 require_puppet_collections | false | Set if using puppet collections install (Puppet v4)
-puppet_yum_collections_repo | "http://yum.puppetlabs.com/puppetlabs-release-pc1-el-6.noarch.rpm" | yum collections repo
+puppet_yum_collections_repo | "http://yum.puppetlabs.com/el/6/PC1/x86_64/puppet-agent-1.0.0-1.el6.x86_64.rpm" | yum collections repo
 puppet_apt_collections_repo | "http://apt.puppetlabs.com/puppetlabs-release-pc1-wheezy.deb" | apt collections repo
 puppet_coll_remote_path | "/opt/puppetlabs" | Server Installation location of a puppet collections install.
 puppet_detailed_exitcodes | nil | Provide transaction information via exit codes.
