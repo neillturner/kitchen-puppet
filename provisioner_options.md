@@ -29,7 +29,7 @@ puppet_git_pr | nil | checkout specific Pull Request from repository specified i
 update_package_repos| true| update OS repository metadata
 custom_facts| Hash.new | Hash to set the puppet facts before running puppet apply
 install_custom_facts| false | Install custom facts to yaml file at "/tmp/kitchen/facter/kitchen.yaml"
-chef_bootstrap_url |"https://www.getchef.com/chef/install.sh"| the chef (needed for busser to run tests)
+chef_bootstrap_url |"https://www.getchef.com/chef/install.sh"| the chef (needed for busser to run tests) NOTE: kitchen 1.4 only requires ruby to run busser so this is not required.
 puppetfile_path | | Path to Puppetfile
 puppet_apply_command | nil | Overwrite the puppet apply command. Needs "sudo -E puppet apply" as a prefix.
 require_chef_for_busser | true | Install chef as currently needed by busser to run tests
@@ -52,6 +52,7 @@ puppet_logdest | nil | _Array_ of log destinations. Include 'console' if wanted
 
 The provisioner can be configured globally or per suite, global settings act as defaults for all suites, you can then customise per suite, for example:
 
+```yaml
     ---
     driver:
       name: vagrant
@@ -71,16 +72,32 @@ The provisioner can be configured globally or per suite, global settings act as 
 
     suites:
      - name: default
+```
 
+**NOTE:** With Test-Kitchen 1.4 you not longer need chef install to run the tests. You just need ruby installed version 1.9 or higher and also add to the .kitchen.yml file
 
-in this example, vagrant will download a box for ubuntu 1204 with no configuration management installed, then install the latest puppet and puppet apply against a puppet repo from the /repository/puppet_repo directory using the defailt manifest site.pp
+```yaml
+  verifier:
+    ruby_bindir: '/usr/bin'
+```
+where /usr/bin is the location of the ruby command. 
+
+in this example, vagrant will download a box for ubuntu 1204 with no configuration management installed, then install the **NOTE:** With Test-Kitchen 1.4 you not longer need chef install to run the tests. You just need ruby installed version 1.9 or higher and also add to the .kitchen.yml file
+
+```yaml
+  verifier:
+    ruby_bindir: '/usr/bin'
+```
+where /usr/bin is the location of the ruby command. 
+latest puppet and puppet apply against a puppet repo from the /repository/puppet_repo directory using the defailt manifest site.pp
 
 To override a setting at the suite-level, specify the setting name under the suite:
 
+```yaml
     suites:
      - name: default
        manifest: foobar.pp
-
+```
 ### Per-suite Structure
 
 It can be beneficial to keep different Puppet layouts for different suites. Rather than having to specify the manifest, modules, etc for each suite, you can create the following directory structure and they will automatically be found:
@@ -137,6 +154,7 @@ NOTE: Puppet Collections Support not in puppet agent yet
 
 The provisioner can be configured globally or per suite, global settings act as defaults for all suites, you can then customise per suite, for example:
 
+```yaml
     ---
     driver:
       name: vagrant
@@ -156,7 +174,15 @@ The provisioner can be configured globally or per suite, global settings act as 
 
     suites:
      - name: default
+```
 
+**NOTE:** With Test-Kitchen 1.4 you not longer need chef install to run the tests. You just need ruby installed version 1.9 or higher and also add to the .kitchen.yml file
+
+```yaml
+  verifier:
+    ruby_bindir: '/usr/bin'
+```
+where /usr/bin is the location of the ruby command. 
 
 In this example, vagrant will download a box for ubuntu 1204 with no configuration management installed, then install the latest puppet and run puppet agent against a puppet master at puppetmaster-nocm-ubuntu-1204
 
@@ -169,6 +195,8 @@ NOTE: For testing it is possible to set the puppetmaster to autosign the certifi
 
 To override a setting at the suite-level, specify the setting name under the suite:
 
+```yaml
     suites:
      - name: default
        manifest: foobar.pp
+```
