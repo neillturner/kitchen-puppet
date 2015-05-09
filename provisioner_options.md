@@ -137,7 +137,7 @@ update_package_repos| true| update OS repository metadata
 custom_facts| Hash.new | Hash to set the puppet facts before running puppet apply
 chef_bootstrap_url |"https://www.getchef.com/chef/install.sh"| the chef (needed for busser to run tests)
 puppet_agent_command | nil | Overwrite the puppet agent command. Needs "sudo -E puppet agent" as a prefix.
-require_chef_for_busser | true | Install chef as currently needed by busser to run tests
+require_chef_for_busser | true | Install chef as currently needed by busser to run tests. NOTE: kitchen 1.4 only requires ruby to run busser so this is not required.
 puppet_config_path | | path of custom puppet.conf file
 http_proxy | nil | use http proxy when installing puppet and packages
 
