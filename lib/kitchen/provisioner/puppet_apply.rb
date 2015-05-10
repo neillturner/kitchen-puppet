@@ -301,8 +301,8 @@ module Kitchen
         INSTALL
       end
 
-     # /bin/wget -P /etc/pki/rpm-gpg/ http://yum.puppetlabs.com/RPM-GPG-KEY-puppetlabs
-     # changed to curl
+      # /bin/wget -P /etc/pki/rpm-gpg/ http://yum.puppetlabs.com/RPM-GPG-KEY-puppetlabs
+      # changed to curl
 
       def install_puppet_yum_repo
         <<-INSTALL
