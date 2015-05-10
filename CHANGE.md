@@ -1,3 +1,21 @@
+v0.0.27
+* Support Centos 7 install of puppet
+* document use of busser without a chef install in kitchen 1.4
+
+v0.0.26
+* puppet collections (v4) support
+* https_proxy support
+
+v0.0.24
+* for eyaml install ruby 187 compatible version of highline
+
+v0.0.23
+* yaml add deep merge option
+* fix eyaml install bug
+
+v0.0.22
+* Add logdest provisioner option
+
 v0.0.19
 *  travis Ci support
 *  puppet_detailed_exitcodes to puppet_apply

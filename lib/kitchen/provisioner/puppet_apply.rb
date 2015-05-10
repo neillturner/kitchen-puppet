@@ -173,9 +173,7 @@ module Kitchen
             info("Installing puppet from yum on #{puppet_platform}")
             <<-INSTALL
               if [ ! $(which puppet) ]; then
-                #{sudo('rpm')} -ivh #{proxy_parm} #{puppet_yum_repo}
-                #{update_packages_redhat_cmd}
-                #{sudo_env('yum')} -y install puppet#{puppet_redhat_version}
+                #{install_puppet_yum_repo}
               fi
               #{install_eyaml}
               #{install_deep_merge}
@@ -186,14 +184,10 @@ module Kitchen
             <<-INSTALL
               if [ ! $(which puppet) ]; then
                 if [ -f /etc/centos-release ] || [ -f /etc/redhat-release ] || [ -f /etc/oracle-release ]; then
-                    #{sudo('rpm')} -ivh #{proxy_parm} #{puppet_yum_repo}
-                    #{update_packages_redhat_cmd}
-                    #{sudo_env('yum')} -y install puppet#{puppet_redhat_version}
+                    #{install_puppet_yum_repo}
                 else
                   if [ -f /etc/system-release ] || [ grep -q 'Amazon Linux' /etc/system-release ]; then
-                     #{sudo('rpm')} -ivh #{proxy_parm} #{puppet_yum_repo}
-                     #{update_packages_redhat_cmd}
-                     #{sudo_env('yum')} -y install puppet#{puppet_redhat_version}
+                     #{install_puppet_yum_repo}
                   else
                     #{sudo('apt-get')} -y install wget
                     #{sudo('wget')} #{wget_proxy_parm} #{puppet_apt_repo}
@@ -303,6 +297,40 @@ module Kitchen
             echo '-----> Installing Chef Omnibus to install busser to run tests'
             do_download #{chef_url} /tmp/install.sh
             #{sudo('sh')} /tmp/install.sh
+          fi
+        INSTALL
+      end
+
+     # /bin/wget -P /etc/pki/rpm-gpg/ http://yum.puppetlabs.com/RPM-GPG-KEY-puppetlabs
+     # changed to curl
+
+      def install_puppet_yum_repo
+        <<-INSTALL
+          rhelversion=$(cat /etc/redhat-release | grep release\ 7)
+          # For CentOS7/RHEL7 the rdo release contains puppetlabs repo, creating conflict. Create temp-repo
+          #{sudo_env('curl')} -o /etc/pki/rpm-gpg/RPM-GPG-KEY-puppetlabs http://yum.puppetlabs.com/RPM-GPG-KEY-puppetlabs
+          if [ -n "$rhelversion" ]; then
+          echo '[puppettemp-products]
+          name=Puppet Labs Products - \$basearch
+          baseurl=http://yum.puppetlabs.com/el/7/products/\$basearch
+          gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-puppetlabs
+          enabled=0
+          gpgcheck=1
+          [puppettemp-deps]
+          name=Puppet Labs Dependencies - \$basearch
+          baseurl=http://yum.puppetlabs.com/el/7/dependencies/\$basearch
+          gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-puppetlabs
+          enabled=0
+          gpgcheck=1' >> /etc/yum.repos.d/puppettemp.repo
+            #{update_packages_redhat_cmd}
+            #{sudo_env('yum')} -y --enablerepo=puppettemp-products --enablerepo=puppettemp-deps install puppet#{puppet_redhat_version}
+            # Clean up temporary puppet repo
+            rm -rf /etc/pki/rpm-gpg/RPM-GPG-KEY-puppetlabs
+            rm -rf /etc/yum.repos.d/puppettemp.repo
+          else
+            #{sudo('rpm')} -ivh #{proxy_parm} #{puppet_yum_repo}
+            #{update_packages_redhat_cmd}
+            #{sudo_env('yum')} -y install puppet#{puppet_redhat_version}
           fi
         INSTALL
       end
