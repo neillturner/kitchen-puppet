@@ -306,7 +306,7 @@ module Kitchen
 
       def install_puppet_yum_repo
         <<-INSTALL
-          rhelversion=$(cat /etc/redhat-release | grep release\ 7)
+          rhelversion=$(cat /etc/redhat-release | grep "release 7")
           # For CentOS7/RHEL7 the rdo release contains puppetlabs repo, creating conflict. Create temp-repo
           #{sudo_env('curl')} -o /etc/pki/rpm-gpg/RPM-GPG-KEY-puppetlabs http://yum.puppetlabs.com/RPM-GPG-KEY-puppetlabs
           if [ -n "$rhelversion" ]; then
@@ -321,12 +321,13 @@ module Kitchen
           baseurl=http://yum.puppetlabs.com/el/7/dependencies/\$basearch
           gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-puppetlabs
           enabled=0
-          gpgcheck=1' >> /etc/yum.repos.d/puppettemp.repo
+          gpgcheck=1' | sudo tee /etc/yum.repos.d/puppettemp.repo > /dev/null
+          sudo sed -i 's/^[ \t]*//' /etc/yum.repos.d/puppettemp.repo
             #{update_packages_redhat_cmd}
             #{sudo_env('yum')} -y --enablerepo=puppettemp-products --enablerepo=puppettemp-deps install puppet#{puppet_redhat_version}
             # Clean up temporary puppet repo
-            rm -rf /etc/pki/rpm-gpg/RPM-GPG-KEY-puppetlabs
-            rm -rf /etc/yum.repos.d/puppettemp.repo
+            sudo rm -rf /etc/pki/rpm-gpg/RPM-GPG-KEY-puppetlabs
+            sudo rm -rf /etc/yum.repos.d/puppettemp.repo
           else
             #{sudo('rpm')} -ivh #{proxy_parm} #{puppet_yum_repo}
             #{update_packages_redhat_cmd}
