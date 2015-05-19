@@ -192,5 +192,6 @@ To override a setting at the suite-level, specify the setting name under the sui
 ```yaml
     suites:
      - name: default
-       manifest: foobar.pp
+       provisioner:
+         manifest: foobar.pp
 ```
