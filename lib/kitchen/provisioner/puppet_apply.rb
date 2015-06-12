@@ -809,7 +809,7 @@ module Kitchen
         info('Preparing hiera')
         debug("Using hiera from #{hiera_config}")
 
-        FileUtils.cp_r(hiera_config, File.join(sandbox_path, 'hiera.yaml'))
+        FileUtils.cp(File.join(hiera_config, 'hiera.yaml'), File.join(sandbox_path, 'hiera.yaml'))
       end
 
       def prepare_fileserver_config
