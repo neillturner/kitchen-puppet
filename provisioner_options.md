@@ -4,6 +4,8 @@
 key | default value | Notes
 ----|---------------|--------
 puppet_version | "latest"| desired version, affects apt installs.
+facter_version | "latest"| desired version, affects apt installs.
+hiera_version | "latest"| desired version, affects apt installs.
 puppet_platform | naively tries to determine | OS platform of server
 require_puppet_repo | true | Set if using a puppet install from yum or apt repo
 puppet_apt_repo | "http://apt.puppetlabs.com/puppetlabs-release-precise.deb"| apt repo
@@ -113,6 +115,7 @@ no idea why Puppet versioned their repository with a trailing
 key | default value | Notes
 ----|---------------|--------
 puppet_version | "latest"| desired version, affects apt installs.
+facter_version | "latest"| desired version, affects apt installs.
 puppet_platform | naively tries to determine | OS platform of server
 require_puppet_repo | true | Set if using a puppet install from yum or apt repo
 puppet_apt_repo | "http://apt.puppetlabs.com/puppetlabs-release-precise.deb"| apt repo
