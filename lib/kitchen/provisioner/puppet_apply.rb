@@ -613,7 +613,11 @@ module Kitchen
       end
 
       def puppet_environment_flag
-        config[:puppet_environment] ? "--environment=#{config[:puppet_environment]} --environmentpath=#{puppet_dir}" : nil
+        if config[:puppet_version] =~ /^2/
+          config[:puppet_environment] ? "--environment=#{config[:puppet_environment]}" : nil
+        else
+          config[:puppet_environment] ? "--environment=#{config[:puppet_environment]} --environmentpath=#{puppet_dir}" : nil
+        end
       end
 
       def puppet_manifestdir
