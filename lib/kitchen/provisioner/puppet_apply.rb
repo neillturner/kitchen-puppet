@@ -44,6 +44,8 @@ module Kitchen
       default_config :puppet_apt_collections_repo, 'http://apt.puppetlabs.com/puppetlabs-release-pc1-wheezy.deb'
       default_config :puppet_coll_remote_path, '/opt/puppetlabs'
       default_config :puppet_version, nil
+      default_config :facter_version, nil
+      default_config :hiera_version, nil
       default_config :require_puppet_repo, true
       default_config :require_chef_for_busser, true
       default_config :resolve_with_librarian_puppet, true
@@ -162,8 +164,10 @@ module Kitchen
                 #{sudo('wget')} #{wget_proxy_parm} #{puppet_apt_repo}
                 #{sudo('dpkg')} -i #{puppet_apt_repo_file}
                 #{update_packages_debian_cmd}
+                #{sudo_env('apt-get')} -y install facter#{facter_debian_version}
                 #{sudo_env('apt-get')} -y install puppet-common#{puppet_debian_version}
                 #{sudo_env('apt-get')} -y install puppet#{puppet_debian_version}
+                #{sudo_env('apt-get')} -y install hiera-puppet#{puppet_hiera_debian_version}
               fi
               #{install_eyaml}
               #{install_deep_merge}
@@ -193,8 +197,10 @@ module Kitchen
                     #{sudo('wget')} #{wget_proxy_parm} #{puppet_apt_repo}
                     #{sudo('dpkg')} -i #{puppet_apt_repo_file}
                     #{update_packages_debian_cmd}
+                    #{sudo_env('apt-get')} -y install facter#{facter_debian_version}
                     #{sudo_env('apt-get')} -y install puppet-common#{puppet_debian_version}
                     #{sudo_env('apt-get')} -y install puppet#{puppet_debian_version}
+                    #{sudo_env('apt-get')} -y install hiera-puppet#{puppet_hiera_debian_version}
                   fi
                 fi
               fi
@@ -594,12 +600,24 @@ module Kitchen
         config[:puppet_version] ? "=#{config[:puppet_version]}" : nil
       end
 
+      def facter_debian_version
+        config[:facter_version] ? "=#{config[:facter_version]}" : nil
+      end
+
+      def puppet_hiera_debian_version
+        config[:hiera_version] ? "=#{config[:hiera_version]}" : nil
+      end
+
       def puppet_redhat_version
         config[:puppet_version] ? "-#{config[:puppet_version]}" : nil
       end
 
       def puppet_environment_flag
-        config[:puppet_environment] ? "--environment=#{config[:puppet_environment]} --environmentpath=#{puppet_dir}" : nil
+        if config[:puppet_version] =~ /^2/
+          config[:puppet_environment] ? "--environment=#{config[:puppet_environment]}" : nil
+        else
+          config[:puppet_environment] ? "--environment=#{config[:puppet_environment]} --environmentpath=#{puppet_dir}" : nil
+        end
       end
 
       def puppet_manifestdir

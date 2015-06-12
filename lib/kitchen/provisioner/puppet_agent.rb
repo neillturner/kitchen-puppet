@@ -43,6 +43,7 @@ module Kitchen
       default_config :puppet_omnibus_url, nil
       default_config :puppet_omnibus_remote_path, '/opt/puppet'
       default_config :puppet_version, nil
+      default_config :facter_version, nil
       default_config :require_puppet_repo, true
       default_config :require_chef_for_busser, true
 
@@ -120,6 +121,7 @@ module Kitchen
                 #{sudo('wget')} #{wget_proxy_parm} #{puppet_apt_repo}
                 #{sudo('dpkg')} -i #{puppet_apt_repo_file}
                 #{update_packages_debian_cmd}
+                #{sudo_env('apt-get')} -y install facter#{facter_debian_version}
                 #{sudo('apt-get')} -y install puppet-common#{puppet_debian_version}
                 #{sudo('apt-get')} -y install puppet#{puppet_debian_version}
               fi
@@ -153,6 +155,7 @@ module Kitchen
                     #{sudo('wget')} #{wget_proxy_parm} #{puppet_apt_repo}
                     #{sudo('dpkg')} -i #{puppet_apt_repo_file}
                     #{update_packages_debian_cmd}
+                    #{sudo('apt-get')} -y install facter#{facter_debian_version}
                     #{sudo('apt-get')} -y install puppet-common#{puppet_debian_version}
                     #{sudo('apt-get')} -y install puppet#{puppet_debian_version}
                   fi
@@ -253,6 +256,10 @@ module Kitchen
 
       def puppet_debian_version
         config[:puppet_version] ? "=#{config[:puppet_version]}" : nil
+      end
+
+      def facter_debian_version
+        config[:facter_version] ? "=#{config[:facter_version]}" : nil
       end
 
       def puppet_redhat_version
