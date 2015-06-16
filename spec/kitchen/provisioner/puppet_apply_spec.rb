@@ -209,6 +209,10 @@ describe Kitchen::Provisioner::PuppetApply do
         expect(provisioner[:facter_file]).to eq(nil)
       end
 
+      it 'should set facterlib to nil' do
+        expect(provisioner[:facterlib]).to eq(nil)
+      end
+
       it 'should not use librarian ssl file' do
         expect(provisioner[:librarian_puppet_ssl_file]).to eq(nil)
       end
@@ -246,6 +250,11 @@ describe Kitchen::Provisioner::PuppetApply do
     it 'Sets Hiera Version to 2.0.1' do
       config[:hiera_version] = '2.0.1'
       expect(provisioner[:hiera_version]).to eq('2.0.1')
+    end
+
+    it 'exports FACTERLIB' do
+      config[:facterlib] = '/etc/puppet/facter'
+      expect(provisioner.run_command).to include("export FACTERLIB='/etc/puppet/facter';")
     end
   end
 end
