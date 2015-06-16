@@ -22,7 +22,7 @@
 
 require 'uri'
 require 'json'
-require 'kitchen/provisioner/base'
+require 'kitchen'
 require 'kitchen/provisioner/puppet/librarian'
 
 module Kitchen
