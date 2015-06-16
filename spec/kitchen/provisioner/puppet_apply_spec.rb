@@ -436,7 +436,7 @@ describe Kitchen::Provisioner::PuppetApply do
 
       it 'should set a custom fact' do
         config[:custom_facts] = { 'puppet' => 'yay' }
-        expect(provisioner[:custom_facts]).to eq({ 'puppet' => 'yay' })
+        expect(provisioner[:custom_facts]).to eq('puppet' => 'yay')
       end
 
       it 'should set detailed exitcodes' do
