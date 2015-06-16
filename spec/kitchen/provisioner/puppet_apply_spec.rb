@@ -230,22 +230,249 @@ describe Kitchen::Provisioner::PuppetApply do
       end
     end
 
-    # Test Puppet Version
-    it 'Sets Puppet Version to 3.5.1' do
-      config[:puppet_version] = '3.5.1'
-      expect(provisioner[:puppet_version]).to eq('3.5.1')
-    end
+    context 'non-default sets' do
+      it 'requires puppet collections' do
+        config[:require_puppet_collections] = true
+        expect(provisioner[:require_puppet_collections]).to eq(true)
+      end
 
-    # Test Facter Version
-    it 'Sets Facter Version to 2.4.3' do
-      config[:facter_version] = '2.4.3'
-      expect(provisioner[:facter_version]).to eq('2.4.3')
-    end
+      it 'sets yum collections repo' do
+        config[:puppet_yum_collections_repo] = 'yum-http-address-foo'
+        expect(provisioner[:puppet_yum_collections_repo]).to eq('yum-http-address-foo')
+      end
 
-    # Test Hiera Version
-    it 'Sets Hiera Version to 2.0.1' do
-      config[:hiera_version] = '2.0.1'
-      expect(provisioner[:hiera_version]).to eq('2.0.1')
+      it 'sets apt collections repo' do
+        config[:puppet_apt_collections_repo] = 'bar-http-address'
+        expect(provisioner[:puppet_apt_collections_repo]).to eq('bar-http-address')
+      end
+
+      it 'sets puppet collections path' do
+        config[:puppet_coll_remote_path] = '/foo/bar'
+        expect(provisioner[:puppet_coll_remote_path]).to eq('/foo/bar')
+      end
+
+      # Test Puppet Version
+      it 'Sets Puppet Version to 3.5.1' do
+        config[:puppet_version] = '3.5.1'
+        expect(provisioner[:puppet_version]).to eq('3.5.1')
+      end
+
+      # Test Facter Version
+      it 'Sets Facter Version to 2.4.3' do
+        config[:facter_version] = '2.4.3'
+        expect(provisioner[:facter_version]).to eq('2.4.3')
+      end
+
+      # Test Hiera Version
+      it 'Sets Hiera Version to 2.0.1' do
+        config[:hiera_version] = '2.0.1'
+        expect(provisioner[:hiera_version]).to eq('2.0.1')
+      end
+
+      it 'sets puppet repo to false' do
+        config[:require_puppet_repo] = false
+        expect(provisioner[:require_puppet_repo]).to eq(false)
+      end
+
+      it 'sets chef busser to false' do
+        config[:require_chef_for_busser] = false
+        expect(provisioner[:require_chef_for_busser]).to eq(false)
+      end
+
+      it 'should not resolve with librarian puppet' do
+        config[:resolve_with_librarian_puppet] = false
+        expect(provisioner[:resolve_with_librarian_puppet]).to eq(false)
+      end
+
+      it 'should set puppet environment' do
+        config[:puppet_environment] = 'foo-bar'
+        expect(provisioner[:puppet_environment]).to eq('foo-bar')
+      end
+
+      it 'should install custom facts' do
+        config[:install_custom_facts] = true
+        expect(provisioner[:install_custom_facts]).to eq(true)
+      end
+
+      it 'should set puppet_apt repo' do
+        config[:puppet_apt_repo] = 'best-url-ever'
+        expect(provisioner[:puppet_apt_repo]).to eq('best-url-ever')
+      end
+
+      it 'should set puppet_yum repo' do
+        config[:puppet_yum_repo] = 'terrible-url'
+        expect(provisioner[:puppet_yum_repo]).to eq('terrible-url')
+      end
+
+      it 'should set chef_url' do
+        config[:chef_bootstrap_url] = 'not-puppet'
+        expect(provisioner[:chef_bootstrap_url]).to eq('not-puppet')
+      end
+
+      it 'should set a puppet logdest' do
+        config[:puppet_logdest] = '/var/log/puppet.log'
+        expect(provisioner[:puppet_logdest]).to eq('/var/log/puppet.log')
+      end
+
+      it 'should set puppet apply command' do
+        config[:puppet_apply_command] = 'puppet apply things.pp'
+        expect(provisioner[:puppet_apply_command]).to eq('puppet apply things.pp')
+      end
+
+      it 'should set git init' do
+        config[:puppet_git_init] = 'init'
+        expect(provisioner[:puppet_git_init]).to eq('init')
+      end
+
+      it 'should set git pr' do
+        config[:puppet_git_pr] = 'pr'
+        expect(provisioner[:puppet_git_pr]).to eq('pr')
+      end
+
+      it 'should set http proxy' do
+        config[:http_proxy] = 'best-proxy'
+        expect(provisioner[:http_proxy]).to eq('best-proxy')
+      end
+
+      it 'should set https proxy' do
+        config[:https_proxy] = 'better-proxy'
+        expect(provisioner[:https_proxy]).to eq('better-proxy')
+      end
+
+      it 'should set hiera data path' do
+        config[:hiera_data_remote_path] = '/foo/bar'
+        expect(provisioner[:hiera_data_remote_path]).to eq('/foo/bar')
+      end
+
+      it 'should set a manifest' do
+        config[:manifest] = 'fuck.pp'
+        expect(provisioner[:manifest]).to eq('fuck.pp')
+      end
+
+      it 'should set a manifests path' do
+        config[:manifests_path] = 'nope'
+        expect(provisioner[:manifests_path]).to eq('nope')
+      end
+
+      it 'should set a modules path' do
+        config[:modules_path] = 'mods'
+        expect(provisioner[:modules_path]).to eq('mods')
+      end
+
+      it 'should set a files path' do
+        config[:files_path] = 'fils'
+        expect(provisioner[:files_path]).to eq('fils')
+      end
+
+      it 'should set hiera data path' do
+        config[:hiera_data_path] = 'data'
+        expect(provisioner[:hiera_data_path]).to eq('data')
+      end
+
+      it 'should set puppet config path' do
+        config[:puppet_config_path] = 'nope.conf'
+        expect(provisioner[:puppet_config_path]).to eq('nope.conf')
+      end
+
+      it 'should set hiera config path' do
+        config[:hiera_config_path] = 'config.yaml'
+        expect(provisioner[:hiera_config_path]).to eq('config.yaml')
+      end
+
+      it 'should should set fileserver config' do
+        config[:fileserver_config_path] = 'server.conf'
+        expect(provisioner[:fileserver_config_path]).to eq('server.conf')
+      end
+
+      it 'should set puppetfile path' do
+        config[:puppetfile_path] = 'pfile'
+        expect(provisioner[:puppetfile_path]).to eq('pfile')
+      end
+
+      it 'should set modulefile path' do
+        config[:modulefile_path] = 'mfile'
+        expect(provisioner[:modulefile_path]).to eq('mfile')
+      end
+
+      it 'should set metadata json path' do
+        config[:metadata_json_path] = 'met.json'
+        expect(provisioner[:metadata_json_path]).to eq('met.json')
+      end
+
+      it 'should set manifests path' do
+        config[:manifests_path] = 'mfests'
+        expect(provisioner[:manifests_path]).to eq('mfests')
+      end
+
+      it 'should set puppet debug' do
+        config[:puppet_debug] = true
+        expect(provisioner[:puppet_debug]).to eq(true)
+      end
+
+      it 'should set puppet verbose' do
+        config[:puppet_verbose] = true
+        expect(provisioner[:puppet_verbose]).to eq(true)
+      end
+
+      it 'should set puppet noop' do
+        config[:puppet_noop] = true
+        expect(provisioner[:puppet_noop]).to eq(true)
+      end
+
+      it 'should set puppet platform' do
+        config[:puppet_platform] = 'oss'
+        expect(provisioner[:puppet_platform]).to eq('oss')
+      end
+
+      it 'should not update package repos' do
+        config[:update_package_repos] = false
+        expect(provisioner[:update_package_repos]).to eq(false)
+      end
+
+      it 'should remove puppet repo' do
+        config[:remove_puppet_repo] = true
+        expect(provisioner[:remove_puppet_repo]).to eq(true)
+      end
+
+      it 'should set a custom fact' do
+        config[:custom_facts] = { 'puppet' => 'yay' }
+        expect(provisioner[:custom_facts]).to eq({ 'puppet' => 'yay' })
+      end
+
+      it 'should set detailed exitcodes' do
+        config[:puppet_detailed_exitcodes] = true
+        expect(provisioner[:puppet_detailed_exitcodes]).to eq(true)
+      end
+
+      it 'should set facter file' do
+        config[:facter_file] = 'facts.yml'
+        expect(provisioner[:facter_file]).to eq('facts.yml')
+      end
+
+      it 'should set librarian ssl file' do
+        config[:librarian_puppet_ssl_file] = 'ssl_secure'
+        expect(provisioner[:librarian_puppet_ssl_file]).to eq('ssl_secure')
+      end
+
+      it 'should set hiera eyaml' do
+        config[:hiera_eyaml] = true
+        expect(provisioner[:hiera_eyaml]).to eq(true)
+      end
+
+      it 'should set eyaml remote path' do
+        config[:hiera_eyaml_key_remote_path] = 'foo/bar/bizz'
+        expect(provisioner[:hiera_eyaml_key_remote_path]).to eq('foo/bar/bizz')
+      end
+
+      it 'should set eyaml key path' do
+        config[:hiera_eyaml_key_path] = 'key/path'
+        expect(provisioner[:hiera_eyaml_key_path]).to eq('key/path')
+      end
+
+      it 'should set hiera deep merge' do
+        config[:hiera_deep_merge] = true
+        expect(provisioner[:hiera_deep_merge]).to eq(true)
+      end
     end
   end
 end
