@@ -10,7 +10,7 @@ describe Kitchen::Busser do
   let(:busser) { Kitchen::Busser.new }
 
   it 'should return non suite dirs' do
-    expect(busser.non_suite_dirs).to eq(["data", "data_bags", "environments", "nodes", "roles", "puppet"])
+    expect(busser.non_suite_dirs).to eq(%w(data data_bags environments nodes roles puppet))
   end
 end
 
