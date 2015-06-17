@@ -6,6 +6,14 @@ require 'kitchen/transport/dummy'
 require 'kitchen/verifier/dummy'
 require 'kitchen/driver/dummy'
 
+describe Kitchen::Busser do
+  let(:busser) { Kitchen::Busser.new }
+
+  it 'should return non suite dirs' do
+    expect(busser.non_suite_dirs).to eq(["data", "data_bags", "environments", "nodes", "roles", "puppet"])
+  end
+end
+
 describe Kitchen::Provisioner::PuppetApply do
   let(:logged_output) { StringIO.new }
   let(:logger)        { Logger.new(logged_output) }
@@ -473,6 +481,14 @@ describe Kitchen::Provisioner::PuppetApply do
         config[:hiera_deep_merge] = true
         expect(provisioner[:hiera_deep_merge]).to eq(true)
       end
+    end
+  end
+
+  context 'install command' do
+    it 'should return if nil vars are set' do
+      config[:require_puppet_collections] = nil
+      config[:require_puppet_repo] = nil
+      expect(provisioner.install_command).to be_nil
     end
   end
 end
