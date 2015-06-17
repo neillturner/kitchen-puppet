@@ -122,6 +122,7 @@ module Kitchen
       default_config :update_package_repos, true
       default_config :remove_puppet_repo, false
       default_config :custom_facts, {}
+      default_config :facterlib, nil
       default_config :puppet_detailed_exitcodes, nil
       default_config :facter_file, nil
       default_config :librarian_puppet_ssl_file, nil
@@ -468,6 +469,7 @@ module Kitchen
           return config[:puppet_apply_command]
         else
           [
+            facterlib,
             custom_facts,
             facter_facts,
             puppet_cmd,
@@ -677,6 +679,13 @@ module Kitchen
 
       def remove_puppet_repo
         config[:remove_puppet_repo]
+      end
+
+      def facterlib
+        return nil if config[:facterlib].nil?
+        bash_vars = "export FACTERLIB='#{config[:facterlib]}';"
+        debug(bash_vars)
+        bash_vars
       end
 
       def custom_facts
