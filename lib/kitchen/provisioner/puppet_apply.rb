@@ -348,7 +348,7 @@ module Kitchen
         .map { |dir| File.join(config[:root_path], dir) }.join(' ')
         cmd = "#{sudo('rm')} -rf #{dirs} #{hiera_data_remote_path} /etc/hiera.yaml #{puppet_dir}/hiera.yaml #{puppet_dir}/fileserver.conf;"
         cmd += config[:puppet_environment] ? "#{sudo('rm')} -f #{File.join(puppet_dir, config[:puppet_environment])};" : ''
-        cmd += " mkdir -p #{config[:root_path]} #{puppet_dir}"
+        cmd += " mkdir -p #{config[:root_path]}; #{sudo('mkdir')} -p #{puppet_dir}"
         debug(cmd)
         cmd
       end
