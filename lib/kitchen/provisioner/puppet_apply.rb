@@ -475,7 +475,7 @@ module Kitchen
             facter_facts,
             puppet_cmd,
             'apply',
-            File.join(config[:root_path], 'manifests', manifest),
+            manifest_path,
             module_path,
             puppet_manifestdir,
             "--fileserverconfig=#{File.join(config[:root_path], 'fileserver.conf')}",
@@ -517,6 +517,14 @@ module Kitchen
 
       def manifest
         config[:manifest]
+      end
+
+      def manifest_path
+        if Pathname.new(manifest).absolute?
+          manifest
+        else
+          File.join(config[:root_path], 'manifests', manifest)
+        end
       end
 
       def manifests
