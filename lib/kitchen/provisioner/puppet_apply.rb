@@ -632,16 +632,16 @@ module Kitchen
       end
 
       def module_path
-         if config[:modules_path_synced]
-           if config[:modules_path].is_a? Array
-             path = config[:modules_path].join(':')
-           else
-             path = config[:modules_path]
-           end
-         else
-           path = "#{File.join(config[:root_path], 'modules')}"
-         end
-         return "--modulepath=#{path}"
+        if config[:modules_path_synced]
+          if config[:modules_path].is_a? Array
+            path = config[:modules_path].join(':')
+          else
+            path = config[:modules_path]
+          end
+        else
+          path = "#{File.join(config[:root_path], 'modules')}"
+        end
+        "--modulepath=#{path}"
       end
 
       def puppet_manifestdir
