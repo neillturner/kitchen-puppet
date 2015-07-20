@@ -55,6 +55,7 @@ module Kitchen
       default_config :puppet_yum_repo, 'https://yum.puppetlabs.com/puppetlabs-release-el-6.noarch.rpm'
       default_config :chef_bootstrap_url, 'https://www.getchef.com/chef/install.sh'
       default_config :puppet_logdest, nil
+      default_config :module_path_synced, false
 
       default_config :puppet_apply_command, nil
 
@@ -474,8 +475,8 @@ module Kitchen
             facter_facts,
             puppet_cmd,
             'apply',
-            File.join(config[:root_path], 'manifests', manifest),
-            "--modulepath=#{File.join(config[:root_path], 'modules')}",
+            manifest_path,
+            module_path,
             puppet_manifestdir,
             "--fileserverconfig=#{File.join(config[:root_path], 'fileserver.conf')}",
             puppet_environment_flag,
@@ -518,12 +519,20 @@ module Kitchen
         config[:manifest]
       end
 
+      def manifest_path
+        if Pathname.new(manifest).absolute?
+          manifest
+        else
+          File.join(config[:root_path], 'manifests', manifest)
+        end
+      end
+
       def manifests
         config[:manifests_path]
       end
 
       def modules
-        config[:modules_path]
+        modules_path
       end
 
       def files
@@ -620,6 +629,19 @@ module Kitchen
         else
           config[:puppet_environment] ? "--environment=#{config[:puppet_environment]} --environmentpath=#{puppet_dir}" : nil
         end
+      end
+
+      def module_path
+        if config[:modules_path_synced]
+          if config[:modules_path].is_a? Array
+            path = config[:modules_path].join(':')
+          else
+            path = config[:modules_path]
+          end
+        else
+          path = "#{File.join(config[:root_path], 'modules')}"
+        end
+        "--modulepath=#{path}"
       end
 
       def puppet_manifestdir
@@ -783,6 +805,7 @@ module Kitchen
       end
 
       def prepare_modules
+        return if config[:modules_path_synced]
         info('Preparing modules')
 
         FileUtils.mkdir_p(tmpmodules_dir)
