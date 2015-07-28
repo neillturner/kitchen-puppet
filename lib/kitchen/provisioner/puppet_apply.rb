@@ -55,6 +55,7 @@ module Kitchen
       default_config :puppet_yum_repo, 'https://yum.puppetlabs.com/puppetlabs-release-el-6.noarch.rpm'
       default_config :chef_bootstrap_url, 'https://www.getchef.com/chef/install.sh'
       default_config :puppet_logdest, nil
+      default_config :custom_install_command, nil
 
       default_config :puppet_apply_command, nil
 
@@ -173,6 +174,7 @@ module Kitchen
               #{install_eyaml}
               #{install_deep_merge}
               #{install_busser}
+              #{custom_install_command}
             INSTALL
           when 'redhat', 'centos', 'fedora', 'oracle', 'amazon'
             info("Installing puppet from yum on #{puppet_platform}")
@@ -183,6 +185,7 @@ module Kitchen
               #{install_eyaml}
               #{install_deep_merge}
               #{install_busser}
+              #{custom_install_command}
             INSTALL
           else
             info('Installing puppet, will try to determine platform os')
@@ -208,6 +211,7 @@ module Kitchen
               #{install_eyaml}
               #{install_deep_merge}
               #{install_busser}
+              #{custom_install_command}
             INSTALL
           end
         end
@@ -221,6 +225,7 @@ module Kitchen
           #{sudo('apt-get')} -y install wget
           #{sudo('wget')} #{wget_proxy_parm} #{config[:puppet_apt_collections_repo]}
           #{sudo('dpkg')} -i #{puppet_apt_coll_repo_file}
+          #{custom_install_command}
           INSTALL
         when 'redhat', 'centos', 'fedora', 'oracle', 'amazon'
           info("Installing Puppet Collections on #{puppet_platform}")
@@ -234,6 +239,7 @@ module Kitchen
           #{install_eyaml("#{config[:puppet_coll_remote_path]}/puppet/bin/gem")}
           #{install_deep_merge}
           #{install_busser}
+          #{custom_install_command}
           INSTALL
         else
           info('Installing Puppet Collections, will try to determine platform os')
@@ -264,6 +270,7 @@ module Kitchen
             #{install_eyaml("#{config[:puppet_coll_remote_path]}/puppet/bin/gem")}
             #{install_deep_merge}
             #{install_busser}
+            #{custom_install_command}
           INSTALL
         end
       end
@@ -340,6 +347,12 @@ module Kitchen
             #{update_packages_redhat_cmd}
             #{sudo_env('yum')} -y install puppet#{puppet_redhat_version}
           fi
+        INSTALL
+      end
+
+      def custom_install_command
+        <<-INSTALL
+          #{config[:custom_install_command]}
         INSTALL
       end
 

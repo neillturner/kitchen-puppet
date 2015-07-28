@@ -48,6 +48,7 @@ facter_file | nil | yaml file of custom facter_files to be provided to the puppe
 http_proxy | nil | use http proxy when installing puppet, packages and running puppet
 https_proxy | nil | use https proxy when installing puppet, packages and running puppet
 puppet_logdest | nil | _Array_ of log destinations. Include 'console' if wanted
+custom_install_command | nil | Custom shell command to be used at install stage. Can be multiline. See examples below.
 
 
 ## Puppet Apply Configuring Provisioner Options
@@ -94,6 +95,26 @@ To override a setting at the suite-level, specify the setting name under the sui
      - name: default
        manifest: foobar.pp
 ```
+
+#### custom_install_command example usage
+
+* One liner
+```yaml
+    custom_install_command: yum install -y git
+```
+* Multiple lines, a.k.a embed shell script
+```yaml
+  custom_install_command: |
+     command1
+     command2
+```
+* Multiple lines join without new line
+```yaml
+  custom_install_command: >
+     command1 &&
+     command2
+```
+
 ### Per-suite Structure
 
 It can be beneficial to keep different Puppet layouts for different suites. Rather than having to specify the manifest, modules, etc for each suite, you can create the following directory structure and they will automatically be found:

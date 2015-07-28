@@ -495,6 +495,22 @@ describe Kitchen::Provisioner::PuppetApply do
       expect(provisioner.install_command).to be_nil
     end
 
+    it 'runs custom shell command at install stage' do
+      config[:custom_install_command] = 'echo "CUSTOM_SHELL"'
+      expect(provisioner.install_command).to include('echo "CUSTOM_SHELL"')
+    end
+
+    it 'runs multiline custom shell command at install stage' do
+      config[:custom_install_command] = <<CUSTOM_COMMAND
+echo "string1"
+echo "string2"
+CUSTOM_COMMAND
+
+      expect(provisioner.install_command).to include(%(echo "string1"\necho "string2"))
+    end
+  end
+
+  context 'run command' do
     it 'exports FACTERLIB' do
       config[:facterlib] = '/etc/puppet/facter'
       expect(provisioner.run_command).to include("export FACTERLIB='/etc/puppet/facter';")
