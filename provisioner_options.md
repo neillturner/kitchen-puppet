@@ -139,6 +139,7 @@ puppet_verbose| false| Extra information logging on puppet run
 puppet_noop| false| puppet runs in a no-op or dry-run mode
 update_package_repos| true| update OS repository metadata
 custom_facts| Hash.new | Hash to set the puppet facts before running puppet apply
+facterlib | nil | Path for dynamic fact generation, e.g. /etc/puppet/facter . See https://docs.puppetlabs.com/facter/2.2/custom_facts.html
 chef_bootstrap_url |"https://www.getchef.com/chef/install.sh"| the chef (needed for busser to run tests)
 puppet_agent_command | nil | Overwrite the puppet agent command. Needs "sudo -E puppet agent" as a prefix.
 require_chef_for_busser | true | Install chef as currently needed by busser to run tests. NOTE: kitchen 1.4 only requires ruby to run busser so this is not required.
