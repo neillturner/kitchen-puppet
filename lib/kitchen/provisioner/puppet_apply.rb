@@ -116,6 +116,12 @@ module Kitchen
         provisioner.calculate_path('manifests', :directory)
       end
 
+      default_config :spec_files_path do |provisioner|
+        provisioner.calculate_path('spec', :directory)
+      end
+
+      default_config :spec_files_remote_path, '/etc/puppet/spec'
+
       default_config :puppet_debug, false
       default_config :puppet_verbose, false
       default_config :puppet_noop, false
@@ -359,7 +365,10 @@ module Kitchen
       def init_command
         dirs = %w(modules manifests files hiera hiera.yaml)
         .map { |dir| File.join(config[:root_path], dir) }.join(' ')
-        cmd = "#{sudo('rm')} -rf #{dirs} #{hiera_data_remote_path} /etc/hiera.yaml #{puppet_dir}/hiera.yaml #{puppet_dir}/fileserver.conf;"
+        cmd = "#{sudo('rm')} -rf #{dirs} #{hiera_data_remote_path} \
+              /etc/hiera.yaml #{puppet_dir}/hiera.yaml \
+              #{spec_files_remote_path} \
+              #{puppet_dir}/fileserver.conf;"
         cmd += config[:puppet_environment] ? "#{sudo('rm')} -f #{File.join(puppet_dir, config[:puppet_environment])};" : ''
         cmd += " mkdir -p #{config[:root_path]} #{puppet_dir}"
         debug(cmd)
@@ -378,6 +387,7 @@ module Kitchen
         prepare_hiera_config
         prepare_fileserver_config
         prepare_hiera_data
+        prepare_spec_files
         info('Finished Preparing files for transfer')
       end
 
@@ -468,6 +478,15 @@ module Kitchen
         if puppet_environment
           commands << [
             sudo('ln -s '),  config[:root_path], File.join(puppet_dir, config[:puppet_environment])
+          ].join(' ')
+        end
+
+        if spec_files_path && spec_files_remote_path
+          commands << [
+            sudo('mkdir -p'), spec_files_remote_path
+          ].join(' ')
+          commands << [
+            sudo('cp -r'), File.join(config[:root_path], 'spec/*'), spec_files_remote_path
           ].join(' ')
         end
 
@@ -694,6 +713,14 @@ module Kitchen
         config[:remove_puppet_repo]
       end
 
+      def spec_files_path
+        config[:spec_files_path]
+      end
+
+      def spec_files_remote_path
+        config[:spec_files_remote_path]
+      end
+
       def facterlib
         return nil if config[:facterlib].nil?
         bash_vars = "export FACTERLIB='#{config[:facterlib]}';"
@@ -873,6 +900,15 @@ module Kitchen
         debug("Copying hiera eyaml keys from #{hiera_eyaml_key_path} to #{tmp_hiera_key_dir}")
         FileUtils.mkdir_p(tmp_hiera_key_dir)
         FileUtils.cp_r(Dir.glob("#{hiera_eyaml_key_path}/*"), tmp_hiera_key_dir)
+      end
+
+      def prepare_spec_files
+        return unless spec_files_path
+        info('Preparing spec files')
+        tmp_spec_dir = File.join(sandbox_path, 'spec')
+        debug("Copying specs from #{spec_files_path} to #{tmp_spec_dir}")
+        FileUtils.mkdir_p(tmp_spec_dir)
+        FileUtils.cp_r(Dir.glob("#{spec_files_path}/*"), tmp_spec_dir)
       end
 
       def resolve_with_librarian
