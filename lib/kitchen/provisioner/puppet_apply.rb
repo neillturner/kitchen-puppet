@@ -467,7 +467,7 @@ module Kitchen
 
         if puppet_environment
           commands << [
-            sudo('ln -s '),  config[:root_path], File.join(puppet_dir, config[:puppet_environment])
+            sudo('ln -s '), config[:root_path], File.join(puppet_dir, config[:puppet_environment])
           ].join(' ')
         end
 
