@@ -4,8 +4,8 @@ require_relative '../../../spec_helper.rb'
 require 'kitchen/provisioner/puppet/librarian'
 
 describe Kitchen::Provisioner::Puppet::Librarian do
-  let(:puppetfile)  { 'TestPuppetfile' }
-  let(:path)  { 'Path' }
+  let(:puppetfile) { 'TestPuppetfile' }
+  let(:path) { 'Path' }
   let(:librarian) { Kitchen::Provisioner::Puppet::Librarian.new(puppetfile, path) }
 
   context 'defaults' do
