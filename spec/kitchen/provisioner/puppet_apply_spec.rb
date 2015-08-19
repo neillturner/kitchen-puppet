@@ -485,6 +485,23 @@ describe Kitchen::Provisioner::PuppetApply do
         config[:hiera_deep_merge] = true
         expect(provisioner[:hiera_deep_merge]).to eq(true)
       end
+
+      it 'should set spec files path' do
+        config[:spec_files_path] = 'spec'
+        expect(provisioner[:spec_files_path]).to eq('spec')
+      end
+
+      it 'should set spec files remote path' do
+        config[:spec_files_remote_path] = '/etc/puppet/spec'
+        expect(provisioner[:spec_files_remote_path]).to eq('/etc/puppet/spec')
+      end
+    end
+  end
+
+  context 'init command' do
+    it 'should clean spec_files_remote_path' do
+      config[:spec_files_remote_path] = '/etc/puppet/spec'
+      expect(provisioner.init_command).to match(/rm -rf.*#{config[:spec_files_remote_path]}/)
     end
   end
 
