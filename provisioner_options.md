@@ -221,3 +221,31 @@ To override a setting at the suite-level, specify the setting name under the sui
        provisioner:
          manifest: foobar.pp
 ```
+
+## Custom ServerSpec or Beaker Invocation 
+
+ Instead of using the busser use a custom serverspec invocation using [shell verifier](https://github.com/higanworks/kitchen-verifier-shell) to call it. 
+With such setup there is no dependency on busser and any other chef library.
+
+Also you can specify you tests in a different directory structure or even call [beaker](https://github.com/puppetlabs/beaker) instead of server spec and have tests in beaker structure 
+
+Using a structure like
+```yaml
+verifier:                                                                       
+  name: shell                                                                   
+  remote_exec: true                                                             
+  command: |                                                                    
+    sudo -s <<SERVERSPEC                                                        
+    cd /opt/gdc/serverspec-core                                                 
+    export SERVERSPEC_ENV=$EC2DATA_ENVIRONMENT                                  
+    export SERVERSPEC_BACKEND=exec                                              
+    serverspec junit=true tag=~skip_in_kitchen check:role:$EC2DATA_TYPE               
+    SERVERSPEC
+```
+
+where `serverspec` is a wrapper around `rake` invocation.
+Use a `Rakefile` similar to one in https://github.com/vincentbernat/serverspec-example.
+
+With such approach we can achieve flexibility of running same test suite both in test kitchen and actual, even production, instances.
+
+Beware: kitchen-shell-verifier is not yet merged into test-kitchen upstream so using separate gem is unavoidable so far
