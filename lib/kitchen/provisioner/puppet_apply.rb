@@ -363,7 +363,7 @@ module Kitchen
       end
 
       def init_command
-        dirs = %w(modules manifests files hiera hiera.yaml)
+        dirs = %w(modules manifests files hiera hiera.yaml spec)
         .map { |dir| File.join(config[:root_path], dir) }.join(' ')
         cmd = "#{sudo('rm')} -rf #{dirs} #{hiera_data_remote_path} \
               /etc/hiera.yaml #{puppet_dir}/hiera.yaml \
