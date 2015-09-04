@@ -32,6 +32,12 @@ module Kitchen
     end
   end
 
+  module Configurable
+    def platform_name
+      instance.platform.name
+    end
+  end
+
   module Provisioner
     #
     # Puppet Apply provisioner.
@@ -46,6 +52,7 @@ module Kitchen
       default_config :puppet_version, nil
       default_config :facter_version, nil
       default_config :hiera_version, nil
+      default_config :install_hiera, false
       default_config :require_puppet_repo, true
       default_config :require_chef_for_busser, true
       default_config :resolve_with_librarian_puppet, true
@@ -125,7 +132,9 @@ module Kitchen
       default_config :puppet_debug, false
       default_config :puppet_verbose, false
       default_config :puppet_noop, false
-      default_config :puppet_platform, ''
+      default_config :platform do |provisioner|
+        provisioner.platform_name
+      end
       default_config :update_package_repos, true
       default_config :remove_puppet_repo, false
       default_config :custom_facts, {}
@@ -165,7 +174,7 @@ module Kitchen
         else
           case puppet_platform
           when 'debian', 'ubuntu'
-            info("Installing puppet on #{puppet_platform}")
+            info("Installing puppet on #{config[:platform]}")
             <<-INSTALL
               if [ ! $(which puppet) ]; then
                 #{sudo('apt-get')} -y install wget
@@ -175,7 +184,7 @@ module Kitchen
                 #{sudo_env('apt-get')} -y install facter#{facter_debian_version}
                 #{sudo_env('apt-get')} -y install puppet-common#{puppet_debian_version}
                 #{sudo_env('apt-get')} -y install puppet#{puppet_debian_version}
-                #{sudo_env('apt-get')} -y install hiera-puppet#{puppet_hiera_debian_version}
+                #{install_hiera}
               fi
               #{install_eyaml}
               #{install_deep_merge}
@@ -210,7 +219,7 @@ module Kitchen
                     #{sudo_env('apt-get')} -y install facter#{facter_debian_version}
                     #{sudo_env('apt-get')} -y install puppet-common#{puppet_debian_version}
                     #{sudo_env('apt-get')} -y install puppet#{puppet_debian_version}
-                    #{sudo_env('apt-get')} -y install hiera-puppet#{puppet_hiera_debian_version}
+                    #{install_hiera}
                   fi
                 fi
               fi
@@ -318,6 +327,13 @@ module Kitchen
             do_download #{chef_url} /tmp/install.sh
             #{sudo('sh')} /tmp/install.sh
           fi
+        INSTALL
+      end
+
+      def install_hiera
+        return unless config[:install_hiera]
+        <<-INSTALL
+          #{sudo_env('apt-get')} -y install hiera-puppet#{puppet_hiera_debian_version}
         INSTALL
       end
 
@@ -680,7 +696,7 @@ module Kitchen
       end
 
       def puppet_platform
-        config[:puppet_platform].to_s.downcase
+        config[:platform].gsub(/-.*/, '')
       end
 
       def facter_facts
@@ -744,12 +760,47 @@ module Kitchen
         remove_puppet_repo ? "; #{sudo('rm')} -rf /tmp/kitchen #{hiera_data_remote_path} #{hiera_eyaml_key_remote_path} #{puppet_dir}/* " : nil
       end
 
+      # rubocop:disable Metrics/CyclomaticComplexity
       def puppet_apt_repo
-        config[:puppet_apt_repo]
+        platform_version = config[:platform].partition('-')[2]
+        case puppet_platform
+        when 'ubuntu'
+          case platform_version
+          when '14.10'
+            # Utopic Repo
+            'https://apt.puppetlabs.com/puppetlabs-release-utopic.deb'
+          when '14.04'
+            # Trusty Repo
+            'https://apt.puppetlabs.com/puppetlabs-release-trusty.deb'
+          when '12.04'
+            # Precise Repo
+            'https://apt.puppetlabs.com/puppetlabs-release-precise.deb'
+          else
+            # Configured Repo
+            config[:puppet_apt_repo]
+          end
+        when 'debian'
+          case platform_version.gsub(/\..*/, '')
+          when '8'
+            # Debian Jessie
+            'https://apt.puppetlabs.com/puppetlabs-release-jessie.deb'
+          when '7'
+            # Debian Wheezy
+            'https://apt.puppetlabs.com/puppetlabs-release-wheezy.deb'
+          when '6'
+            # Debian Squeeze
+            'https://apt.puppetlabs.com/puppetlabs-release-squeeze.deb'
+          else
+            # Configured Repo
+            config[:puppet_apt_repo]
+          end
+        else
+          error("Unsupported Platform - #{config[:platform]}")
+        end
       end
 
       def puppet_apt_repo_file
-        config[:puppet_apt_repo].split('/').last
+        puppet_apt_repo.split('/').last
       end
 
       def puppet_apt_coll_repo_file

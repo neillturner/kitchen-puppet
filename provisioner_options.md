@@ -6,7 +6,7 @@ key | default value | Notes
 puppet_version | "latest"| desired version, affects apt installs.
 facter_version | "latest"| desired version, affects apt installs.
 hiera_version | "latest"| desired version, affects apt installs.
-puppet_platform | naively tries to determine | OS platform of server
+install_hiera | false | Installs `hiera-puppet` package. Not needed for puppet > 3.x.x
 require_puppet_repo | true | Set if using a puppet install from yum or apt repo
 puppet_apt_repo | "http://apt.puppetlabs.com/puppetlabs-release-precise.deb"| apt repo
 puppet_yum_repo | "https://yum.puppetlabs.com/puppetlabs-release-el-6.noarch.rpm"| yum repo
@@ -83,9 +83,9 @@ The provisioner can be configured globally or per suite, global settings act as 
   verifier:
     ruby_bindir: '/usr/bin'
 ```
-where /usr/bin is the location of the ruby command. 
+where /usr/bin is the location of the ruby command.
 
-in this example, vagrant will download a box for ubuntu 1204 with no configuration management installed, then install the 
+in this example, vagrant will download a box for ubuntu 1204 with no configuration management installed, then install the
 latest puppet and puppet apply against a puppet repo from the /repository/puppet_repo directory using the defailt manifest site.pp
 
 To override a setting at the suite-level, specify the setting name under the suite:
@@ -202,7 +202,7 @@ The provisioner can be configured globally or per suite, global settings act as 
   verifier:
     ruby_bindir: '/usr/bin'
 ```
-where /usr/bin is the location of the ruby command. 
+where /usr/bin is the location of the ruby command.
 
 In this example, vagrant will download a box for ubuntu 1204 with no configuration management installed, then install the latest puppet and run puppet agent against a puppet master at puppetmaster-nocm-ubuntu-1204
 
@@ -222,24 +222,24 @@ To override a setting at the suite-level, specify the setting name under the sui
          manifest: foobar.pp
 ```
 
-## Custom ServerSpec or Beaker Invocation 
+## Custom ServerSpec or Beaker Invocation
 
- Instead of using the busser use a custom serverspec invocation using [shell verifier](https://github.com/higanworks/kitchen-verifier-shell) to call it. 
+ Instead of using the busser use a custom serverspec invocation using [shell verifier](https://github.com/higanworks/kitchen-verifier-shell) to call it.
 With such setup there is no dependency on busser and any other chef library.
 
-Also you can specify you tests in a different directory structure or even call [beaker](https://github.com/puppetlabs/beaker) instead of server spec and have tests in beaker structure 
+Also you can specify you tests in a different directory structure or even call [beaker](https://github.com/puppetlabs/beaker) instead of server spec and have tests in beaker structure
 
 Using a structure like
 ```yaml
-verifier:                                                                       
-  name: shell                                                                   
-  remote_exec: true                                                             
-  command: |                                                                    
-    sudo -s <<SERVERSPEC                                                        
-    cd /opt/gdc/serverspec-core                                                 
-    export SERVERSPEC_ENV=$EC2DATA_ENVIRONMENT                                  
-    export SERVERSPEC_BACKEND=exec                                              
-    serverspec junit=true tag=~skip_in_kitchen check:role:$EC2DATA_TYPE               
+verifier:
+  name: shell
+  remote_exec: true
+  command: |
+    sudo -s <<SERVERSPEC
+    cd /opt/gdc/serverspec-core
+    export SERVERSPEC_ENV=$EC2DATA_ENVIRONMENT
+    export SERVERSPEC_BACKEND=exec
+    serverspec junit=true tag=~skip_in_kitchen check:role:$EC2DATA_TYPE
     SERVERSPEC
 ```
 
