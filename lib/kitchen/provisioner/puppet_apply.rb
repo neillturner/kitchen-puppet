@@ -160,8 +160,8 @@ module Kitchen
       end
       
       def platform_name(a)
-+       instance.platform.name
-+     end
+        instance.platform.name
+      end
 
       # TODO: refactor for smaller cyclomatic complexity and perceived complexity
       # rubocop:disable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
