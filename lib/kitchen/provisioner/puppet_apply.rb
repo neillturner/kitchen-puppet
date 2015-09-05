@@ -32,13 +32,6 @@ module Kitchen
     end
   end
 
-  # this breaks travis
-  # module Configurable
-  #  def platform_name
-  #    instance.platform.name
-  #   end
-  # end
-
   module Provisioner
     #
     # Puppet Apply provisioner.
@@ -133,9 +126,7 @@ module Kitchen
       default_config :puppet_debug, false
       default_config :puppet_verbose, false
       default_config :puppet_noop, false
-      default_config :platform do |provisioner|
-        provisioner.platform_name
-      end
+      default_config :platform, instance.platform.name
       default_config :update_package_repos, true
       default_config :remove_puppet_repo, false
       default_config :custom_facts, {}
@@ -165,10 +156,6 @@ module Kitchen
           type == :directory ? File.directory?(c) : File.file?(c)
         end
       end
-
-      def platform_name
-        instance.platform.name
-      end      
 
       # TODO: refactor for smaller cyclomatic complexity and perceived complexity
       # rubocop:disable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
