@@ -18,7 +18,7 @@ describe Kitchen::Provisioner::PuppetApply do
   let(:logged_output) { StringIO.new }
   let(:logger)        { Logger.new(logged_output) }
   let(:config)        { { test_base_path: '/kitchen' } }
-  let(:platform)      { Kitchen::Platform.new(name: 'fooos-99') }
+  let(:platform)      { Kitchen::Platform.new(name: 'ubuntu-14.04') }
   let(:suite)         { Kitchen::Suite.new(name: 'suitey') }
   let(:verifier)      { Kitchen::Verifier::Dummy.new }
   let(:transport)     { Kitchen::Transport::Dummy.new }
@@ -194,7 +194,7 @@ describe Kitchen::Provisioner::PuppetApply do
       end
 
       it "should set puppet platform to ''" do
-        expect(provisioner[:puppet_platform]).to eq('')
+        expect(provisioner[:puppet_platform]).to eq(nil)
       end
 
       it 'should update package repos' do
