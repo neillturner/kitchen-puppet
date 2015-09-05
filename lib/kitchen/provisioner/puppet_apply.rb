@@ -32,11 +32,12 @@ module Kitchen
     end
   end
 
-  module Configurable
-    def platform_name
-      instance.platform.name
-    end
-  end
+  # this breaks travis
+  # module Configurable
+  #  def platform_name
+  #    instance.platform.name
+  #   end
+  #end
 
   module Provisioner
     #
@@ -164,6 +165,10 @@ module Kitchen
           type == :directory ? File.directory?(c) : File.file?(c)
         end
       end
+
+      def platform_name
+        instance.platform.name
+      end      
 
       # TODO: refactor for smaller cyclomatic complexity and perceived complexity
       # rubocop:disable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
