@@ -158,8 +158,8 @@ module Kitchen
           type == :directory ? File.directory?(c) : File.file?(c)
         end
       end
-      
-      def platform_name(a)
+
+      def platform_name(*)
         instance.platform.name
       end
 
