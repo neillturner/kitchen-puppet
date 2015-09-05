@@ -5,6 +5,7 @@ require 'kitchen-puppet/version'
 
 Gem::Specification.new do |s|
   s.name          = 'kitchen-puppet'
+  s.license       = 'Apache-2.0'
   s.version       = Kitchen::Puppet::VERSION
   s.authors       = ['Neill Turner']
   s.email         = ['neillwturner@gmail.com']
