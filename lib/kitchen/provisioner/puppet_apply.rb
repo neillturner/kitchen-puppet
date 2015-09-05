@@ -132,7 +132,7 @@ module Kitchen
       default_config :puppet_debug, false
       default_config :puppet_verbose, false
       default_config :puppet_noop, false
-      default_config :platform  do |provisioner|
+      default_config :platform do |provisioner|
         provisioner.platform_name
       end  
       default_config :update_package_repos, true
