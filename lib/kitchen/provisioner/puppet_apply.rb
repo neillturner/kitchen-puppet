@@ -37,7 +37,7 @@ module Kitchen
   #  def platform_name
   #    instance.platform.name
   #   end
-  #end
+  # end
 
   module Provisioner
     #
@@ -135,7 +135,7 @@ module Kitchen
       default_config :puppet_noop, false
       default_config :platform do |provisioner|
         provisioner.platform_name
-      end  
+      end
       default_config :update_package_repos, true
       default_config :remove_puppet_repo, false
       default_config :custom_facts, {}
