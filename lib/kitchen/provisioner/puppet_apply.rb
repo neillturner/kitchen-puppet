@@ -906,7 +906,7 @@ module Kitchen
         module_target_path = File.join(sandbox_path, 'modules', module_name)
         FileUtils.mkdir_p(module_target_path)
         FileUtils.cp_r(
-          Dir.glob(File.join(config[:kitchen_root], '*')).reject { |entry| entry =~ /modules$|spec$|pkg$/ },
+          Dir.glob(File.join(config[:kitchen_root], '*')).select { |entry| entry =~ /manifests$|files$|templates$|lib$|facts\.d$|examples$|data$/ },
           module_target_path,
           remove_destination: true
         )
