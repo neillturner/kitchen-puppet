@@ -2,7 +2,7 @@
 source 'https://rubygems.org'
 gemspec
 
-gem 'rubocop', '>=0.26.1'
-gem 'rake', '>=10.2.0'
-gem 'rspec'
-gem 'simplecov'
+gem 'rubocop', '~> 0.34'
+gem 'rake', '~> 10.4.2'
+gem 'rspec', '~> 3.3.0'
+gem 'simplecov', '~> 0.10'
