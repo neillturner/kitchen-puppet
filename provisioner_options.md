@@ -5,7 +5,6 @@ key | default value | Notes
 ----|---------------|--------
 puppet_version | "latest"| desired version, affects apt installs.
 facter_version | "latest"| desired version, affects apt installs.
-platform | platform_name kitchen.yml parameter | OS platform of server
 hiera_version | "latest"| desired version, affects apt installs.
 install_hiera | false | Installs `hiera-puppet` package. Not needed for puppet > 3.x.x
 require_puppet_repo | true | Set if using a puppet install from yum or apt repo
