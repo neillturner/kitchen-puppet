@@ -10,6 +10,7 @@ Gemfile.lock
 
 *.rbc
 .bundle
+bundle
 .config
 coverage
 InstalledFiles
