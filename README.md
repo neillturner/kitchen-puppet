@@ -40,7 +40,7 @@ You need to download the puppet msi and install it and run everything inside the
   
 ## Mac-OSX Workstation Install
 
-1. Download and install from the mac packages from https://downloads.puppetlabs.com/mac/
+1. Download and install the mac packages from https://downloads.puppetlabs.com/mac/
   * The most recent Facter package (facter-<VERSION>.dmg)
   * The most recent Hiera package (hiera-<VERSION>.dmg)
   * The most recent Puppet package (puppet-<VERSION>.dmg)
