@@ -25,7 +25,7 @@ You need to download the puppet msi and install it and run everything inside the
 
 2. Select "Start Command Prompt with Puppet" to go to a Command Window.
 
-3. install the Ruby DevKit:
+3. Install the Ruby DevKit:
    * Download and install devkit from http://rubyinstaller.org/downloads
      * (Use a 32 or 64 bit version that matches version of the ruby install)
    * In the devkit directory run “ruby dk.rb init”.
