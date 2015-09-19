@@ -16,15 +16,7 @@ The PuppetAgent provider works by passing the puppetmaster and other attributes 
 
 This provider has been tested against the Ubuntu 1204 and Centos 6.5 boxes running in vagrant/virtualbox as well as various docker .
 
-## Requirements
-You'll need a driver box without a chef installation so puppet can be installed. Puppet have one at http://puppet-vagrant-boxes.puppetlabs.com/ubuntu-server-12042-x64-vbox4210-nocm.box or http://puppet-vagrant-boxes.puppetlabs.com/centos-65-x64-virtualbox-nocm.box.
-
-For PuppetAgent a server with a puppet master is required that can resolve the hostname ip address of the server. The server must also be able to resolve the hostname ip address of the puppet master.
-
-You can also use the PuppetApply driver with a docker container, provided the necessary box requirements to install puppet are included inside the container. The easiest way to do this is to supply Kitchen-Docker with a custom dockerfile to install the needed dependencies for puppet installation.
-
 ## Windows Workstation Install
-
 You need to download the puppet msi and install it and run everything inside the puppet window. 
 
 1. Download and install puppet from the windows msi file from https://downloads.puppetlabs.com/windows
@@ -45,9 +37,28 @@ You need to download the puppet msi and install it and run everything inside the
   * gem install librarian-puppet
   * gem install test-kitchen
   * gem install kitchen-puppet
+  
+Mac-OSX Workstation Install
+
+1. Download and install from the mac packages from https://downloads.puppetlabs.com/mac/
+  * The most recent Facter package (facter-<VERSION>.dmg)
+  * The most recent Hiera package (hiera-<VERSION>.dmg)
+  * The most recent Puppet package (puppet-<VERSION>.dmg)
+  * See [How to Install Software from DMG Files on a Mac](http://www.ofzenandcomputing.com/how-to-install-dmg-files-mac/) for details.
+
+2. From a Command prompt:
+  * gem install librarian-puppet
+  * gem install test-kitchen
+  * gem install kitchen-puppet
+
+## Requirements
+You'll need a driver box without a chef installation so puppet can be installed. Puppet have one at http://puppet-vagrant-boxes.puppetlabs.com/ubuntu-server-12042-x64-vbox4210-nocm.box or http://puppet-vagrant-boxes.puppetlabs.com/centos-65-x64-virtualbox-nocm.box.
+
+For PuppetAgent a server with a puppet master is required that can resolve the hostname ip address of the server. The server must also be able to resolve the hostname ip address of the puppet master.
+
+You can also use the PuppetApply driver with a docker container, provided the necessary box requirements to install puppet are included inside the container. The easiest way to do this is to supply Kitchen-Docker with a custom dockerfile to install the needed dependencies for puppet installation.
 
 ## Provisioner Options
-
 Please see the Provisioner Options (https://github.com/neillturner/kitchen-puppet/blob/master/provisioner_options.md).
 
 ## Contributing
