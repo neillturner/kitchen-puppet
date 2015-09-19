@@ -240,6 +240,14 @@ describe Kitchen::Provisioner::PuppetApply do
       it 'should set hiera deep merge to false' do
         expect(provisioner[:hiera_deep_merge]).to eq(false)
       end
+
+      it 'should not install the hiera package' do
+        expect(provisioner[:install_hiera]).to eq(false)
+      end
+
+      it 'should keep default hiera package name' do
+        expect(provisioner[:hiera_package]).to eq('hiera-puppet')
+      end
     end
 
     context 'non-default sets' do
@@ -494,6 +502,11 @@ describe Kitchen::Provisioner::PuppetApply do
       it 'should set spec files remote path' do
         config[:spec_files_remote_path] = '/etc/puppet/spec'
         expect(provisioner[:spec_files_remote_path]).to eq('/etc/puppet/spec')
+      end
+
+      it 'should set hiera package name' do
+        config[:hiera_package] = 'hiera'
+        expect(provisioner[:hiera_package]).to eq('hiera')
       end
     end
   end
