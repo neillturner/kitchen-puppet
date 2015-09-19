@@ -38,7 +38,7 @@ You need to download the puppet msi and install it and run everything inside the
   * gem install test-kitchen
   * gem install kitchen-puppet
   
-Mac-OSX Workstation Install
+## Mac-OSX Workstation Install
 
 1. Download and install from the mac packages from https://downloads.puppetlabs.com/mac/
   * The most recent Facter package (facter-<VERSION>.dmg)
