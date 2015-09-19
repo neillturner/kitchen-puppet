@@ -34,16 +34,23 @@ You need to download the puppet msi and install it and run everything inside the
 2. Select "Start Command Prompt with Puppet" to go to a Command Window.
 
 3. install the Ruby DevKit:
-    a. Download and install devkit from http://rubyinstaller.org/downloads
-       (Use a 32 or 64 bit version that matches version of the ruby install)
-    b. In the devkit directory run “ruby dk.rb init”.
-    c. Edit the config.yml generated and add the the path of the ruby install for puppet
-        (it will be <install dir of puppet>/sys/ruby).
-    d. run “ruby dk.rb install” to bind it to the puppet ruby installation.
+4. 
+a. Download and install devkit from http://rubyinstaller.org/downloads
+   (Use a 32 or 64 bit version that matches version of the ruby install)
+
+b. In the devkit directory run “ruby dk.rb init”.
+    
+c. Edit the config.yml generated and add the the path of the ruby install for puppet
+  (it will be <install dir of puppet>/sys/ruby).
+        
+d. run “ruby dk.rb install” to bind it to the puppet ruby installation.
 
 4. From a Command prompt:
+    
     gem install librarian-puppet
+    
     gem install test-kitchen
+    
     gem install kitchen-puppet
 
 ## Provisioner Options
