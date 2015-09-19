@@ -8,6 +8,7 @@ facter_version | "latest"| desired version, affects apt installs.
 platform | platform_name kitchen.yml parameter | OS platform of server
 hiera_version | "latest"| desired version, affects apt installs.
 install_hiera | false | Installs `hiera-puppet` package. Not needed for puppet > 3.x.x
+hiera_package | 'hiera-puppet' | Only used if `install_hiera` is set
 require_puppet_repo | true | Set if using a puppet install from yum or apt repo
 puppet_apt_repo | "http://apt.puppetlabs.com/puppetlabs-release-precise.deb"| apt repo
 puppet_yum_repo | "https://yum.puppetlabs.com/puppetlabs-release-el-6.noarch.rpm"| yum repo

@@ -53,6 +53,7 @@ module Kitchen
       default_config :facter_version, nil
       default_config :hiera_version, nil
       default_config :install_hiera, false
+      default_config :hiera_package, 'hiera-puppet'
       default_config :require_puppet_repo, true
       default_config :require_chef_for_busser, true
       default_config :resolve_with_librarian_puppet, true
@@ -331,8 +332,12 @@ module Kitchen
       def install_hiera
         return unless config[:install_hiera]
         <<-INSTALL
-          #{sudo_env('apt-get')} -y install hiera-puppet#{puppet_hiera_debian_version}
+        #{sudo_env('apt-get')} -y install #{hiera_package}
         INSTALL
+      end
+
+      def hiera_package
+        "#{config[:hiera_package]}#{puppet_hiera_debian_version}"
       end
 
       # /bin/wget -P /etc/pki/rpm-gpg/ http://yum.puppetlabs.com/RPM-GPG-KEY-puppetlabs
