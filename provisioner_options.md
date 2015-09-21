@@ -15,7 +15,7 @@ puppet_yum_repo | "https://yum.puppetlabs.com/puppetlabs-release-el-6.noarch.rpm
 _for RH/Centos7 change to_ | "https://yum.puppetlabs.com/puppetlabs-release-el-7.noarch.rpm" | 
 require_puppet_collections | false | Set if using puppet collections install (Puppet v4)
 puppet_yum_collections_repo | "http://yum.puppetlabs.com/puppetlabs-release-pc1-el-6.noarch.rpm" | yum collections repo RH/Centos6
-_for RH/Centos7 change to_ | "https://yum.puppetlabs.com/puppetlabs-releasepc1-el-7.noarch.rpm" | 
+_for RH/Centos7 change to_ | "https://yum.puppetlabs.com/puppetlabs-release-pc1-el-7.noarch.rpm" | 
 puppet_apt_collections_repo | "http://apt.puppetlabs.com/puppetlabs-release-pc1-wheezy.deb" | apt collections repo
 _for Ubuntu15 change to_ | "http://apt.puppetlabs.com/puppetlabs-release-pc1-jessie.deb" | 
 puppet_coll_remote_path | "/opt/puppetlabs" | Server Installation location of a puppet collections install.
