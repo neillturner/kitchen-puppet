@@ -52,7 +52,7 @@ You need to download the puppet msi and install it and run everything inside the
   * gem install kitchen-puppet
 
 ## Requirements
-You need a metadata.json file of your puppet module. It is used by kitchen-puppet to configure the module path.
+It is recommended to have a metadata.json file of your puppet module. It is used by kitchen-puppet to configure the module path.
 The puppet docs describe (https://docs.puppetlabs.com/puppet/latest/reference/modules_publishing.html#write-a-metadatajson-file) how to create one.
 
 You'll need a driver box without a chef installation so puppet can be installed. Puppet have one at http://puppet-vagrant-boxes.puppetlabs.com/ubuntu-server-12042-x64-vbox4210-nocm.box or http://puppet-vagrant-boxes.puppetlabs.com/centos-65-x64-virtualbox-nocm.box.
