@@ -124,11 +124,11 @@ Create your serverspec tests in `test/integration/default/serverspec/localhost/x
 ## Test-Kitchen Beaker
 
 test-kitchen normally uses tests setup in `test/integration/....` directory. Beaker format puts the tests with the
-`spec/acceptance directory` in the puppet repository and the `spec_helper_acceptance.rb` under the `spec` directory.
+`spec/acceptance` directory in the puppet repository and the `spec_helper_acceptance.rb` under the `spec` directory.
 
-For eaxmples see:
-[https://gitlab.com/joshbeard/puppet-module-test]
-[https://github.com/puppetlabs/puppetlabs-mysql/tree/master/spec]
+For examples see:
+https://gitlab.com/joshbeard/puppet-module-test
+https://github.com/puppetlabs/puppetlabs-mysql/tree/master/spec
 
 To implement this with test-kitchen setup the puppet repository with:
 
