@@ -127,8 +127,8 @@ test-kitchen normally uses tests setup in `test/integration/....` directory. Bea
 `spec/acceptance` directory in the puppet repository and the `spec_helper_acceptance.rb` under the `spec` directory.
 
 For examples see:
-https://gitlab.com/joshbeard/puppet-module-test
-https://github.com/puppetlabs/puppetlabs-mysql/tree/master/spec
+* https://gitlab.com/joshbeard/puppet-module-test
+* https://github.com/puppetlabs/puppetlabs-mysql/tree/master/spec
 
 To implement this with test-kitchen setup the puppet repository with:
 
