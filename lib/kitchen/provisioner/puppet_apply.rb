@@ -674,6 +674,7 @@ module Kitchen
       end
 
       def puppet_manifestdir
+        return nil if config[:require_puppet_collections]
         config[:puppet_environment] ? nil : "--manifestdir=#{File.join(config[:root_path], 'manifests')}"
       end
 
