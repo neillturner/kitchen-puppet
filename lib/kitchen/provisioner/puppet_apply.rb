@@ -523,11 +523,11 @@ module Kitchen
             facterlib,
             custom_facts,
             facter_facts,
+            puppet_manifestdir,
             puppet_cmd,
             'apply',
             File.join(config[:root_path], 'manifests', manifest),
             "--modulepath=#{File.join(config[:root_path], 'modules')}",
-            puppet_manifestdir,
             "--fileserverconfig=#{File.join(config[:root_path], 'fileserver.conf')}",
             puppet_environment_flag,
             puppet_noop_flag,
@@ -675,7 +675,10 @@ module Kitchen
 
       def puppet_manifestdir
         return nil if config[:require_puppet_collections]
-        config[:puppet_environment] ? nil : "--manifestdir=#{File.join(config[:root_path], 'manifests')}"
+        return nil if config[:puppet_environment]
+        bash_vars = "export MANIFESTDIR=#{File.join(config[:root_path], 'manifests')};"
+        debug(bash_vars)
+        bash_vars
       end
 
       def puppet_noop_flag
