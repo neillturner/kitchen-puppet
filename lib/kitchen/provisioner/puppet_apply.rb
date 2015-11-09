@@ -529,6 +529,7 @@ module Kitchen
             File.join(config[:root_path], 'manifests', manifest),
             "--modulepath=#{File.join(config[:root_path], 'modules')}",
             "--fileserverconfig=#{File.join(config[:root_path], 'fileserver.conf')}",
+            custom_options,
             puppet_environment_flag,
             puppet_noop_flag,
             puppet_detailed_exitcodes_flag,
@@ -679,6 +680,10 @@ module Kitchen
         bash_vars = "export MANIFESTDIR='#{File.join(config[:root_path], 'manifests')}';"
         debug(bash_vars)
         bash_vars
+      end
+
+      def custom_options
+        config[:custom_options] || ''
       end
 
       def puppet_noop_flag
