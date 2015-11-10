@@ -170,11 +170,11 @@ See [busser-beaker](https://github.com/neillturner/busser-beaker)
 Please see the Provisioner Options (https://github.com/neillturner/kitchen-puppet/blob/master/provisioner_options.md).
 
 ## Contributing
-To contriubute to the repository, please follow the Fork / PR model:
+To contribute to the repository, please follow the Fork / PR model:
 
 1. Fork The Repository
 2. Work on epic changes
-3. Write tests for your changes
+3. Write tests for your changes, see [TESTING](TESTING.md)
 4. Update Documentation
 5. Commit
 6. Push
