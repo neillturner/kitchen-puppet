@@ -11,14 +11,14 @@ install_hiera | false | Installs `hiera-puppet` package. Not needed for puppet >
 hiera_package | 'hiera-puppet' | Only used if `install_hiera` is set
 require_puppet_repo | true | Set if using a puppet install from yum or apt repo
 puppet_apt_repo | "http://apt.puppetlabs.com/puppetlabs-release-precise.deb"| apt repo Ubuntu12
-_for Ubuntu15 change to_ | "http://apt.puppetlabs.com/puppetlabs-release-jessie.deb" | 
+_for Ubuntu15 change to_ | "http://apt.puppetlabs.com/puppetlabs-release-jessie.deb" |
 puppet_yum_repo | "https://yum.puppetlabs.com/puppetlabs-release-el-6.noarch.rpm"| yum repo RH/Centos6
-_for RH/Centos7 change to_ | "https://yum.puppetlabs.com/puppetlabs-release-el-7.noarch.rpm" | 
+_for RH/Centos7 change to_ | "https://yum.puppetlabs.com/puppetlabs-release-el-7.noarch.rpm" |
 require_puppet_collections | false | Set if using puppet collections install (Puppet v4)
 puppet_yum_collections_repo | "http://yum.puppetlabs.com/puppetlabs-release-pc1-el-6.noarch.rpm" | yum collections repo RH/Centos6
-_for RH/Centos7 change to_ | "https://yum.puppetlabs.com/puppetlabs-release-pc1-el-7.noarch.rpm" | 
+_for RH/Centos7 change to_ | "https://yum.puppetlabs.com/puppetlabs-release-pc1-el-7.noarch.rpm" |
 puppet_apt_collections_repo | "http://apt.puppetlabs.com/puppetlabs-release-pc1-wheezy.deb" | apt collections repo
-_for Ubuntu15 change to_ | "http://apt.puppetlabs.com/puppetlabs-release-pc1-jessie.deb" | 
+_for Ubuntu15 change to_ | "http://apt.puppetlabs.com/puppetlabs-release-pc1-jessie.deb" |
 puppet_coll_remote_path | "/opt/puppetlabs" | Server Installation location of a puppet collections install.
 puppet_detailed_exitcodes | nil | Provide transaction information via exit codes.
 manifests_path | | puppet repo manifests directory
@@ -36,7 +36,8 @@ puppet_git_init | nil | initialize puppet from GIT repository, e.g. "git@github.
 puppet_git_pr | nil | checkout specific Pull Request from repository specified in puppet_git_init, e.g. "324"
 update_package_repos| true| update OS repository metadata
 custom_facts| Hash.new | Hash to set the puppet facts before running puppet apply
-install_custom_facts| false | Install custom facts to yaml file at "/tmp/kitchen/facter/kitchen.yaml"
+install_custom_facts| false | Install custom facts to yaml file at "/tmp/kitchen/facter/kitchen.rb"
+facter_file | nil | yaml file of custom facter_files to be provided to the puppet-apply command
 chef_bootstrap_url |"https://www.getchef.com/chef/install.sh"| the chef (needed for busser to run tests) NOTE: kitchen 1.4 only requires ruby to run busser so this is not required.
 puppetfile_path | | Path to Puppetfile
 puppet_apply_command | nil | Overwrite the puppet apply command. Needs "sudo -E puppet apply" as a prefix.
@@ -50,10 +51,10 @@ hiera_eyaml | false | use hiera-eyaml to encrypt hiera data
 hiera_eyaml_key_remote_path | "/etc/puppet/secure/keys" | directory of hiera-eyaml keys on server
 hiera_eyaml_key_path  | "hiera_keys" | directory of hiera-eyaml keys on workstation
 hiera_deep_merge | false | install the deep_merge gem to support hiera deep merge mode
-facter_file | nil | yaml file of custom facter_files to be provided to the puppet-apply command
 http_proxy | nil | use http proxy when installing puppet, packages and running puppet
 https_proxy | nil | use https proxy when installing puppet, packages and running puppet
 puppet_logdest | nil | _Array_ of log destinations. Include 'console' if wanted
+custom_options | | custom options to add to puppet apply command.
 custom_install_command | nil | Custom shell command to be used at install stage. Can be multiline. See examples below.
 
 
