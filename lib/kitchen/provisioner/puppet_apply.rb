@@ -58,7 +58,6 @@ module Kitchen
       default_config :require_chef_for_busser, true
       default_config :resolve_with_librarian_puppet, true
       default_config :puppet_environment, nil
-      default_config :install_custom_facts, false
       default_config :puppet_apt_repo, 'http://apt.puppetlabs.com/puppetlabs-release-precise.deb'
       default_config :puppet_yum_repo, 'https://yum.puppetlabs.com/puppetlabs-release-el-6.noarch.rpm'
       default_config :chef_bootstrap_url, 'https://www.getchef.com/chef/install.sh'
@@ -136,6 +135,7 @@ module Kitchen
       default_config :platform, &:platform_name
       default_config :update_package_repos, true
       default_config :remove_puppet_repo, false
+      default_config :install_custom_facts, false
       default_config :custom_facts, {}
       default_config :facterlib, nil
       default_config :puppet_detailed_exitcodes, nil
@@ -382,7 +382,7 @@ module Kitchen
       end
 
       def init_command
-        dirs = %w(modules manifests files hiera hiera.yaml spec)
+        dirs = %w(modules manifests files hiera hiera.yaml facter spec)
         .map { |dir| File.join(config[:root_path], dir) }.join(' ')
         cmd = "#{sudo('rm')} -rf #{dirs} #{hiera_data_remote_path} \
               /etc/hiera.yaml #{puppet_dir}/hiera.yaml \
@@ -401,6 +401,7 @@ module Kitchen
         prepare_modules
         prepare_manifests
         prepare_files
+        prepare_facter_file
         prepare_facts
         prepare_puppet_config
         prepare_hiera_config
@@ -519,10 +520,9 @@ module Kitchen
         if !config[:puppet_apply_command].nil?
           return config[:puppet_apply_command]
         else
-          [
+          result = [
             facterlib,
             custom_facts,
-            facter_facts,
             puppet_manifestdir,
             puppet_cmd,
             'apply',
@@ -538,6 +538,8 @@ module Kitchen
             puppet_logdest_flag,
             remove_repo
           ].join(' ')
+          info("Going to invoke puppet apply with: #{result}")
+          result
         end
       end
 
@@ -711,17 +713,6 @@ module Kitchen
         config[:platform].gsub(/-.*/, '')
       end
 
-      def facter_facts
-        return nil unless config[:facter_file]
-        fact_vars = 'export '
-        fact_hash = YAML.load_file(config[:facter_file])
-        fact_hash.each do |key, value|
-          fact_vars << "FACTER_#{key}=#{value} "
-        end
-        fact_vars << ';'
-        fact_vars
-      end
-
       def update_packages_debian_cmd
         config[:update_package_repos] ? "#{sudo_env('apt-get')} update" : nil
       end
@@ -749,15 +740,22 @@ module Kitchen
         config[:spec_files_remote_path]
       end
 
+      # rubocop:disable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       def facterlib
-        return nil if config[:facterlib].nil?
-        bash_vars = "export FACTERLIB='#{config[:facterlib]}';"
+        factpath = nil
+        factpath = "#{File.join(config[:root_path], 'facter')}" if config[:install_custom_facts] && !config[:custom_facts].none?
+        factpath = "#{File.join(config[:root_path], 'facter')}" if config[:facter_file]
+        factpath = "#{factpath}:" if config[:facterlib] && !factpath.nil?
+        factpath = "#{factpath}#{config[:facterlib]}" if config[:facterlib]
+        return nil if factpath.nil?
+        bash_vars = "export FACTERLIB='#{factpath}';"
         debug(bash_vars)
         bash_vars
       end
 
       def custom_facts
         return nil if config[:custom_facts].none?
+        return nil if config[:install_custom_facts]
         bash_vars = config[:custom_facts].map { |k, v| "FACTER_#{k}=#{v}" }.join(' ')
         bash_vars = "export #{bash_vars};"
         debug(bash_vars)
@@ -772,7 +770,6 @@ module Kitchen
         remove_puppet_repo ? "; #{sudo('rm')} -rf /tmp/kitchen #{hiera_data_remote_path} #{hiera_eyaml_key_remote_path} #{puppet_dir}/* " : nil
       end
 
-      # rubocop:disable Metrics/CyclomaticComplexity
       def puppet_apt_repo
         platform_version = config[:platform].partition('-')[2]
         case puppet_platform
@@ -872,16 +869,30 @@ module Kitchen
         FileUtils.cp_r(Dir.glob("#{files}/*"), tmp_files_dir)
       end
 
+      def prepare_facter_file
+        return unless config[:facter_file]
+        info 'Copying facter file'
+        facter_dir = File.join(sandbox_path, 'facter')
+        FileUtils.mkdir_p(facter_dir)
+        FileUtils.cp_r(config[:facter_file], facter_dir)
+      end
+
       def prepare_facts
         return unless config[:install_custom_facts]
         return unless config[:custom_facts]
         info 'Installing custom facts'
         facter_dir = File.join(sandbox_path, 'facter')
         FileUtils.mkdir_p(facter_dir)
-        tmp_facter_file = File.join(facter_dir, 'kitchen.yaml')
+        tmp_facter_file = File.join(facter_dir, 'kitchen.rb')
         facter_facts = Hash[config[:custom_facts].map { |k, v| [k.to_s, v.to_s] }]
-        File.open(tmp_facter_file, 'w') do |out|
-          YAML.dump(facter_facts, out)
+        File.open(tmp_facter_file, 'a') do |out|
+          facter_facts.each do |k, v|
+            out.write "\nFacter.add(:#{k}) do\n"
+            out.write "  setcode do\n"
+            out.write "    \"#{v}\"\n"
+            out.write "  end\n"
+            out.write "end\n"
+          end
         end
       end
 

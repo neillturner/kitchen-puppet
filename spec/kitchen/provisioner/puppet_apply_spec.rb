@@ -551,5 +551,16 @@ CUSTOM_COMMAND
       config[:puppet_environment] = nil
       expect(provisioner.run_command).to include("export MANIFESTDIR='/tmp/kitchen/manifests';")
     end
+
+    it 'exports FACTERLIB for facter directory if factor_file specified' do
+      config[:facter_file] = 'facter/hello.rb'
+      expect(provisioner.run_command).to include("export FACTERLIB='/tmp/kitchen/facter';")
+    end
+
+    it 'exports FACTERLIB for facter directory if install_custom_facts is true' do
+      config[:install_custom_facts] = true
+      config[:custom_facts] = { role: 'webserver' }
+      expect(provisioner.run_command).to include("export FACTERLIB='/tmp/kitchen/facter';")
+    end
   end
 end

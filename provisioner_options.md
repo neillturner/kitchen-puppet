@@ -36,7 +36,8 @@ puppet_git_init | nil | initialize puppet from GIT repository, e.g. "git@github.
 puppet_git_pr | nil | checkout specific Pull Request from repository specified in puppet_git_init, e.g. "324"
 update_package_repos| true| update OS repository metadata
 custom_facts| Hash.new | Hash to set the puppet facts before running puppet apply
-install_custom_facts| false | Install custom facts to yaml file at "/tmp/kitchen/facter/kitchen.yaml"
+install_custom_facts| false | Install custom facts to yaml file at "/tmp/kitchen/facter/kitchen.rb"
+facter_file | nil | yaml file of custom facter_files to be provided to the puppet-apply command
 chef_bootstrap_url |"https://www.getchef.com/chef/install.sh"| the chef (needed for busser to run tests) NOTE: kitchen 1.4 only requires ruby to run busser so this is not required.
 puppetfile_path | | Path to Puppetfile
 puppet_apply_command | nil | Overwrite the puppet apply command. Needs "sudo -E puppet apply" as a prefix.
@@ -50,7 +51,6 @@ hiera_eyaml | false | use hiera-eyaml to encrypt hiera data
 hiera_eyaml_key_remote_path | "/etc/puppet/secure/keys" | directory of hiera-eyaml keys on server
 hiera_eyaml_key_path  | "hiera_keys" | directory of hiera-eyaml keys on workstation
 hiera_deep_merge | false | install the deep_merge gem to support hiera deep merge mode
-facter_file | nil | yaml file of custom facter_files to be provided to the puppet-apply command
 http_proxy | nil | use http proxy when installing puppet, packages and running puppet
 https_proxy | nil | use https proxy when installing puppet, packages and running puppet
 puppet_logdest | nil | _Array_ of log destinations. Include 'console' if wanted
