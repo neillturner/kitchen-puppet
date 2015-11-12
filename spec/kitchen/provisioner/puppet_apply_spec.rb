@@ -562,10 +562,10 @@ CUSTOM_COMMAND
       config[:custom_facts] = { role: 'webserver' }
       expect(provisioner.run_command).to include("export FACTERLIB='/tmp/kitchen/facter';")
     end
-    
+
     it 'custom options should appear in run command' do
       config[:custom_options] = '--no-stringify_facts'
       expect(provisioner.run_command).to include('--no-stringify_facts')
-    end    
+    end
   end
 end
