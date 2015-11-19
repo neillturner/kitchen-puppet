@@ -1,7 +1,6 @@
 ---
 driver:
   name: docker
-  image: centos:6.7
   use_sudo: <%= ENV['DOCKER_SUDO'] %>
 
 provisioner:
@@ -13,6 +12,12 @@ provisioner:
 
 platforms:
   - name: centos
+    driver:
+      image: centos:6.7
+  - name: fake
+    driver:
+      image: devopsil/puppet
+      platform: rhel
 
 suites:
   - name: default
