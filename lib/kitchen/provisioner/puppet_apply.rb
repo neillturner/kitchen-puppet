@@ -804,12 +804,13 @@ module Kitchen
             config[:puppet_apt_repo]
           end
         else
-          error("Unsupported Platform - #{config[:platform]}")
+          debug("Apt repo detection failed with platform - #{config[:platform]}")
+          false
         end
       end
 
       def puppet_apt_repo_file
-        puppet_apt_repo.split('/').last
+        puppet_apt_repo.split('/').last if puppet_apt_repo
       end
 
       def puppet_apt_coll_repo_file
