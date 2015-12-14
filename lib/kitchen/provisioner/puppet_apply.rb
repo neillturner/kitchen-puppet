@@ -831,7 +831,7 @@ module Kitchen
 
       def wget_proxy_parm
         p = http_proxy ? "-e http_proxy=#{http_proxy}" : nil
-        s = https_proxy ? "-e http_proxy=#{http_proxy}" : nil
+        s = https_proxy ? "-e https_proxy=#{https_proxy}" : nil
         p || s ? "-e use_proxy=yes #{p} #{s}" : nil
       end
 
