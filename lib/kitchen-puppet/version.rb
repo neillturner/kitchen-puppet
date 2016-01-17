@@ -2,6 +2,6 @@
 
 module Kitchen
   module Puppet
-    VERSION = '1.0.35-CML'
+    VERSION = '1.0.35.beta.1'
   end
 end
