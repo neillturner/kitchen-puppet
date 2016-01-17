@@ -1,30 +1,26 @@
-# coding: utf-8
-lib = File.expand_path('../lib', __FILE__)
-$LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-require 'kitchen/puppet/version'
+# encoding: utf-8
 
-Gem::Specification.new do |spec|
-  spec.name          = "kitchen-puppet"
-  spec.version       = Kitchen::Puppet::VERSION
-  spec.authors       = ["Chris Lambertus"]
-  spec.email         = ["cml@apache.org"]
+$LOAD_PATH.unshift File.expand_path('../lib', __FILE__)
+require 'kitchen-puppet/version'
 
-  spec.summary       = %q{kitchen-puppet with hiera-eyaml-gpg}
-  spec.homepage      = "https://github.com/clambertus/kitchen-puppet"
-
-  # Prevent pushing this gem to RubyGems.org by setting 'allowed_push_host', or
-  # delete this section to allow pushing this gem to any host.
-  if spec.respond_to?(:metadata)
-    spec.metadata['allowed_push_host'] = "http://table2.com"
-  else
-    raise "RubyGems 2.0 or newer is required to protect against public gem pushes."
-  end
-
-  spec.files         = `git ls-files -z`.split("\x0").reject { |f| f.match(%r{^(test|spec|features)/}) }
-  spec.bindir        = "exe"
-  spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
-  spec.require_paths = ["lib"]
-
-  spec.add_development_dependency "bundler", "~> 1.9"
-  spec.add_development_dependency "rake", "~> 10.0"
+Gem::Specification.new do |s|
+  s.name          = 'kitchen-puppet'
+  s.license       = 'Apache-2.0'
+  s.version       = Kitchen::Puppet::VERSION
+  s.authors       = ['Neill Turner']
+  s.email         = ['neillwturner@gmail.com']
+  s.homepage      = 'https://github.com/neillturner/kitchen-puppet'
+  s.summary       = 'puppet provisioner for test-kitchen'
+  candidates = Dir.glob('{lib}/**/*') + ['README.md', 'provisioner_options.md', 'kitchen-puppet.gemspec']
+  s.files = candidates.sort
+  s.platform      = Gem::Platform::RUBY
+  s.require_paths = ['lib']
+  s.rubyforge_project = '[none]'
+  s.add_dependency 'test-kitchen', '~> 1.4'
+  s.description = <<-EOF
+== DESCRIPTION:
+Puppet Provisioner for Test Kitchen
+== FEATURES:
+Supports puppet apply, puppet agent, hiera, hiera-eyaml, custom facts, librarian-puppet, puppet collections (v4)
+EOF
 end

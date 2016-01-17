@@ -22,13 +22,19 @@
 
 require 'uri'
 require 'json'
-require 'kitchen/provisioner/base'
+require 'kitchen'
 require 'kitchen/provisioner/puppet/librarian'
 
 module Kitchen
   class Busser
     def non_suite_dirs
       %w(data data_bags environments nodes roles puppet)
+    end
+  end
+
+  module Configurable
+    def platform_name
+      instance.platform.name
     end
   end
 
@@ -44,15 +50,19 @@ module Kitchen
       default_config :puppet_apt_collections_repo, 'http://apt.puppetlabs.com/puppetlabs-release-pc1-wheezy.deb'
       default_config :puppet_coll_remote_path, '/opt/puppetlabs'
       default_config :puppet_version, nil
+      default_config :facter_version, nil
+      default_config :hiera_version, nil
+      default_config :install_hiera, false
+      default_config :hiera_package, 'hiera-puppet'
       default_config :require_puppet_repo, true
       default_config :require_chef_for_busser, true
       default_config :resolve_with_librarian_puppet, true
       default_config :puppet_environment, nil
-      default_config :install_custom_facts, false
       default_config :puppet_apt_repo, 'http://apt.puppetlabs.com/puppetlabs-release-precise.deb'
       default_config :puppet_yum_repo, 'https://yum.puppetlabs.com/puppetlabs-release-el-6.noarch.rpm'
       default_config :chef_bootstrap_url, 'https://www.getchef.com/chef/install.sh'
       default_config :puppet_logdest, nil
+      default_config :custom_install_command, nil
 
       default_config :puppet_apply_command, nil
 
@@ -113,13 +123,21 @@ module Kitchen
         provisioner.calculate_path('manifests', :directory)
       end
 
+      default_config :spec_files_path do |provisioner|
+        provisioner.calculate_path('spec', :directory)
+      end
+
+      default_config :spec_files_remote_path, '/etc/puppet/spec'
+
       default_config :puppet_debug, false
       default_config :puppet_verbose, false
       default_config :puppet_noop, false
-      default_config :puppet_platform, ''
+      default_config :platform, &:platform_name
       default_config :update_package_repos, true
       default_config :remove_puppet_repo, false
+      default_config :install_custom_facts, false
       default_config :custom_facts, {}
+      default_config :facterlib, nil
       default_config :puppet_detailed_exitcodes, nil
       default_config :facter_file, nil
       default_config :librarian_puppet_ssl_file, nil
@@ -161,58 +179,59 @@ module Kitchen
         else
           case puppet_platform
           when 'debian', 'ubuntu'
-            info("Installing puppet on #{puppet_platform}")
+            info("Installing puppet on #{config[:platform]}")
             <<-INSTALL
               if [ ! $(which puppet) ]; then
                 #{sudo('apt-get')} -y install wget
                 #{sudo('wget')} #{wget_proxy_parm} #{puppet_apt_repo}
                 #{sudo('dpkg')} -i #{puppet_apt_repo_file}
                 #{update_packages_debian_cmd}
+                #{sudo_env('apt-get')} -y install facter#{facter_debian_version}
                 #{sudo_env('apt-get')} -y install puppet-common#{puppet_debian_version}
                 #{sudo_env('apt-get')} -y install puppet#{puppet_debian_version}
+                #{install_hiera}
               fi
               #{install_eyaml}
               #{install_deep_merge}
               #{install_busser}
+              #{custom_install_command}
             INSTALL
           when 'redhat', 'centos', 'fedora', 'oracle', 'amazon'
             info("Installing puppet from yum on #{puppet_platform}")
             <<-INSTALL
               if [ ! $(which puppet) ]; then
-                #{sudo('rpm')} -ivh #{proxy_parm} #{puppet_yum_repo}
-                #{update_packages_redhat_cmd}
-                #{sudo_env('yum')} -y install puppet#{puppet_redhat_version}
+                #{install_puppet_yum_repo}
               fi
               #{install_eyaml}
               #{install_deep_merge}
               #{install_busser}
+              #{custom_install_command}
             INSTALL
           else
             info('Installing puppet, will try to determine platform os')
             <<-INSTALL
               if [ ! $(which puppet) ]; then
                 if [ -f /etc/centos-release ] || [ -f /etc/redhat-release ] || [ -f /etc/oracle-release ]; then
-                    #{sudo('rpm')} -ivh #{proxy_parm} #{puppet_yum_repo}
-                    #{update_packages_redhat_cmd}
-                    #{sudo_env('yum')} -y install puppet#{puppet_redhat_version}
+                    #{install_puppet_yum_repo}
                 else
                   if [ -f /etc/system-release ] || [ grep -q 'Amazon Linux' /etc/system-release ]; then
-                     #{sudo('rpm')} -ivh #{proxy_parm} #{puppet_yum_repo}
-                     #{update_packages_redhat_cmd}
-                     #{sudo_env('yum')} -y install puppet#{puppet_redhat_version}
+                     #{install_puppet_yum_repo}
                   else
                     #{sudo('apt-get')} -y install wget
                     #{sudo('wget')} #{wget_proxy_parm} #{puppet_apt_repo}
                     #{sudo('dpkg')} -i #{puppet_apt_repo_file}
                     #{update_packages_debian_cmd}
+                    #{sudo_env('apt-get')} -y install facter#{facter_debian_version}
                     #{sudo_env('apt-get')} -y install puppet-common#{puppet_debian_version}
                     #{sudo_env('apt-get')} -y install puppet#{puppet_debian_version}
+                    #{install_hiera}
                   fi
                 fi
               fi
               #{install_eyaml}
               #{install_deep_merge}
               #{install_busser}
+              #{custom_install_command}
             INSTALL
           end
         end
@@ -226,6 +245,7 @@ module Kitchen
           #{sudo('apt-get')} -y install wget
           #{sudo('wget')} #{wget_proxy_parm} #{config[:puppet_apt_collections_repo]}
           #{sudo('dpkg')} -i #{puppet_apt_coll_repo_file}
+          #{custom_install_command}
           INSTALL
         when 'redhat', 'centos', 'fedora', 'oracle', 'amazon'
           info("Installing Puppet Collections on #{puppet_platform}")
@@ -239,6 +259,7 @@ module Kitchen
           #{install_eyaml("#{config[:puppet_coll_remote_path]}/puppet/bin/gem")}
           #{install_deep_merge}
           #{install_busser}
+          #{custom_install_command}
           INSTALL
         else
           info('Installing Puppet Collections, will try to determine platform os')
@@ -269,6 +290,7 @@ module Kitchen
             #{install_eyaml("#{config[:puppet_coll_remote_path]}/puppet/bin/gem")}
             #{install_deep_merge}
             #{install_busser}
+            #{custom_install_command}
           INSTALL
         end
       end
@@ -323,12 +345,67 @@ module Kitchen
         INSTALL
       end
 
+      def install_hiera
+        return unless config[:install_hiera]
+        <<-INSTALL
+        #{sudo_env('apt-get')} -y install #{hiera_package}
+        INSTALL
+      end
+
+      def hiera_package
+        "#{config[:hiera_package]}#{puppet_hiera_debian_version}"
+      end
+
+      # /bin/wget -P /etc/pki/rpm-gpg/ http://yum.puppetlabs.com/RPM-GPG-KEY-puppetlabs
+      # changed to curl
+
+      def install_puppet_yum_repo
+        <<-INSTALL
+          rhelversion=$(cat /etc/redhat-release | grep 'release 7')
+          # For CentOS7/RHEL7 the rdo release contains puppetlabs repo, creating conflict. Create temp-repo
+          #{sudo_env('curl')} -o /etc/pki/rpm-gpg/RPM-GPG-KEY-puppetlabs http://yum.puppetlabs.com/RPM-GPG-KEY-puppetlabs
+          if [ -n "$rhelversion" ]; then
+          echo '[puppettemp-products]
+          name=Puppet Labs Products - \$basearch
+          baseurl=http://yum.puppetlabs.com/el/7/products/\$basearch
+          gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-puppetlabs
+          enabled=0
+          gpgcheck=1
+          [puppettemp-deps]
+          name=Puppet Labs Dependencies - \$basearch
+          baseurl=http://yum.puppetlabs.com/el/7/dependencies/\$basearch
+          gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-puppetlabs
+          enabled=0
+          gpgcheck=1' | sudo tee /etc/yum.repos.d/puppettemp.repo > /dev/null
+          sudo sed -i 's/^[ \t]*//' /etc/yum.repos.d/puppettemp.repo
+            #{update_packages_redhat_cmd}
+            #{sudo_env('yum')} -y --enablerepo=puppettemp-products --enablerepo=puppettemp-deps install puppet#{puppet_redhat_version}
+            # Clean up temporary puppet repo
+            sudo rm -rf /etc/pki/rpm-gpg/RPM-GPG-KEY-puppetlabs
+            sudo rm -rf /etc/yum.repos.d/puppettemp.repo
+          else
+            #{sudo('rpm')} -ivh #{proxy_parm} #{puppet_yum_repo}
+            #{update_packages_redhat_cmd}
+            #{sudo_env('yum')} -y install puppet#{puppet_redhat_version}
+          fi
+        INSTALL
+      end
+
+      def custom_install_command
+        <<-INSTALL
+          #{config[:custom_install_command]}
+        INSTALL
+      end
+
       def init_command
-        dirs = %w(modules manifests files hiera hiera.yaml)
+        dirs = %w(modules manifests files hiera hiera.yaml facter spec)
         .map { |dir| File.join(config[:root_path], dir) }.join(' ')
-        cmd = "#{sudo('rm')} -rf #{dirs} #{hiera_data_remote_path} /etc/hiera.yaml #{puppet_dir}/hiera.yaml #{puppet_dir}/fileserver.conf;"
+        cmd = "#{sudo('rm')} -rf #{dirs} #{hiera_data_remote_path} \
+              /etc/hiera.yaml #{puppet_dir}/hiera.yaml \
+              #{spec_files_remote_path} \
+              #{puppet_dir}/fileserver.conf;"
         cmd += config[:puppet_environment] ? "#{sudo('rm')} -f #{File.join(puppet_dir, config[:puppet_environment])};" : ''
-        cmd += " mkdir -p #{config[:root_path]} #{puppet_dir}"
+        cmd += " mkdir -p #{config[:root_path]}; #{sudo('mkdir')} -p #{puppet_dir}"
         debug(cmd)
         cmd
       end
@@ -340,11 +417,13 @@ module Kitchen
         prepare_modules
         prepare_manifests
         prepare_files
+        prepare_facter_file
         prepare_facts
         prepare_puppet_config
         prepare_hiera_config
         prepare_fileserver_config
         prepare_hiera_data
+        prepare_spec_files
         info('Finished Preparing files for transfer')
       end
 
@@ -449,7 +528,16 @@ module Kitchen
 
         if puppet_environment
           commands << [
-            sudo('ln -s '),  config[:root_path], File.join(puppet_dir, config[:puppet_environment])
+            sudo('ln -s '), config[:root_path], File.join(puppet_dir, config[:puppet_environment])
+          ].join(' ')
+        end
+
+        if spec_files_path && spec_files_remote_path
+          commands << [
+            sudo('mkdir -p'), spec_files_remote_path
+          ].join(' ')
+          commands << [
+            sudo('cp -r'), File.join(config[:root_path], 'spec/*'), spec_files_remote_path
           ].join(' ')
         end
 
@@ -463,15 +551,16 @@ module Kitchen
         if !config[:puppet_apply_command].nil?
           return config[:puppet_apply_command]
         else
-          [
+          result = [
+            facterlib,
             custom_facts,
-            facter_facts,
+            puppet_manifestdir,
             puppet_cmd,
             'apply',
             File.join(config[:root_path], 'manifests', manifest),
             "--modulepath=#{File.join(config[:root_path], 'modules')}",
-            puppet_manifestdir,
             "--fileserverconfig=#{File.join(config[:root_path], 'fileserver.conf')}",
+            custom_options,
             puppet_environment_flag,
             puppet_noop_flag,
             puppet_detailed_exitcodes_flag,
@@ -480,6 +569,8 @@ module Kitchen
             puppet_logdest_flag,
             remove_repo
           ].join(' ')
+          info("Going to invoke puppet apply with: #{result}")
+          result
         end
       end
 
@@ -620,16 +711,36 @@ module Kitchen
         config[:puppet_version] ? "=#{config[:puppet_version]}" : nil
       end
 
+      def facter_debian_version
+        config[:facter_version] ? "=#{config[:facter_version]}" : nil
+      end
+
+      def puppet_hiera_debian_version
+        config[:hiera_version] ? "=#{config[:hiera_version]}" : nil
+      end
+
       def puppet_redhat_version
         config[:puppet_version] ? "-#{config[:puppet_version]}" : nil
       end
 
       def puppet_environment_flag
-        config[:puppet_environment] ? "--environment=#{config[:puppet_environment]} --environmentpath=#{puppet_dir}" : nil
+        if config[:puppet_version] =~ /^2/
+          config[:puppet_environment] ? "--environment=#{config[:puppet_environment]}" : nil
+        else
+          config[:puppet_environment] ? "--environment=#{config[:puppet_environment]} --environmentpath=#{puppet_dir}" : nil
+        end
       end
 
       def puppet_manifestdir
-        config[:puppet_environment] ? nil : "--manifestdir=#{File.join(config[:root_path], 'manifests')}"
+        return nil if config[:require_puppet_collections]
+        return nil if config[:puppet_environment]
+        bash_vars = "export MANIFESTDIR='#{File.join(config[:root_path], 'manifests')}';"
+        debug(bash_vars)
+        bash_vars
+      end
+
+      def custom_options
+        config[:custom_options] || ''
       end
 
       def puppet_noop_flag
@@ -654,18 +765,7 @@ module Kitchen
       end
 
       def puppet_platform
-        config[:puppet_platform].to_s.downcase
-      end
-
-      def facter_facts
-        return nil unless config[:facter_file]
-        fact_vars = 'export '
-        fact_hash = YAML.load_file(config[:facter_file])
-        fact_hash.each do |key, value|
-          fact_vars << "FACTER_#{key}=#{value} "
-        end
-        fact_vars << ';'
-        fact_vars
+        config[:platform].gsub(/-.*/, '')
       end
 
       def update_packages_debian_cmd
@@ -687,8 +787,30 @@ module Kitchen
         config[:remove_puppet_repo]
       end
 
+      def spec_files_path
+        config[:spec_files_path]
+      end
+
+      def spec_files_remote_path
+        config[:spec_files_remote_path]
+      end
+
+      # rubocop:disable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
+      def facterlib
+        factpath = nil
+        factpath = "#{File.join(config[:root_path], 'facter')}" if config[:install_custom_facts] && !config[:custom_facts].none?
+        factpath = "#{File.join(config[:root_path], 'facter')}" if config[:facter_file]
+        factpath = "#{factpath}:" if config[:facterlib] && !factpath.nil?
+        factpath = "#{factpath}#{config[:facterlib]}" if config[:facterlib]
+        return nil if factpath.nil?
+        bash_vars = "export FACTERLIB='#{factpath}';"
+        debug(bash_vars)
+        bash_vars
+      end
+
       def custom_facts
         return nil if config[:custom_facts].none?
+        return nil if config[:install_custom_facts]
         bash_vars = config[:custom_facts].map { |k, v| "FACTER_#{k}=#{v}" }.join(' ')
         bash_vars = "export #{bash_vars};"
         debug(bash_vars)
@@ -704,11 +826,46 @@ module Kitchen
       end
 
       def puppet_apt_repo
-        config[:puppet_apt_repo]
+        platform_version = config[:platform].partition('-')[2]
+        case puppet_platform
+        when 'ubuntu'
+          case platform_version
+          when '14.10'
+            # Utopic Repo
+            'https://apt.puppetlabs.com/puppetlabs-release-utopic.deb'
+          when '14.04'
+            # Trusty Repo
+            'https://apt.puppetlabs.com/puppetlabs-release-trusty.deb'
+          when '12.04'
+            # Precise Repo
+            'https://apt.puppetlabs.com/puppetlabs-release-precise.deb'
+          else
+            # Configured Repo
+            config[:puppet_apt_repo]
+          end
+        when 'debian'
+          case platform_version.gsub(/\..*/, '')
+          when '8'
+            # Debian Jessie
+            'https://apt.puppetlabs.com/puppetlabs-release-jessie.deb'
+          when '7'
+            # Debian Wheezy
+            'https://apt.puppetlabs.com/puppetlabs-release-wheezy.deb'
+          when '6'
+            # Debian Squeeze
+            'https://apt.puppetlabs.com/puppetlabs-release-squeeze.deb'
+          else
+            # Configured Repo
+            config[:puppet_apt_repo]
+          end
+        else
+          debug("Apt repo detection failed with platform - #{config[:platform]}")
+          false
+        end
       end
 
       def puppet_apt_repo_file
-        config[:puppet_apt_repo].split('/').last
+        puppet_apt_repo.split('/').last if puppet_apt_repo
       end
 
       def puppet_apt_coll_repo_file
@@ -729,7 +886,7 @@ module Kitchen
 
       def wget_proxy_parm
         p = http_proxy ? "-e http_proxy=#{http_proxy}" : nil
-        s = https_proxy ? "-e http_proxy=#{http_proxy}" : nil
+        s = https_proxy ? "-e https_proxy=#{https_proxy}" : nil
         p || s ? "-e use_proxy=yes #{p} #{s}" : nil
       end
 
@@ -768,16 +925,30 @@ module Kitchen
         FileUtils.cp_r(Dir.glob("#{files}/*"), tmp_files_dir)
       end
 
+      def prepare_facter_file
+        return unless config[:facter_file]
+        info 'Copying facter file'
+        facter_dir = File.join(sandbox_path, 'facter')
+        FileUtils.mkdir_p(facter_dir)
+        FileUtils.cp_r(config[:facter_file], facter_dir)
+      end
+
       def prepare_facts
         return unless config[:install_custom_facts]
         return unless config[:custom_facts]
         info 'Installing custom facts'
         facter_dir = File.join(sandbox_path, 'facter')
         FileUtils.mkdir_p(facter_dir)
-        tmp_facter_file = File.join(facter_dir, 'kitchen.yaml')
+        tmp_facter_file = File.join(facter_dir, 'kitchen.rb')
         facter_facts = Hash[config[:custom_facts].map { |k, v| [k.to_s, v.to_s] }]
-        File.open(tmp_facter_file, 'w') do |out|
-          YAML.dump(facter_facts, out)
+        File.open(tmp_facter_file, 'a') do |out|
+          facter_facts.each do |k, v|
+            out.write "\nFacter.add(:#{k}) do\n"
+            out.write "  setcode do\n"
+            out.write "    \"#{v}\"\n"
+            out.write "  end\n"
+            out.write "end\n"
+          end
         end
       end
 
@@ -814,7 +985,7 @@ module Kitchen
         module_target_path = File.join(sandbox_path, 'modules', module_name)
         FileUtils.mkdir_p(module_target_path)
         FileUtils.cp_r(
-          Dir.glob(File.join(config[:kitchen_root], '*')).reject { |entry| entry =~ /modules$/ },
+          Dir.glob(File.join(config[:kitchen_root], '*')).reject { |entry| entry =~ /modules$|spec$|pkg$/ },
           module_target_path,
           remove_destination: true
         )
@@ -859,6 +1030,15 @@ module Kitchen
         debug("Copying hiera eyaml keys from #{hiera_eyaml_key_path} to #{tmp_hiera_key_dir}")
         FileUtils.mkdir_p(tmp_hiera_key_dir)
         FileUtils.cp_r(Dir.glob("#{hiera_eyaml_key_path}/*"), tmp_hiera_key_dir)
+      end
+
+      def prepare_spec_files
+        return unless spec_files_path
+        info('Preparing spec files')
+        tmp_spec_dir = File.join(sandbox_path, 'spec')
+        debug("Copying specs from #{spec_files_path} to #{tmp_spec_dir}")
+        FileUtils.mkdir_p(tmp_spec_dir)
+        FileUtils.cp_r(Dir.glob("#{spec_files_path}/*"), tmp_spec_dir)
       end
 
       def resolve_with_librarian

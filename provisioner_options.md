@@ -4,13 +4,21 @@
 key | default value | Notes
 ----|---------------|--------
 puppet_version | "latest"| desired version, affects apt installs.
-puppet_platform | naively tries to determine | OS platform of server
+facter_version | "latest"| desired version, affects apt installs.
+platform | platform_name kitchen.yml parameter | OS platform of server
+hiera_version | "latest"| desired version, affects apt installs.
+install_hiera | false | Installs `hiera-puppet` package. Not needed for puppet > 3.x.x
+hiera_package | 'hiera-puppet' | Only used if `install_hiera` is set
 require_puppet_repo | true | Set if using a puppet install from yum or apt repo
-puppet_apt_repo | "http://apt.puppetlabs.com/puppetlabs-release-precise.deb"| apt repo
-puppet_yum_repo | "https://yum.puppetlabs.com/puppetlabs-release-el-6.noarch.rpm"| yum repo
+puppet_apt_repo | "http://apt.puppetlabs.com/puppetlabs-release-precise.deb"| apt repo Ubuntu12
+_for Ubuntu15 change to_ | "http://apt.puppetlabs.com/puppetlabs-release-jessie.deb" |
+puppet_yum_repo | "https://yum.puppetlabs.com/puppetlabs-release-el-6.noarch.rpm"| yum repo RH/Centos6
+_for RH/Centos7 change to_ | "https://yum.puppetlabs.com/puppetlabs-release-el-7.noarch.rpm" |
 require_puppet_collections | false | Set if using puppet collections install (Puppet v4)
-puppet_yum_collections_repo | "http://yum.puppetlabs.com/puppetlabs-release-pc1-el-6.noarch.rpm" | yum collections repo
+puppet_yum_collections_repo | "http://yum.puppetlabs.com/puppetlabs-release-pc1-el-6.noarch.rpm" | yum collections repo RH/Centos6
+_for RH/Centos7 change to_ | "https://yum.puppetlabs.com/puppetlabs-release-pc1-el-7.noarch.rpm" |
 puppet_apt_collections_repo | "http://apt.puppetlabs.com/puppetlabs-release-pc1-wheezy.deb" | apt collections repo
+_for Ubuntu15 change to_ | "http://apt.puppetlabs.com/puppetlabs-release-pc1-jessie.deb" |
 puppet_coll_remote_path | "/opt/puppetlabs" | Server Installation location of a puppet collections install.
 puppet_detailed_exitcodes | nil | Provide transaction information via exit codes.
 manifests_path | | puppet repo manifests directory
@@ -28,8 +36,9 @@ puppet_git_init | nil | initialize puppet from GIT repository, e.g. "git@github.
 puppet_git_pr | nil | checkout specific Pull Request from repository specified in puppet_git_init, e.g. "324"
 update_package_repos| true| update OS repository metadata
 custom_facts| Hash.new | Hash to set the puppet facts before running puppet apply
-install_custom_facts| false | Install custom facts to yaml file at "/tmp/kitchen/facter/kitchen.yaml"
-chef_bootstrap_url |"https://www.getchef.com/chef/install.sh"| the chef (needed for busser to run tests)
+install_custom_facts| false | Install custom facts to yaml file at "/tmp/kitchen/facter/kitchen.rb"
+facter_file | nil | yaml file of custom facter_files to be provided to the puppet-apply command
+chef_bootstrap_url |"https://www.getchef.com/chef/install.sh"| the chef (needed for busser to run tests) NOTE: kitchen 1.4 only requires ruby to run busser so this is not required.
 puppetfile_path | | Path to Puppetfile
 puppet_apply_command | nil | Overwrite the puppet apply command. Needs "sudo -E puppet apply" as a prefix.
 require_chef_for_busser | true | Install chef as currently needed by busser to run tests
@@ -42,16 +51,18 @@ hiera_eyaml | false | use hiera-eyaml to encrypt hiera data
 hiera_eyaml_key_remote_path | "/etc/puppet/secure/keys" | directory of hiera-eyaml keys on server
 hiera_eyaml_key_path  | "hiera_keys" | directory of hiera-eyaml keys on workstation
 hiera_deep_merge | false | install the deep_merge gem to support hiera deep merge mode
-facter_file | nil | yaml file of custom facter_files to be provided to the puppet-apply command
 http_proxy | nil | use http proxy when installing puppet, packages and running puppet
 https_proxy | nil | use https proxy when installing puppet, packages and running puppet
 puppet_logdest | nil | _Array_ of log destinations. Include 'console' if wanted
+custom_options | | custom options to add to puppet apply command.
+custom_install_command | nil | Custom shell command to be used at install stage. Can be multiline. See examples below.
 
 
 ## Puppet Apply Configuring Provisioner Options
 
 The provisioner can be configured globally or per suite, global settings act as defaults for all suites, you can then customise per suite, for example:
 
+```yaml
     ---
     driver:
       name: vagrant
@@ -71,15 +82,46 @@ The provisioner can be configured globally or per suite, global settings act as 
 
     suites:
      - name: default
+```
 
+**NOTE:** With Test-Kitchen 1.4 you not longer need chef install to run the tests. You just need ruby installed version 1.9 or higher and also add to the .kitchen.yml file
 
-in this example, vagrant will download a box for ubuntu 1204 with no configuration management installed, then install the latest puppet and puppet apply against a puppet repo from the /repository/puppet_repo directory using the defailt manifest site.pp
+```yaml
+  verifier:
+    ruby_bindir: '/usr/bin'
+```
+where /usr/bin is the location of the ruby command.
+
+in this example, vagrant will download a box for ubuntu 1204 with no configuration management installed, then install the
+latest puppet and puppet apply against a puppet repo from the /repository/puppet_repo directory using the defailt manifest site.pp
 
 To override a setting at the suite-level, specify the setting name under the suite:
 
+```yaml
     suites:
      - name: default
-       manifest: foobar.pp
+       provisioner:
+         manifest: foobar.pp
+```
+
+#### custom_install_command example usage
+
+* One liner
+```yaml
+    custom_install_command: yum install -y git
+```
+* Multiple lines, a.k.a embed shell script
+```yaml
+  custom_install_command: |
+     command1
+     command2
+```
+* Multiple lines join without new line
+```yaml
+  custom_install_command: >
+     command1 &&
+     command2
+```
 
 ### Per-suite Structure
 
@@ -102,7 +144,8 @@ no idea why Puppet versioned their repository with a trailing
 key | default value | Notes
 ----|---------------|--------
 puppet_version | "latest"| desired version, affects apt installs.
-puppet_platform | naively tries to determine | OS platform of server
+facter_version | "latest"| desired version, affects apt installs.
+platform | platform_name kitchen.yml parameter | OS platform of server
 require_puppet_repo | true | Set if using a puppet install from yum or apt repo
 puppet_apt_repo | "http://apt.puppetlabs.com/puppetlabs-release-precise.deb"| apt repo
 puppet_yum_repo | "https://yum.puppetlabs.com/puppetlabs-release-el-6.noarch.rpm"| yum repo
@@ -124,9 +167,10 @@ puppet_verbose| false| Extra information logging on puppet run
 puppet_noop| false| puppet runs in a no-op or dry-run mode
 update_package_repos| true| update OS repository metadata
 custom_facts| Hash.new | Hash to set the puppet facts before running puppet apply
+facterlib | nil | Path for dynamic fact generation, e.g. /etc/puppet/facter . See https://docs.puppetlabs.com/facter/2.2/custom_facts.html
 chef_bootstrap_url |"https://www.getchef.com/chef/install.sh"| the chef (needed for busser to run tests)
 puppet_agent_command | nil | Overwrite the puppet agent command. Needs "sudo -E puppet agent" as a prefix.
-require_chef_for_busser | true | Install chef as currently needed by busser to run tests
+require_chef_for_busser | true | Install chef as currently needed by busser to run tests. NOTE: kitchen 1.4 only requires ruby to run busser so this is not required.
 puppet_config_path | | path of custom puppet.conf file
 http_proxy | nil | use http proxy when installing puppet and packages
 
@@ -137,6 +181,7 @@ NOTE: Puppet Collections Support not in puppet agent yet
 
 The provisioner can be configured globally or per suite, global settings act as defaults for all suites, you can then customise per suite, for example:
 
+```yaml
     ---
     driver:
       name: vagrant
@@ -156,7 +201,15 @@ The provisioner can be configured globally or per suite, global settings act as 
 
     suites:
      - name: default
+```
 
+**NOTE:** With Test-Kitchen 1.4 you not longer need chef install to run the tests. You just need ruby installed version 1.9 or higher and also add to the .kitchen.yml file
+
+```yaml
+  verifier:
+    ruby_bindir: '/usr/bin'
+```
+where /usr/bin is the location of the ruby command.
 
 In this example, vagrant will download a box for ubuntu 1204 with no configuration management installed, then install the latest puppet and run puppet agent against a puppet master at puppetmaster-nocm-ubuntu-1204
 
@@ -169,6 +222,37 @@ NOTE: For testing it is possible to set the puppetmaster to autosign the certifi
 
 To override a setting at the suite-level, specify the setting name under the suite:
 
+```yaml
     suites:
      - name: default
-       manifest: foobar.pp
+       provisioner:
+         manifest: foobar.pp
+```
+
+## Custom ServerSpec or Beaker Invocation
+
+ Instead of using the busser use a custom serverspec invocation using [shell verifier](https://github.com/higanworks/kitchen-verifier-shell) to call it.
+With such setup there is no dependency on busser and any other chef library.
+
+Also you can specify you tests in a different directory structure or even call [beaker](https://github.com/puppetlabs/beaker) instead of server spec and have tests in beaker structure
+
+Using a structure like
+```yaml
+verifier:
+  name: shell
+  remote_exec: true
+  command: |
+    sudo -s <<SERVERSPEC
+    cd /opt/gdc/serverspec-core
+    export SERVERSPEC_ENV=$EC2DATA_ENVIRONMENT
+    export SERVERSPEC_BACKEND=exec
+    serverspec junit=true tag=~skip_in_kitchen check:role:$EC2DATA_TYPE
+    SERVERSPEC
+```
+
+where `serverspec` is a wrapper around `rake` invocation.
+Use a `Rakefile` similar to one in https://github.com/vincentbernat/serverspec-example.
+
+With such approach we can achieve flexibility of running same test suite both in test kitchen and actual, even production, instances.
+
+Beware: kitchen-shell-verifier is not yet merged into test-kitchen upstream so using separate gem is unavoidable so far
