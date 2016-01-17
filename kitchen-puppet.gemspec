@@ -19,8 +19,12 @@ Gem::Specification.new do |s|
   s.add_dependency 'test-kitchen', '~> 1.4'
   s.description = <<-EOF
 == DESCRIPTION:
+
 Puppet Provisioner for Test Kitchen
+
 == FEATURES:
+
 Supports puppet apply, puppet agent, hiera, hiera-eyaml, custom facts, librarian-puppet, puppet collections (v4)
+
 EOF
 end

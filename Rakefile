@@ -24,4 +24,3 @@ namespace :integration do
          bundle exec 'kitchen destroy')
   end
 end
-
