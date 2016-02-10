@@ -323,6 +323,8 @@ module Kitchen
           if [ ! -d "/opt/chef" ]
           then
             echo '-----> Installing Chef Omnibus to install busser to run tests'
+            #{export_http_proxy_parm}
+            #{export_https_proxy_parm}
             do_download #{chef_url} /tmp/install.sh
             #{sudo('sh')} /tmp/install.sh
           fi
@@ -833,6 +835,14 @@ module Kitchen
         p = http_proxy ? "-e http_proxy=#{http_proxy}" : nil
         s = https_proxy ? "-e https_proxy=#{https_proxy}" : nil
         p || s ? "-e use_proxy=yes #{p} #{s}" : nil
+      end
+
+      def export_http_proxy_parm
+        http_proxy ? "export http_proxy=#{http_proxy}" : nil
+      end
+
+      def export_https_proxy_parm
+        http_proxy ? "export https_proxy=#{http_proxy}" : nil
       end
 
       def http_proxy
