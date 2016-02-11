@@ -29,9 +29,9 @@ module Kitchen
         include Logging
 
         def initialize(puppetfile, path, logger = Kitchen.logger)
-          @puppetfile   = puppetfile
-          @path       = path
-          @logger     = logger
+          @puppetfile = puppetfile
+          @path = path
+          @logger = logger
         end
 
         def self.load!(logger = Kitchen.logger)

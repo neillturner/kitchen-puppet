@@ -6,6 +6,7 @@ gem 'rubocop', '~> 0.34'
 gem 'rake', '~> 10.4.2'
 gem 'rspec', '~> 3.3.0'
 gem 'simplecov', '~> 0.10'
+gem 'net-ssh', '~> 2.0'
 
 group :integration do
   gem 'test-kitchen'
