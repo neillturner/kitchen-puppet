@@ -77,13 +77,13 @@ module Kitchen
 
       default_config :manifests_path do |provisioner|
         provisioner.calculate_path('manifests') ||
-          raise 'No manifests_path detected. Please specify one in .kitchen.yml' 
+          raise('No manifests_path detected. Please specify one in .kitchen.yml')
       end
 
       default_config :modules_path do |provisioner|
         modules_path = provisioner.calculate_path('modules')
         if modules_path.nil? && provisioner.calculate_path('Puppetfile', :file).nil?
-          raise 'No modules_path detected. Please specify one in .kitchen.yml'
+          raise('No modules_path detected. Please specify one in .kitchen.yml')
         end
         modules_path
       end
