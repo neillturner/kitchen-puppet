@@ -417,6 +417,7 @@ module Kitchen
         FileUtils.rmtree(sandbox_path)
       end
 
+      # rubocop:disable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       def prepare_command
         commands = []
         if puppet_git_init

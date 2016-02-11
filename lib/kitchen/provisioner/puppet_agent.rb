@@ -91,7 +91,6 @@ module Kitchen
         end
       end
 
-      # rubocop:disable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       def install_command
         return unless config[:require_puppet_omnibus] || config[:require_puppet_repo]
         if config[:require_puppet_omnibus]
