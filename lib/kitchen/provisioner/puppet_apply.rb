@@ -164,8 +164,6 @@ module Kitchen
         end
       end
 
-      # TODO: refactor for smaller cyclomatic complexity and perceived complexity
-      # rubocop:disable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       def install_command
         return unless config[:require_puppet_collections] || config[:require_puppet_repo]
         if config[:require_puppet_collections]
@@ -419,7 +417,6 @@ module Kitchen
         FileUtils.rmtree(sandbox_path)
       end
 
-      # rubocop:disable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       def prepare_command
         commands = []
         if puppet_git_init
@@ -516,7 +513,6 @@ module Kitchen
         debug(command)
         command
       end
-      # rubocop:enable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
 
       def run_command
         if !config[:puppet_apply_command].nil?
@@ -742,7 +738,6 @@ module Kitchen
         config[:spec_files_remote_path]
       end
 
-      # rubocop:disable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       def facterlib
         factpath = nil
         factpath = File.join(config[:root_path], 'facter').to_s if config[:install_custom_facts] && !config[:custom_facts].none?

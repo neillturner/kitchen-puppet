@@ -96,11 +96,8 @@ module Kitchen
         return unless config[:require_puppet_omnibus] || config[:require_puppet_repo]
         if config[:require_puppet_omnibus]
           info('Installing puppet using puppet omnibus')
-          if config[:puppet_version]
-            version = "-v #{config[:puppet_version]}"
-          else
-            version = ''
-          end
+          version = ''
+          version = "-v #{config[:puppet_version]}" if config[:puppet_version]
           <<-INSTALL
             #{Util.shell_helpers}
 
