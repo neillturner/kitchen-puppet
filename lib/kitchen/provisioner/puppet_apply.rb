@@ -77,13 +77,13 @@ module Kitchen
 
       default_config :manifests_path do |provisioner|
         provisioner.calculate_path('manifests') ||
-          fail('No manifests_path detected. Please specify one in .kitchen.yml')
+          raise 'No manifests_path detected. Please specify one in .kitchen.yml' 
       end
 
       default_config :modules_path do |provisioner|
         modules_path = provisioner.calculate_path('modules')
         if modules_path.nil? && provisioner.calculate_path('Puppetfile', :file).nil?
-          fail 'No modules_path detected. Please specify one in .kitchen.yml'
+          raise 'No modules_path detected. Please specify one in .kitchen.yml'
         end
         modules_path
       end
@@ -385,7 +385,7 @@ module Kitchen
 
       def init_command
         dirs = %w(modules manifests files hiera hiera.yaml facter spec)
-        .map { |dir| File.join(config[:root_path], dir) }.join(' ')
+               .map { |dir| File.join(config[:root_path], dir) }.join(' ')
         cmd = "#{sudo('rm')} -rf #{dirs} #{hiera_data_remote_path} \
               /etc/hiera.yaml #{puppet_dir}/hiera.yaml \
               #{spec_files_remote_path} \
@@ -727,7 +727,7 @@ module Kitchen
       def sudo_env(pm)
         s = https_proxy ? "https_proxy=#{https_proxy}" : nil
         p = http_proxy ? "http_proxy=#{http_proxy}" : nil
-        p || s ? "#{sudo('env')} #{p} #{s} #{pm}" : "#{sudo(pm)}"
+        p || s ? "#{sudo('env')} #{p} #{s} #{pm}" : sudo(pm).to_s
       end
 
       def remove_puppet_repo
@@ -745,8 +745,8 @@ module Kitchen
       # rubocop:disable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       def facterlib
         factpath = nil
-        factpath = "#{File.join(config[:root_path], 'facter')}" if config[:install_custom_facts] && !config[:custom_facts].none?
-        factpath = "#{File.join(config[:root_path], 'facter')}" if config[:facter_file]
+        factpath = File.join(config[:root_path], 'facter').to_s if config[:install_custom_facts] && !config[:custom_facts].none?
+        factpath = File.join(config[:root_path], 'facter').to_s if config[:facter_file]
         factpath = "#{factpath}:" if config[:facterlib] && !factpath.nil?
         factpath = "#{factpath}#{config[:facterlib]}" if config[:facterlib]
         return nil if factpath.nil?
