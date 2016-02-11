@@ -91,16 +91,13 @@ module Kitchen
         end
       end
 
-      # rubocop:disable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
+      # rubocop:disable Metrics/CyclomaticComplexity
       def install_command
         return unless config[:require_puppet_omnibus] || config[:require_puppet_repo]
         if config[:require_puppet_omnibus]
           info('Installing puppet using puppet omnibus')
-          if !config[:puppet_version].nil?
-            version = "-v #{config[:puppet_version]}"
-          else
-            version = ''
-          end
+          version = ''
+          version = "-v #{config[:puppet_version]}" if config[:puppet_version]
           <<-INSTALL
             #{Util.shell_helpers}
 
@@ -166,7 +163,7 @@ module Kitchen
           end
         end
       end
-      # rubocop:enable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
+      # rubocop:enable Metrics/CyclomaticComplexity
 
       def install_busser
         return unless config[:require_chef_for_busser]
@@ -291,7 +288,7 @@ module Kitchen
       end
 
       def sudo_env(pm)
-        http_proxy ? "#{sudo('env')} http_proxy=#{http_proxy} #{pm}" : "#{sudo(pm)}"
+        http_proxy ? "#{sudo('env')} http_proxy=#{http_proxy} #{pm}" : sudo(pm).to_s
       end
 
       def custom_facts

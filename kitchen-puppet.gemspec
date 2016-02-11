@@ -17,6 +17,7 @@ Gem::Specification.new do |s|
   s.require_paths = ['lib']
   s.rubyforge_project = '[none]'
   s.add_dependency 'test-kitchen', '~> 1.4'
+  s.add_dependency 'net-ssh', '~> 2.0'
   s.description = <<-EOF
 == DESCRIPTION:
 

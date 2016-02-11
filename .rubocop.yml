@@ -23,3 +23,5 @@ AbcSize:
   Enabled: false
 MultilineOperationIndentation:
   Enabled: false
+RedundantFreeze:
+  Enabled: false
