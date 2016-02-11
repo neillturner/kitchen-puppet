@@ -91,7 +91,7 @@ module Kitchen
         end
       end
 
-      # rubocop:disable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
+      # rubocop:disable Metrics/CyclomaticComplexity
       def install_command
         return unless config[:require_puppet_omnibus] || config[:require_puppet_repo]
         if config[:require_puppet_omnibus]
@@ -163,7 +163,7 @@ module Kitchen
           end
         end
       end
-      # rubocop:enable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
+      # rubocop:enable Metrics/CyclomaticComplexity
 
       def install_busser
         return unless config[:require_chef_for_busser]
