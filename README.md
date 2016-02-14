@@ -124,7 +124,7 @@ Create your serverspec tests in `test/integration/default/serverspec/localhost/x
 ## Test-Kitchen Beaker
 
 test-kitchen normally uses tests setup in `test/integration/....` directory. Beaker format puts the tests with the
-`spec/acceptance` directory in the puppet repository and the `spec_helper_acceptance.rb` under the `spec` directory.
+`spec/acceptance` directory in the puppet repository and the `spec_helper.rb` under the `spec` directory.
 
 For examples see:
 * https://gitlab.com/joshbeard/puppet-module-test
@@ -134,11 +134,12 @@ To implement this with test-kitchen setup the puppet repository with:
 
 * the spec files with the spec/acceptance directory.
 
-* the spec_helper_acceptance in the spec folder.
+* the spec_helper in the spec folder.
 
-* a dummy `test/integration/<suite>/beaker/localhost/<suite>_spec.rb` containing just a dummy comment.
+* install kitchen-verifier-serverspec on your workstation i.e. 'gem install kitchen-verifier-serverspec' 
 
-See example [https://github.com/neillturner/puppet_repo](https://github.com/neillturner/puppet_repo)
+
+See example [https://github.com/neillturner/puppet_beaker_repo](https://github.com/neillturner/puppet_beaker_repo)
 
 ```
 .
@@ -147,23 +148,27 @@ See example [https://github.com/neillturner/puppet_repo](https://github.com/neil
 ¦   ¦   +-- mariadb_spec.rb
 ¦   ¦   +-- nginx_spec.rb
 ¦   ¦
-¦   +-- spec_helper_acceptance.rb
-+-- test
-    +-- integration
-        +-- default      # name of test-kitchen suite
-            +-- beaker
-                +-- localhost
-                    +-- default_spec.rb   # <suite>_spec.rb
+    +-- spec_helper.rb
+
 ```
 
-In the root directory for your puppet repository create a `.kitchen.yml`, the same as for test-kitchen serverspec above.
+In the root directory for your puppet repository create a `.kitchen.yml` with
 
-When test-kitchen runs the verify step will
-* detect the dummy `/test/integration/<suite>/beaker` directory
-* install the busser-beaker plugin instead of the normal busser-serverspec plugin
-* serverspec will be called using the beaker conventions.
+* a verifier of 'serverspec'
+* a pattern parameter with the spec tests to run
 
-See [busser-beaker](https://github.com/neillturner/busser-beaker)
+```yaml
+verifier:
+  name: serverspec
+
+suites:
+  - name: base
+    verifier:
+      patterns:
+      - mycompany_base/spec/acceptance/base_spec.rb
+```
+
+See [busser-beaker](https://github.com/neillturner/kitchen-verifier-serverspec)
 
 
 ## Provisioner Options
