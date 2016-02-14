@@ -165,7 +165,7 @@ suites:
   - name: base
     verifier:
       patterns:
-      - mycompany_base/spec/acceptance/base_spec.rb
+      - modules/mycompany_base/spec/acceptance/base_spec.rb
 ```
 
 See [busser-beaker](https://github.com/neillturner/kitchen-verifier-serverspec)
