@@ -234,9 +234,19 @@ module Kitchen
         when 'debian', 'ubuntu'
           info("Installing Puppet Collections on #{puppet_platform}")
           <<-INSTALL
-          #{sudo('apt-get')} -y install wget
-          #{sudo('wget')} #{wget_proxy_parm} #{config[:puppet_apt_collections_repo]}
-          #{sudo('dpkg')} -i #{puppet_apt_coll_repo_file}
+          #{Util.shell_helpers}
+          if [ ! -d "#{config[:puppet_coll_remote_path]}" ]; then
+            if [ ! -f "#{config[:puppet_apt_collections_repo]}" ]; then
+              #{sudo('apt-get')} -y install wget
+              #{sudo('wget')} #{wget_proxy_parm} #{config[:puppet_apt_collections_repo]}
+            fi
+            #{sudo('dpkg')} -i #{puppet_apt_coll_repo_file}
+            #{sudo('apt-get')} update
+            #{sudo_env('apt-get')} -y install puppet-agent#{puppet_debian_version}
+          fi
+          #{install_eyaml("#{config[:puppet_coll_remote_path]}/puppet/bin/gem")}
+          #{install_deep_merge}
+          #{install_busser}
           #{custom_install_command}
           INSTALL
         when 'redhat', 'centos', 'fedora', 'oracle', 'amazon'
@@ -246,7 +256,7 @@ module Kitchen
           if [ ! -d "#{config[:puppet_coll_remote_path]}" ]; then
             echo "-----> #{sudo_env('yum')} -y localinstall #{config[:puppet_yum_collections_repo]}"
             #{sudo_env('yum')} -y localinstall #{config[:puppet_yum_collections_repo]}
-            #{sudo_env('yum')} -y install puppet
+            #{sudo_env('yum')} -y install puppet-agent#{puppet_redhat_version}
           fi
           #{install_eyaml("#{config[:puppet_coll_remote_path]}/puppet/bin/gem")}
           #{install_deep_merge}
@@ -256,27 +266,19 @@ module Kitchen
         else
           info('Installing Puppet Collections, will try to determine platform os')
           <<-INSTALL
+            #{Util.shell_helpers}
             if [ ! -d "#{config[:puppet_coll_remote_path]}" ]; then
-              if [ -f /etc/centos-release ] || [ -f /etc/redhat-release ] || [ -f /etc/oracle-release ]; then
-                 #{Util.shell_helpers}
-                 if [ ! -d "#{config[:puppet_coll_remote_path]}" ]; then
-                   echo "-----> #{sudo_env('yum')} -y localinstall #{config[:puppet_yum_collections_repo]}"
-                   #{sudo_env('yum')} -y localinstall #{config[:puppet_yum_collections_repo]}
-                   #{sudo_env('yum')} -y install puppet
-                 fi
+              if [ -f /etc/centos-release ] || [ -f /etc/redhat-release ] || [ -f /etc/oracle-release ] || \
+                 [ -f /etc/system-release ] || [ grep -q 'Amazon Linux' /etc/system-release ]; then
+                echo "-----> #{sudo_env('yum')} -y localinstall #{config[:puppet_yum_collections_repo]}"
+                #{sudo_env('yum')} -y localinstall #{config[:puppet_yum_collections_repo]}
+                #{sudo_env('yum')} -y install puppet-agent#{puppet_redhat_version}
               else
-                if [ -f /etc/system-release ] || [ grep -q 'Amazon Linux' /etc/system-release ]; then
-                  #{Util.shell_helpers}
-                  if [ ! -d "#{config[:puppet_coll_remote_path]}" ]; then
-                    echo "-----> #{sudo_env('yum')} -y localinstall #{config[:puppet_yum_collections_repo]}"
-                    #{sudo_env('yum')} -y localinstall #{config[:puppet_yum_collections_repo]}
-                    #{sudo_env('yum')} -y install puppet
-                  fi
-                else
-                  #{sudo('apt-get')} -y install wget
-                  #{sudo('wget')} #{wget_proxy_parm} #{config[:puppet_apt_collections_repo]}
-                  #{sudo('dpkg')} -i #{puppet_apt_coll_repo_file}
-                fi
+                #{sudo('apt-get')} -y install wget
+                #{sudo('wget')} #{wget_proxy_parm} #{config[:puppet_apt_collections_repo]}
+                #{sudo('dpkg')} -i #{puppet_apt_coll_repo_file}
+                #{sudo('apt-get')} update
+                #{sudo_env('apt-get')} -y install puppet-agent#{puppet_debian_version}
               fi
             fi
             #{install_eyaml("#{config[:puppet_coll_remote_path]}/puppet/bin/gem")}
