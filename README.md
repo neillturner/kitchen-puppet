@@ -124,7 +124,7 @@ Create your serverspec tests in `test/integration/default/serverspec/localhost/x
 ## Test-Kitchen Beaker
 
 test-kitchen normally uses tests setup in `test/integration/....` directory. Beaker format puts the tests with the
-`spec/acceptance` directory in the puppet repository and the `spec_helper.rb` under the `spec` directory.
+`spec/acceptance` directory in the puppet repository and the `spec_helper.rb` under the `spec` directory which is more logical.
 
 For examples see:
 * https://gitlab.com/joshbeard/puppet-module-test
@@ -139,7 +139,7 @@ To implement this with test-kitchen setup the puppet repository with:
 * install kitchen-verifier-serverspec on your workstation i.e. 'gem install kitchen-verifier-serverspec' 
 
 
-See example [https://github.com/neillturner/puppet_beaker_repo](https://github.com/neillturner/puppet_beaker_repo)
+See example [https://github.com/neillturner/puppet_repo](https://github.com/neillturner/puppet_repo)
 
 ```
 .
