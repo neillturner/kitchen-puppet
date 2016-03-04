@@ -461,7 +461,7 @@ module Kitchen
           ].join(' ')
 
           commands << [
-            sudo('cp'), File.join(config[:root_path], 'hiera.yaml'), puppet_dir
+            sudo('cp'), File.join(config[:root_path], 'hiera.yaml'), hiera_config_dir
           ].join(' ')
         end
 
@@ -648,6 +648,14 @@ module Kitchen
       def puppet_dir
         if config[:require_puppet_collections]
           '/etc/puppetlabs/puppet'
+        else
+          '/etc/puppet'
+        end
+      end
+
+      def hiera_config_dir
+        if config[:require_puppet_collections]
+          '/etc/puppetlabs/code'
         else
           '/etc/puppet'
         end
