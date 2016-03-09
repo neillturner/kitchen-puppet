@@ -567,5 +567,10 @@ CUSTOM_COMMAND
       config[:custom_options] = '--no-stringify_facts'
       expect(provisioner.run_command).to include('--no-stringify_facts')
     end
+
+    it 'whitelists exit code' do
+      config[:puppet_whitelist_exit_code] = '2'
+      expect(provisioner.run_command).to match(/; \[ \$\? -eq 2 \] && exit 0$/)
+    end
   end
 end
