@@ -63,6 +63,7 @@ module Kitchen
       default_config :chef_bootstrap_url, 'https://www.getchef.com/chef/install.sh'
       default_config :puppet_logdest, nil
       default_config :custom_install_command, nil
+      default_config :puppet_whitelist_exit_code, nil
 
       default_config :puppet_apply_command, nil
 
@@ -417,6 +418,10 @@ module Kitchen
         return if sandbox_path.nil?
         debug("Cleaning up local sandbox in #{sandbox_path}")
         FileUtils.rmtree(sandbox_path)
+        if remove_repo
+          debug("Cleaning up remote sandbox in /tmp/kitchen")
+          remote_command remove_repo
+        end
       end
 
       # rubocop:disable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
@@ -537,7 +542,7 @@ module Kitchen
             puppet_verbose_flag,
             puppet_debug_flag,
             puppet_logdest_flag,
-            remove_repo
+            puppet_whitelist_exit_code
           ].join(' ')
           info("Going to invoke puppet apply with: #{result}")
           result
@@ -775,7 +780,11 @@ module Kitchen
       end
 
       def remove_repo
-        remove_puppet_repo ? "; #{sudo('rm')} -rf /tmp/kitchen #{hiera_data_remote_path} #{hiera_eyaml_key_remote_path} #{puppet_dir}/* " : nil
+        remove_puppet_repo ? "#{sudo('rm')} -rf /tmp/kitchen #{hiera_data_remote_path} #{hiera_eyaml_key_remote_path} #{puppet_dir}/* " : nil
+      end
+
+      def puppet_whitelist_exit_code
+        config[:puppet_whitelist_exit_code] ? "; [ $? -eq #{config[:puppet_whitelist_exit_code]} ] && exit 0" : nil
       end
 
       def puppet_apt_repo

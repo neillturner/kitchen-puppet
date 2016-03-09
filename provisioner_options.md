@@ -20,7 +20,7 @@ _for RH/Centos7 change to_ | "https://yum.puppetlabs.com/puppetlabs-release-pc1-
 puppet_apt_collections_repo | "http://apt.puppetlabs.com/puppetlabs-release-pc1-wheezy.deb" | apt collections repo
 _for Ubuntu15 change to_ | "http://apt.puppetlabs.com/puppetlabs-release-pc1-jessie.deb" |
 puppet_coll_remote_path | "/opt/puppetlabs" | Server Installation location of a puppet collections install.
-puppet_detailed_exitcodes | nil | Provide transaction information via exit codes.
+puppet_detailed_exitcodes | nil | Provide transaction information via exit codes. See `--detailed-exitcodes` section of `puppet help apply`
 manifests_path | | puppet repo manifests directory
 manifest | 'site.pp' | manifest for puppet apply to run
 modules_path | | puppet repo manifests directory
@@ -56,6 +56,7 @@ https_proxy | nil | use https proxy when installing puppet, packages and running
 puppet_logdest | nil | _Array_ of log destinations. Include 'console' if wanted
 custom_options | | custom options to add to puppet apply command.
 custom_install_command | nil | Custom shell command to be used at install stage. Can be multiline. See examples below.
+puppet_whitelist_exit_code | nil | Whitelist exit code expected from puppet run. Intended to be used together with `puppet_detailed_exitcodes`.
 
 
 ## Puppet Apply Configuring Provisioner Options
