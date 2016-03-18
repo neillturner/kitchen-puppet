@@ -260,7 +260,11 @@ module Kitchen
       end
 
       def puppet_redhat_version
-        config[:puppet_version] ? "-#{config[:puppet_version]}" : nil
+        if puppet_platform == 'amazon'
+          config[:puppet_version]
+        else
+          config[:puppet_version] ? "-#{config[:puppet_version]}" : nil
+        end
       end
 
       def puppet_noop_flag
