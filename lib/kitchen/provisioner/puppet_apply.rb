@@ -429,6 +429,7 @@ module Kitchen
       end
 
       def init_command
+        return
         dirs = %w(modules manifests files hiera hiera.yaml facter spec)
                .map { |dir| File.join(config[:root_path], dir) }.join(' ')
         cmd = "#{sudo('rm')} -rf #{dirs} #{hiera_data_remote_path} \
