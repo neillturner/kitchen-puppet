@@ -468,6 +468,11 @@ module Kitchen
         instance.remote_exec remove_repo
       end
 
+      def cp
+        return 'cp -force' if powershell_shell?
+        return 'cp'
+      end
+
       # rubocop:disable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       def prepare_command
         commands = []
@@ -498,7 +503,7 @@ module Kitchen
 
         if puppet_config
           commands << [
-            sudo('cp'),
+            sudo(cp),
             File.join(config[:root_path], 'puppet.conf'),
             puppet_dir
           ].join(' ')
@@ -506,17 +511,17 @@ module Kitchen
 
         if hiera_config
           commands << [
-            sudo('cp'), File.join(config[:root_path], 'hiera.yaml'), '/etc/'
+            sudo(cp), File.join(config[:root_path], 'hiera.yaml'), '/etc/'
           ].join(' ')
 
           commands << [
-            sudo('cp'), File.join(config[:root_path], 'hiera.yaml'), hiera_config_dir
+            sudo(cp), File.join(config[:root_path], 'hiera.yaml'), hiera_config_dir
           ].join(' ')
         end
 
         if fileserver_config
           commands << [
-            sudo('cp'),
+            sudo(cp),
             File.join(config[:root_path], 'fileserver.conf'),
             puppet_dir
           ].join(' ')
@@ -524,7 +529,7 @@ module Kitchen
 
         if hiera_data && hiera_data_remote_path == '/var/lib/hiera'
           commands << [
-            sudo('cp -r'), File.join(config[:root_path], 'hiera'), '/var/lib/'
+            sudo("#{cp} -r"), File.join(config[:root_path], 'hiera'), '/var/lib/'
           ].join(' ')
         end
 
@@ -533,7 +538,7 @@ module Kitchen
             sudo('mkdir -p'), hiera_data_remote_path
           ].join(' ')
           commands << [
-            sudo('cp -r'), File.join(config[:root_path], 'hiera/*'), hiera_data_remote_path
+            sudo("#{cp} -r"), File.join(config[:root_path], 'hiera/*'), hiera_data_remote_path
           ].join(' ')
         end
 
@@ -542,7 +547,7 @@ module Kitchen
             sudo('mkdir -p'), hiera_eyaml_key_remote_path
           ].join(' ')
           commands << [
-            sudo('cp -r'), File.join(config[:root_path], 'hiera_keys/*'), hiera_eyaml_key_remote_path
+            sudo("#{cp} -r"), File.join(config[:root_path], 'hiera_keys/*'), hiera_eyaml_key_remote_path
           ].join(' ')
         end
 
@@ -557,7 +562,7 @@ module Kitchen
             sudo('mkdir -p'), spec_files_remote_path
           ].join(' ')
           commands << [
-            sudo('cp -r'), File.join(config[:root_path], 'spec/*'), spec_files_remote_path
+            sudo("#{cp} -r"), File.join(config[:root_path], 'spec/*'), spec_files_remote_path
           ].join(' ')
         end
 
