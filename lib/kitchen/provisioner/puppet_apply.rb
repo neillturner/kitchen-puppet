@@ -200,17 +200,29 @@ module Kitchen
               #{install_busser}
               #{custom_install_command}
             INSTALL
-          when "windows"
+          when /^windows.*/
             info("Installing puppet on #{puppet_platform}")
-          <<-INSTALL
-            $webclient = New-Object System.Net.WebClient;  $webclient.DownloadFile('http://downloads.puppetlabs.com/windows/puppet-#{puppet_windows_version}.msi','puppet-#{puppet_windows_version}.msi')
-            msiexec /qn /i puppet-#{puppet_windows_version}.msi
-            Start-Sleep -s 60
+            <<-INSTALL
+              if(Get-Command puppet -ErrorAction 0) { return; }
+              if( [Environment]::Is64BitOperatingSystem ) {
+                  $MsiUrl = "https://downloads.puppetlabs.com/windows/puppet-#{puppet_windows_version}-x64.msi"
+              } else {
+                  $MsiUrl = "https://downloads.puppetlabs.com/windows/puppet-#{puppet_windows_version}.msi"
+              }
+              $process = Start-Process -FilePath msiexec.exe -Wait -PassThru -ArgumentList '/qn', '/norestart', '/i', $MsiUrl
+              if ($process.ExitCode -ne 0) {
+                  Write-Host "Installer failed."
+                  Exit 1
+              }
 
-            cmd.exe /C "SET PATH=%PATH%;`"C:\\Program Files (x86)\\Puppet Labs\\Puppet\\bin`""
+              if($env:Path -notcontains 'C:\\Program Files\\Puppet Labs\\Puppet\\bin' ) {
+                $env:Path += ';C:\\Program Files\\Puppet Labs\\Puppet\\bin'
+                [Environment]::SetEnvironmentVariable('Path', $env:Path, 'Machine')
+              }
 
-            #{install_busser}
-          INSTALL
+              puppet config set stringify_facts false
+              #{install_busser}
+            INSTALL
           else
             info('Installing puppet, will try to determine platform os')
             <<-INSTALL
@@ -336,13 +348,13 @@ module Kitchen
         return unless config[:require_chef_for_busser]
         info("Install busser on #{puppet_platform}")
         case puppet_platform
-        when 'windows'
+        when /^windows.*/
           #https://raw.githubusercontent.com/opscode/knife-windows/master/lib/chef/knife/bootstrap/windows-chef-client-msi.erb
           <<-INSTALL
-           $webclient = New-Object System.Net.WebClient;  $webclient.DownloadFile('https://opscode-omnibus-packages.s3.amazonaws.com/windows/2008r2/x86_64/chef-windows-11.12.8-1.windows.msi','chef-windows-11.12.8-1.windows.msi')
-           msiexec /qn /i chef-windows-11.12.8-1.windows.msi
+            $webclient = New-Object System.Net.WebClient;  $webclient.DownloadFile('https://opscode-omnibus-packages.s3.amazonaws.com/windows/2008r2/x86_64/chef-windows-11.12.8-1.windows.msi','chef-windows-11.12.8-1.windows.msi')
+            msiexec /qn /i chef-windows-11.12.8-1.windows.msi
 
-           cmd.exe /C "SET PATH=%PATH%;`"C:\\opscode\\chef\\embedded\\bin`";`"C:\\tmp\\busser\\gems\\bin`""
+            cmd.exe /C "SET PATH=%PATH%;`"C:\\opscode\\chef\\embedded\\bin`";`"C:\\tmp\\busser\\gems\\bin`""
 
           INSTALL
         else
@@ -571,7 +583,7 @@ module Kitchen
             puppet_noop_flag,
             puppet_detailed_exitcodes_flag,
             puppet_verbose_flag,
-            puppet_debug_flag
+            puppet_debug_flag,
             puppet_logdest_flag,
             puppet_whitelist_exit_code
           ].join(' ')
@@ -720,6 +732,10 @@ module Kitchen
         end
       end
 
+      def puppet_windows_version
+        config[:puppet_version] ? "#{config[:puppet_version]}" : nil
+      end
+
       def puppet_environment_flag
         if config[:puppet_version] =~ /^2/
           config[:puppet_environment] ? "--environment=#{config[:puppet_environment]}" : nil
@@ -739,10 +755,6 @@ module Kitchen
       def custom_options
         config[:custom_options] || ''
       end
-
-        def puppet_windows_version
-          config[:puppet_version] ? "#{config[:puppet_version]}" : nil
-        end
 
       def puppet_noop_flag
         config[:puppet_noop] ? '--noop' : nil
