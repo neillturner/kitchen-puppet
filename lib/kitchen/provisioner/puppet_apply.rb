@@ -753,6 +753,7 @@ module Kitchen
       def puppet_manifestdir
         return nil if config[:require_puppet_collections]
         return nil if config[:puppet_environment]
+        return nil if powershell_shell?
         bash_vars = "export MANIFESTDIR='#{File.join(config[:root_path], 'manifests')}';"
         debug(bash_vars)
         bash_vars
