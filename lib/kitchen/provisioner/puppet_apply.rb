@@ -624,9 +624,6 @@ module Kitchen
       end
 
       def manifest
-          info("LBENNETT test")
-          info(config[:manifest])
-          info(diagnose)
         config[:manifest]
       end
 
