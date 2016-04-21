@@ -428,16 +428,35 @@ module Kitchen
         INSTALL
       end
 
+      def get_rm_command
+        return 'rm -force -recurse' if powershell_shell?
+        return "#{sudo('rm')} -rf"
+      end
+
+      def get_mkdir_command
+        return 'mkdir -force -path' if powershell_shell?
+        return "#{sudo('mkdir')} -p"
+      end
+
+      def get_rm_command_paths(paths)
+        return :nil if paths.length == 0
+        return "#{get_rm_command} \"#{paths.join('", "')}\"" if powershell_shell?
+        return "#{get_rm_command} #{paths.join(' ')}"
+      end
+
       def init_command
-        return
-        dirs = %w(modules manifests files hiera hiera.yaml facter spec)
-               .map { |dir| File.join(config[:root_path], dir) }.join(' ')
-        cmd = "#{sudo('rm')} -rf #{dirs} #{hiera_data_remote_path} \
-              /etc/hiera.yaml #{puppet_dir}/hiera.yaml \
-              #{spec_files_remote_path} \
-              #{puppet_dir}/fileserver.conf;"
-        cmd += config[:puppet_environment] ? "#{sudo('rm')} -f #{File.join(puppet_dir, config[:puppet_environment])};" : ''
-        cmd += " mkdir -p #{config[:root_path]}; #{sudo('mkdir')} -p #{puppet_dir}"
+        # TODO: the easiest way is probably to make this full .ps1 / .sh scripts ?
+        todelete = %w(modules manifests files hiera hiera.yaml facter spec)
+               .map { |dir| File.join(config[:root_path], dir) }
+        todelete += [hiera_data_remote_path,
+          '/etc/hiera.yaml',
+          "#{puppet_dir}/hiera.yaml",
+          "#{spec_files_remote_path}",
+          "#{puppet_dir}/fileserver.conf"]
+        todelete += File.join(puppet_dir, config[:puppet_environment]) if config[:puppet_environment]
+        cmd = "#{get_rm_command_paths(todelete)};"
+        cmd += " #{get_mkdir_command} #{config[:root_path]};"
+        cmd += " #{get_mkdir_command} #{puppet_dir}"
         debug(cmd)
         cmd
       end
