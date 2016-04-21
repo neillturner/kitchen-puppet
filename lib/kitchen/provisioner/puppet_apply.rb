@@ -714,6 +714,7 @@ module Kitchen
         if config[:require_puppet_collections]
           sudo_env("#{config[:puppet_coll_remote_path]}/bin/puppet")
         else
+          return sudo_env('$env:Path += ";C:\Program Files\Puppet Labs\Puppet\bin"; puppet') if powershell_shell?
           sudo_env('puppet')
         end
       end
