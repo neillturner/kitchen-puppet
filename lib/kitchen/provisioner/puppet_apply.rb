@@ -253,14 +253,6 @@ module Kitchen
         end
       end
 
-      def install_command_posh
-        install_command
-      end
-
-      def init_command_posh
-
-      end
-
       def install_command_collections
         case puppet_platform
         when 'debian', 'ubuntu'
