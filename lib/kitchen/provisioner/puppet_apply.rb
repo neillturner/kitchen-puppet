@@ -755,7 +755,7 @@ module Kitchen
       end
 
       def puppet_windows_version
-        config[:puppet_version] ? "#{config[:puppet_version]}" : nil
+        config[:puppet_version] ? "#{config[:puppet_version]}" : '3.8.6'
       end
 
       def puppet_environment_flag
