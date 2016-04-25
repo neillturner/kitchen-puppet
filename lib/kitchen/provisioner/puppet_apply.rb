@@ -499,9 +499,11 @@ module Kitchen
         end
 
         if hiera_config
-          commands << [
-            sudo(get_cp_command), File.join(config[:root_path], 'hiera.yaml'), '/etc/'
-          ].join(' ')
+          if !powershell_shell?
+            commands << [
+              sudo(get_cp_command), File.join(config[:root_path], 'hiera.yaml'), '/etc/'
+            ].join(' ')
+          end
 
           commands << [
             sudo(get_cp_command), File.join(config[:root_path], 'hiera.yaml'), hiera_config_dir
