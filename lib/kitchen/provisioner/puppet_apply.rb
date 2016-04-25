@@ -524,7 +524,7 @@ module Kitchen
 
         if hiera_data && hiera_data_remote_path != '/var/lib/hiera'
           commands << [
-            sudo('mkdir -p'), hiera_data_remote_path
+            sudo(get_mkdir_command), hiera_data_remote_path
           ].join(' ')
           commands << [
             sudo("#{get_cp_command} -r"), File.join(config[:root_path], 'hiera/*'), hiera_data_remote_path
@@ -533,7 +533,7 @@ module Kitchen
 
         if hiera_eyaml
           commands << [
-            sudo('mkdir -p'), hiera_eyaml_key_remote_path
+            sudo(get_mkdir_command), hiera_eyaml_key_remote_path
           ].join(' ')
           commands << [
             sudo("#{get_cp_command} -r"), File.join(config[:root_path], 'hiera_keys/*'), hiera_eyaml_key_remote_path
@@ -548,7 +548,7 @@ module Kitchen
 
         if spec_files_path && spec_files_remote_path
           commands << [
-            sudo('mkdir -p'), spec_files_remote_path
+            sudo(get_mkdir_command), spec_files_remote_path
           ].join(' ')
           commands << [
             sudo("#{get_cp_command} -r"), File.join(config[:root_path], 'spec/*'), spec_files_remote_path
