@@ -420,22 +420,6 @@ module Kitchen
         INSTALL
       end
 
-      def get_rm_command
-        return 'rm -force -recurse' if powershell_shell?
-        return "#{sudo('rm')} -rf"
-      end
-
-      def get_mkdir_command
-        return 'mkdir -force -path' if powershell_shell?
-        return "#{sudo('mkdir')} -p"
-      end
-
-      def get_rm_command_paths(paths)
-        return :nil if paths.length == 0
-        return "#{get_rm_command} \"#{paths.join('", "')}\"" if powershell_shell?
-        return "#{get_rm_command} #{paths.join(' ')}"
-      end
-
       def init_command
         todelete = %w(modules manifests files hiera hiera.yaml facter spec)
                .map { |dir| File.join(config[:root_path], dir) }
@@ -478,11 +462,6 @@ module Kitchen
         instance.remote_exec remove_repo
       end
 
-      def cp
-        return 'cp -force' if powershell_shell?
-        return 'cp'
-      end
-
       # rubocop:disable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       def prepare_command
         commands = []
@@ -513,7 +492,7 @@ module Kitchen
 
         if puppet_config
           commands << [
-            sudo(cp),
+            sudo(get_cp_command),
             File.join(config[:root_path], 'puppet.conf'),
             puppet_dir
           ].join(' ')
@@ -521,17 +500,17 @@ module Kitchen
 
         if hiera_config
           commands << [
-            sudo(cp), File.join(config[:root_path], 'hiera.yaml'), '/etc/'
+            sudo(get_cp_command), File.join(config[:root_path], 'hiera.yaml'), '/etc/'
           ].join(' ')
 
           commands << [
-            sudo(cp), File.join(config[:root_path], 'hiera.yaml'), hiera_config_dir
+            sudo(get_cp_command), File.join(config[:root_path], 'hiera.yaml'), hiera_config_dir
           ].join(' ')
         end
 
         if fileserver_config
           commands << [
-            sudo(cp),
+            sudo(get_cp_command),
             File.join(config[:root_path], 'fileserver.conf'),
             puppet_dir
           ].join(' ')
@@ -539,7 +518,7 @@ module Kitchen
 
         if hiera_data && hiera_data_remote_path == '/var/lib/hiera'
           commands << [
-            sudo("#{cp} -r"), File.join(config[:root_path], 'hiera'), '/var/lib/'
+            sudo("#{get_cp_command} -r"), File.join(config[:root_path], 'hiera'), '/var/lib/'
           ].join(' ')
         end
 
@@ -548,7 +527,7 @@ module Kitchen
             sudo('mkdir -p'), hiera_data_remote_path
           ].join(' ')
           commands << [
-            sudo("#{cp} -r"), File.join(config[:root_path], 'hiera/*'), hiera_data_remote_path
+            sudo("#{get_cp_command} -r"), File.join(config[:root_path], 'hiera/*'), hiera_data_remote_path
           ].join(' ')
         end
 
@@ -557,7 +536,7 @@ module Kitchen
             sudo('mkdir -p'), hiera_eyaml_key_remote_path
           ].join(' ')
           commands << [
-            sudo("#{cp} -r"), File.join(config[:root_path], 'hiera_keys/*'), hiera_eyaml_key_remote_path
+            sudo("#{get_cp_command} -r"), File.join(config[:root_path], 'hiera_keys/*'), hiera_eyaml_key_remote_path
           ].join(' ')
         end
 
@@ -572,7 +551,7 @@ module Kitchen
             sudo('mkdir -p'), spec_files_remote_path
           ].join(' ')
           commands << [
-            sudo("#{cp} -r"), File.join(config[:root_path], 'spec/*'), spec_files_remote_path
+            sudo("#{get_cp_command} -r"), File.join(config[:root_path], 'spec/*'), spec_files_remote_path
           ].join(' ')
         end
 
@@ -1088,6 +1067,28 @@ module Kitchen
           ENV['SSL_CERT_FILE'] = '' if librarian_puppet_ssl_file
         end
       end
+
+      def get_cp_command
+        return 'cp -force' if powershell_shell?
+        return 'cp'
+      end
+
+      def get_rm_command
+        return 'rm -force -recurse' if powershell_shell?
+        return "#{sudo('rm')} -rf"
+      end
+
+      def get_mkdir_command
+        return 'mkdir -force -path' if powershell_shell?
+        return "#{sudo('mkdir')} -p"
+      end
+
+      def get_rm_command_paths(paths)
+        return :nil if paths.length == 0
+        return "#{get_rm_command} \"#{paths.join('", "')}\"" if powershell_shell?
+        return "#{get_rm_command} #{paths.join(' ')}"
+      end
+
     end
   end
 end
