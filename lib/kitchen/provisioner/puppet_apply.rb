@@ -839,10 +839,15 @@ module Kitchen
       def custom_facts
         return nil if config[:custom_facts].none?
         return nil if config[:install_custom_facts]
-        bash_vars = config[:custom_facts].map { |k, v| "FACTER_#{k}=#{v}" }.join(' ')
-        bash_vars = "export #{bash_vars};"
-        debug(bash_vars)
-        bash_vars
+        if powershell_shell?
+          environment_vars = config[:custom_facts].map { |k, v| "$env:FACTER_#{k}='#{v}'" }.join('; ')
+          environment_vars = "#{environment_vars};"
+        else
+          environment_vars = config[:custom_facts].map { |k, v| "FACTER_#{k}=#{v}" }.join(' ')
+          environment_vars = "export #{environment_vars};"
+        end
+        debug(environment_vars)
+        environment_vars
       end
 
       def puppet_detailed_exitcodes_flag
