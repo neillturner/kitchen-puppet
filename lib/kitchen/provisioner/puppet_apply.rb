@@ -437,7 +437,6 @@ module Kitchen
       end
 
       def init_command
-        # TODO: the easiest way is probably to make this full .ps1 / .sh scripts ?
         todelete = %w(modules manifests files hiera hiera.yaml facter spec)
                .map { |dir| File.join(config[:root_path], dir) }
         todelete += [hiera_data_remote_path,
