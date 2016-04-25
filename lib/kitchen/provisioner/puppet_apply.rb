@@ -555,7 +555,7 @@ module Kitchen
           ].join(' ')
         end
 
-        command = commands.join(' && ')
+        command = powershell_shell? ? commands.join('; ') : commands.join(' && ')
         debug(command)
         command
       end
