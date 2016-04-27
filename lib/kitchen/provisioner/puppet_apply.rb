@@ -931,7 +931,16 @@ module Kitchen
         FileUtils.mkdir_p(tmpmodules_dir)
         resolve_with_librarian if File.exist?(puppetfile) && config[:resolve_with_librarian_puppet]
 
-        if modules && File.directory?(modules)
+        if modules.include?(':')
+          debug("Found multiple directories in module path merging.....")
+          modules_array = modules.split(':')
+          modules_array.each do |m|
+            if File.directory?(m)
+              debug("Copying modules from #{m} to #{tmpmodules_dir}")
+              FileUtils.cp_r(Dir.glob("#{m}/*"), tmpmodules_dir, remove_destination: true)
+            end
+          end
+        elsif modules && File.directory?(modules)
           debug("Copying modules from #{modules} to #{tmpmodules_dir}")
           FileUtils.cp_r(Dir.glob("#{modules}/*"), tmpmodules_dir, remove_destination: true)
         else

@@ -23,7 +23,7 @@ puppet_coll_remote_path | "/opt/puppetlabs" | Server Installation location of a 
 puppet_detailed_exitcodes | nil | Provide transaction information via exit codes. See `--detailed-exitcodes` section of `puppet help apply`
 manifests_path | | puppet repo manifests directory
 manifest | 'site.pp' | manifest for puppet apply to run
-modules_path | | puppet repo manifests directory
+modules_path | | puppet repo manifests directory. Can be multiple directories separated by colons and then they will be merged
 files_path | | directory to place at /tmp/kitchen/files
 fileserver_config_path | | file to place fileserver.conf
 hiera_config_path | | path to hiera.yaml
