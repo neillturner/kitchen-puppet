@@ -932,7 +932,7 @@ module Kitchen
         resolve_with_librarian if File.exist?(puppetfile) && config[:resolve_with_librarian_puppet]
 
         if modules.include?(':')
-          debug("Found multiple directories in module path merging.....")
+          debug('Found multiple directories in module path merging.....')
           modules_array = modules.split(':')
           modules_array.each do |m|
             if File.directory?(m)
