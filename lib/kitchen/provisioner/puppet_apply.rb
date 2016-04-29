@@ -835,7 +835,9 @@ module Kitchen
       end
 
       def puppet_whitelist_exit_code
-        config[:puppet_whitelist_exit_code] ? "; [ $? -eq #{config[:puppet_whitelist_exit_code]} ] && exit 0" : nil
+        return nil if config[:puppet_whitelist_exit_code].nil?
+        return "; exit ($LASTEXITCODE -ne #{config[:puppet_whitelist_exit_code]})" if powershell_shell?
+        "; [ $? -eq #{config[:puppet_whitelist_exit_code]} ] && exit 0"
       end
 
       def puppet_apt_repo
