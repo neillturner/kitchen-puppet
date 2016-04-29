@@ -168,6 +168,7 @@ module Kitchen
         end
       end
 
+      # rubocop:disable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       def install_command
         return unless config[:require_puppet_collections] || config[:require_puppet_repo] || config[:require_puppet_omnibus]
         if config[:require_puppet_omnibus]
@@ -234,6 +235,7 @@ module Kitchen
           end
         end
       end
+      # rubocop:enable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
 
       def install_command_collections
         case puppet_platform
@@ -350,7 +352,6 @@ module Kitchen
         fi
         INSTALL
       end
-
 
       def install_hiera
         return unless config[:install_hiera]
