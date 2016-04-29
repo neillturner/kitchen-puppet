@@ -1063,7 +1063,7 @@ module Kitchen
         debug("Copying specs from #{spec_files_path} to #{tmp_spec_dir}")
         FileUtils.mkdir_p(tmp_spec_dir)
         FileUtils.cp_r(Dir.glob(File.join(spec_files_path, '*')).reject { |entry| entry =~ /fixtures$/ }, tmp_spec_dir) if config[:ignore_spec_fixtures]
-        FileUtils.cp_r(Dir.glob("#{spec_files_path}/*"), tmp_spec_dir) if !config[:ignore_spec_fixtures]
+        FileUtils.cp_r(Dir.glob("#{spec_files_path}/*"), tmp_spec_dir) unless config[:ignore_spec_fixtures]
       end
 
       def resolve_with_librarian
