@@ -430,6 +430,7 @@ module Kitchen
         prepare_hiera_config
         prepare_fileserver_config
         prepare_hiera_data
+        prepare_enc
         prepare_spec_files
         info('Finished Preparing files for transfer')
       end
@@ -538,7 +539,7 @@ module Kitchen
 
         if config[:puppet_enc]
           commands << [
-            sudo_env('chmod +x'), File.join("#{config[:root_path]}/enc", #{File.basename(config[:puppet_enc])})
+            sudo('chmod 755'), File.join("#{config[:root_path]}/enc", File.basename(config[:puppet_enc]))
           ].join(' ')
         end
 
@@ -1013,7 +1014,7 @@ module Kitchen
         FileUtils.cp_r(puppet_config, File.join(sandbox_path, 'puppet.conf'))
       end
 
-      def prepare_enc_file
+      def prepare_enc
         return unless config[:puppet_enc]
         info 'Copying enc file'
         enc_dir = File.join(sandbox_path, 'enc')
