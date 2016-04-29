@@ -67,6 +67,7 @@ module Kitchen
       default_config :require_puppet_omnibus, false
       default_config :puppet_omnibus_url, 'https://raw.githubusercontent.com/petems/puppet-install-shell/master/install_puppet.sh'
       default_config :puppet_enc, nil
+      default_config :ignore_spec_fixtures, false
 
       default_config :puppet_apply_command, nil
 
@@ -1061,7 +1062,8 @@ module Kitchen
         tmp_spec_dir = File.join(sandbox_path, 'spec')
         debug("Copying specs from #{spec_files_path} to #{tmp_spec_dir}")
         FileUtils.mkdir_p(tmp_spec_dir)
-        FileUtils.cp_r(Dir.glob("#{spec_files_path}/*"), tmp_spec_dir)
+        FileUtils.cp_r(Dir.glob(File.join(spec_files_path, '*')).reject { |entry| entry =~ /fixtures$/ }, tmp_spec_dir) if config[:ignore_spec_fixtures]
+        FileUtils.cp_r(Dir.glob("#{spec_files_path}/*"), tmp_spec_dir) if !config[:ignore_spec_fixtures]
       end
 
       def resolve_with_librarian

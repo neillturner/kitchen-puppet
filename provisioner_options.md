@@ -177,7 +177,7 @@ puppet_agent_command | nil | Overwrite the puppet agent command. Needs "sudo -E 
 require_chef_for_busser | true | Install chef as currently needed by busser to run tests. NOTE: kitchen 1.4 only requires ruby to run busser so this is not required.
 puppet_config_path | | path of custom puppet.conf file
 http_proxy | nil | use http proxy when installing puppet and packages
-
+ignore_spec_fixtures | | ignore spec/fixtures directory
 
 NOTE: Puppet Collections Support not in puppet agent yet
 
