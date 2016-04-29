@@ -57,7 +57,10 @@ puppet_logdest | nil | _Array_ of log destinations. Include 'console' if wanted
 custom_options | | custom options to add to puppet apply command.
 custom_install_command | nil | Custom shell command to be used at install stage. Can be multiline. See examples below.
 puppet_whitelist_exit_code | nil | Whitelist exit code expected from puppet run. Intended to be used together with `puppet_detailed_exitcodes`.
-
+require_puppet_omnibus | false | Set if using omnibus puppet install
+puppet_omnibus_url | https://raw.githubusercontent.com/ petems/puppet-install-shell/ master/install_puppet.sh | omnibus puppet v3 install location.
+_for puppet v4 change to_ | https://raw.githubusercontent.com/ petems/puppet-install-shell/ master/install_puppet_agent.sh |
+puppet_enc | | path for external node classifier script
 
 ## Puppet Apply Configuring Provisioner Options
 

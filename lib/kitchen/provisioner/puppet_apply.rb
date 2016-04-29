@@ -64,6 +64,9 @@ module Kitchen
       default_config :puppet_logdest, nil
       default_config :custom_install_command, nil
       default_config :puppet_whitelist_exit_code, nil
+      default_config :require_puppet_omnibus, false
+      default_config :puppet_omnibus_url, 'https://raw.githubusercontent.com/petems/puppet-install-shell/master/install_puppet.sh'
+      default_config :puppet_enc, nil
 
       default_config :puppet_apply_command, nil
 
@@ -166,8 +169,10 @@ module Kitchen
       end
 
       def install_command
-        return unless config[:require_puppet_collections] || config[:require_puppet_repo]
-        if config[:require_puppet_collections]
+        return unless config[:require_puppet_collections] || config[:require_puppet_repo] || config[:require_puppet_omnibus]
+        if config[:require_puppet_omnibus]
+          install_omnibus_command
+        elsif config[:require_puppet_collections]
           install_command_collections
         else
           case puppet_platform
@@ -331,6 +336,21 @@ module Kitchen
           fi
         INSTALL
       end
+
+      def install_omnibus_command
+        info('Installing puppet using puppet omnibus')
+        <<-INSTALL
+        #{Util.shell_helpers}
+        if [ ! $(which puppet) ]; then
+          echo "-----> Installing Puppet Omnibus"
+          #{export_http_proxy_parm}
+          #{export_https_proxy_parm}
+          do_download #{config[:puppet_omnibus_url]} /tmp/install_puppet.sh
+          #{sudo_env('sh')} /tmp/install_puppet.sh
+        fi
+        INSTALL
+      end
+
 
       def install_hiera
         return unless config[:install_hiera]
@@ -516,6 +536,12 @@ module Kitchen
           ].join(' ')
         end
 
+        if config[:puppet_enc]
+          commands << [
+            sudo_env('chmod +x'), File.join("#{config[:root_path]}/enc", #{File.basename(config[:puppet_enc])})
+          ].join(' ')
+        end
+
         command = commands.join(' && ')
         debug(command)
         command
@@ -537,6 +563,7 @@ module Kitchen
             custom_options,
             puppet_environment_flag,
             puppet_noop_flag,
+            puppet_enc_flag,
             puppet_detailed_exitcodes_flag,
             puppet_verbose_flag,
             puppet_debug_flag,
@@ -778,6 +805,10 @@ module Kitchen
         bash_vars
       end
 
+      def puppet_enc_flag
+        config[:puppet_enc] ? '--node_terminus=exec --external_nodes=/tmp/kitchen/enc' : nil
+      end
+
       def puppet_detailed_exitcodes_flag
         config[:puppet_detailed_exitcodes] ? '--detailed-exitcodes' : nil
       end
@@ -980,6 +1011,14 @@ module Kitchen
         debug("Using puppet config from #{puppet_config}")
 
         FileUtils.cp_r(puppet_config, File.join(sandbox_path, 'puppet.conf'))
+      end
+
+      def prepare_enc_file
+        return unless config[:puppet_enc]
+        info 'Copying enc file'
+        enc_dir = File.join(sandbox_path, 'enc')
+        FileUtils.mkdir_p(enc_dir)
+        FileUtils.cp_r(config[:puppet_enc], enc_dir)
       end
 
       def prepare_hiera_config
