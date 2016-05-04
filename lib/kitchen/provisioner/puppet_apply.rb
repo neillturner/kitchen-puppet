@@ -180,7 +180,9 @@ module Kitchen
           case puppet_platform
           when 'debian', 'ubuntu'
             info("Installing puppet on #{config[:platform]}")
+            # need to add a CR to avoid trouble with proxy settings concatenation
             <<-INSTALL
+
               if [ ! $(which puppet) ]; then
                 #{sudo('apt-get')} -y install wget
                 #{sudo('wget')} #{wget_proxy_parm} #{puppet_apt_repo}
@@ -198,7 +200,9 @@ module Kitchen
             INSTALL
           when 'redhat', 'centos', 'fedora', 'oracle', 'amazon'
             info("Installing puppet from yum on #{puppet_platform}")
+            # need to add a CR to avoid trouble with proxy settings concatenation
             <<-INSTALL
+
               if [ ! $(which puppet) ]; then
                 #{install_puppet_yum_repo}
               fi
@@ -209,7 +213,9 @@ module Kitchen
             INSTALL
           else
             info('Installing puppet, will try to determine platform os')
+            # need to add a CR to avoid trouble with proxy settings concatenation
             <<-INSTALL
+
               if [ ! $(which puppet) ]; then
                 if [ -f /etc/centos-release ] || [ -f /etc/redhat-release ] || [ -f /etc/oracle-release ]; then
                     #{install_puppet_yum_repo}
