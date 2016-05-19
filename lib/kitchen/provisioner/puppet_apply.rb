@@ -155,6 +155,7 @@ module Kitchen
       end
 
       default_config :hiera_deep_merge, false
+      default_config :puppet_no_sudo, false
 
       def calculate_path(path, type = :directory)
         base = config[:test_base_path]
@@ -678,10 +679,15 @@ module Kitchen
       end
 
       def puppet_cmd
+        puppet_bin = 'puppet'
         if config[:require_puppet_collections]
-          sudo_env("#{config[:puppet_coll_remote_path]}/bin/puppet")
+          puppet_bin = "#{config[:puppet_coll_remote_path]}/bin/puppet"
+        end
+
+        if config[:puppet_no_sudo]
+          puppet_bin
         else
-          sudo_env('puppet')
+          sudo_env(puppet_bin)
         end
       end
 
