@@ -145,6 +145,10 @@ describe Kitchen::Provisioner::PuppetApply do
         expect(provisioner[:manifests_path]).to eq(nil)
       end
 
+      it 'Should not ignore path when copying the module under test' do
+        expect(provisioner[:ignore_paths_from_root]).to eq([])
+      end
+
       it 'Should find files path' do
         expect(provisioner[:files_path]).to eq('files')
       end
