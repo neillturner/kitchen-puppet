@@ -77,6 +77,7 @@ module Kitchen
       default_config :http_proxy, nil
       default_config :https_proxy, nil
 
+      default_config :ignored_paths_from_root, []
       default_config :hiera_data_remote_path, '/var/lib/hiera'
       default_config :manifest, 'site.pp'
 
@@ -467,18 +468,21 @@ module Kitchen
         end
 
         if puppet_git_pr
-          commands << [sudo('git'),
-                       '--git-dir=/etc/puppet/.git/',
-                       'fetch -f',
-                       'origin',
-                       "pull/#{puppet_git_pr}/head:pr_#{puppet_git_pr}"
-                      ].join(' ')
+          commands << [
+            sudo('git'),
+            '--git-dir=/etc/puppet/.git/',
+            'fetch -f',
+            'origin',
+            "pull/#{puppet_git_pr}/head:pr_#{puppet_git_pr}"
+          ].join(' ')
 
-          commands << [sudo('git'), '--git-dir=/etc/puppet/.git/',
-                       '--work-tree=/etc/puppet/',
-                       'checkout',
-                       "pr_#{puppet_git_pr}"
-                      ].join(' ')
+          commands << [
+            sudo('git'),
+            '--git-dir=/etc/puppet/.git/',
+            '--work-tree=/etc/puppet/',
+            'checkout',
+            "pr_#{puppet_git_pr}"
+          ].join(' ')
         end
 
         if puppet_config
@@ -1012,8 +1016,11 @@ module Kitchen
         return unless module_name
         module_target_path = File.join(sandbox_path, 'modules', module_name)
         FileUtils.mkdir_p(module_target_path)
+
+        excluded_paths = %w(modules spec pkg) + config[:ignored_paths_from_root]
+
         FileUtils.cp_r(
-          Dir.glob(File.join(config[:kitchen_root], '*')).reject { |entry| entry =~ /modules$|spec$|pkg$/ },
+          Dir.glob(File.join(config[:kitchen_root], '*')).reject { |entry| entry =~ /#{excluded_paths.join('$|')}$/ },
           module_target_path,
           remove_destination: true
         )
