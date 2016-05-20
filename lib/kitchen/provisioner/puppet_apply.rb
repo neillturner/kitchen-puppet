@@ -467,18 +467,21 @@ module Kitchen
         end
 
         if puppet_git_pr
-          commands << [sudo('git'),
-                       '--git-dir=/etc/puppet/.git/',
-                       'fetch -f',
-                       'origin',
-                       "pull/#{puppet_git_pr}/head:pr_#{puppet_git_pr}"
-                      ].join(' ')
+          commands << [
+            sudo('git'),
+            '--git-dir=/etc/puppet/.git/',
+            'fetch -f',
+            'origin',
+            "pull/#{puppet_git_pr}/head:pr_#{puppet_git_pr}"
+          ].join(' ')
 
-          commands << [sudo('git'), '--git-dir=/etc/puppet/.git/',
-                       '--work-tree=/etc/puppet/',
-                       'checkout',
-                       "pr_#{puppet_git_pr}"
-                      ].join(' ')
+          commands << [
+            sudo('git'),
+            '--git-dir=/etc/puppet/.git/',
+            '--work-tree=/etc/puppet/',
+            'checkout',
+            "pr_#{puppet_git_pr}"
+          ].join(' ')
         end
 
         if puppet_config
@@ -1008,7 +1011,7 @@ module Kitchen
         module_target_path = File.join(sandbox_path, 'modules', module_name)
         FileUtils.mkdir_p(module_target_path)
 
-        excluded_paths = ['modules', 'spec', 'pkg'] + config[:ignored_paths_from_root]
+        excluded_paths = %w(modules spec pkg) + config[:ignored_paths_from_root]
 
         FileUtils.cp_r(
           Dir.glob(File.join(config[:kitchen_root], '*')).reject { |entry| entry =~ /#{excluded_paths.join('$|')}$/ },
