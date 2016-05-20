@@ -248,6 +248,10 @@ describe Kitchen::Provisioner::PuppetApply do
       it 'should keep default hiera package name' do
         expect(provisioner[:hiera_package]).to eq('hiera-puppet')
       end
+
+      it 'should run puppet with sudo' do
+        expect(provisioner[:puppet_no_sudo]).to eq(false)
+      end
     end
 
     context 'non-default sets' do
@@ -571,6 +575,16 @@ CUSTOM_COMMAND
     it 'whitelists exit code' do
       config[:puppet_whitelist_exit_code] = '2'
       expect(provisioner.run_command).to match(/; \[ \$\? -eq 2 \] && exit 0$/)
+    end
+
+    it 'can run without sudo' do
+      config[:puppet_no_sudo] = true
+      expect(provisioner.run_command).not_to include('sudo -E')
+    end
+
+    it 'can run with sudo' do
+      config[:puppet_no_sudo] = false
+      expect(provisioner.run_command).to include('sudo -E')
     end
   end
 end
