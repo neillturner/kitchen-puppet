@@ -8,7 +8,7 @@ Documentation:
 AlignParameters:
   Enabled: true
 Encoding:
-  Enabled: true
+  Enabled: false
 HashSyntax:
   Enabled: true
 LineLength:
