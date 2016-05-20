@@ -77,7 +77,7 @@ module Kitchen
       default_config :http_proxy, nil
       default_config :https_proxy, nil
 
-      default_config :ignore_paths_from_root, []
+      default_config :ignored_paths_from_root, []
       default_config :hiera_data_remote_path, '/var/lib/hiera'
       default_config :manifest, 'site.pp'
 
