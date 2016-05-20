@@ -61,6 +61,8 @@ require_puppet_omnibus | false | Set if using omnibus puppet install
 puppet_omnibus_url | https://raw.githubusercontent.com/ petems/puppet-install-shell/ master/install_puppet.sh | omnibus puppet v3 install location.
 _for puppet v4 change to_ | https://raw.githubusercontent.com/ petems/puppet-install-shell/ master/install_puppet_agent.sh |
 puppet_enc | | path for external node classifier script
+puppet_no_sudo | false | allow puppet command to run without sudo if required
+ignored_paths_from_root | [] | allow extra paths to be ignored when copying from puppet repository
 
 ## Puppet Apply Configuring Provisioner Options
 
