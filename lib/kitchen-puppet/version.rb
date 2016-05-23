@@ -2,6 +2,6 @@
 
 module Kitchen
   module Puppet
-    VERSION = '1.41.0'.freeze
+    VERSION = '1.41.1'.freeze
   end
 end
