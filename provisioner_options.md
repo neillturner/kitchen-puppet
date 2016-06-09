@@ -62,6 +62,7 @@ puppet_omnibus_url | https://raw.githubusercontent.com/ petems/puppet-install-sh
 _for puppet v4 change to_ | https://raw.githubusercontent.com/ petems/puppet-install-shell/ master/install_puppet_agent.sh |
 puppet_enc | | path for external node classifier script
 puppet_no_sudo | false | allow puppet command to run without sudo if required
+ignore_spec_fixtures | false | don't copy spec/fixtures to avoid problems with symlinks
 ignored_paths_from_root | [] | allow extra paths to be ignored when copying from puppet repository
 
 ## Puppet Apply Configuring Provisioner Options
