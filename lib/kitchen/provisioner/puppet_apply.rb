@@ -415,7 +415,7 @@ module Kitchen
       end
 
       def init_command
-        dirs = %w(modules manifests files hiera hiera.yaml facter spec)
+        dirs = %w(modules manifests files hiera hiera.yaml facter spec enc)
                .map { |dir| File.join(config[:root_path], dir) }.join(' ')
         cmd = "#{sudo('rm')} -rf #{dirs} #{hiera_data_remote_path} \
               /etc/hiera.yaml #{puppet_dir}/hiera.yaml \
@@ -825,7 +825,7 @@ module Kitchen
       end
 
       def puppet_enc_flag
-        config[:puppet_enc] ? '--node_terminus=exec --external_nodes=/tmp/kitchen/enc' : nil
+        config[:puppet_enc] ? "--node_terminus=exec --external_nodes=#{config[:root_path]}/enc/#{File.basename(config[:puppet_enc])}" : nil
       end
 
       def puppet_detailed_exitcodes_flag
@@ -1040,7 +1040,7 @@ module Kitchen
         info 'Copying enc file'
         enc_dir = File.join(sandbox_path, 'enc')
         FileUtils.mkdir_p(enc_dir)
-        FileUtils.cp_r(config[:puppet_enc], enc_dir)
+        FileUtils.cp_r(config[:puppet_enc], File.join(enc_dir, '/'))
       end
 
       def prepare_hiera_config
