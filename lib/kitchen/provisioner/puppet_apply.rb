@@ -1040,7 +1040,7 @@ module Kitchen
         info 'Copying enc file'
         enc_dir = File.join(sandbox_path, 'enc')
         FileUtils.mkdir_p(enc_dir)
-        FileUtils.cp_r(config[:puppet_enc], File.join(enc_dir,'/'))
+        FileUtils.cp_r(config[:puppet_enc], File.join(enc_dir, '/'))
       end
 
       def prepare_hiera_config
@@ -1095,4 +1095,3 @@ module Kitchen
     end
   end
 end
-
