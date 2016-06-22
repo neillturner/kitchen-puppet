@@ -184,7 +184,7 @@ module Kitchen
             info("Installing puppet on #{config[:platform]}")
             # need to add a CR to avoid trouble with proxy settings concatenation
             <<-INSTALL
-
+              #{custom_install_command}
               if [ ! $(which puppet) ]; then
                 #{sudo('apt-get')} -y install wget
                 #{sudo('wget')} #{wget_proxy_parm} #{puppet_apt_repo}
@@ -198,26 +198,24 @@ module Kitchen
               #{install_eyaml}
               #{install_deep_merge}
               #{install_busser}
-              #{custom_install_command}
             INSTALL
           when 'redhat', 'centos', 'fedora', 'oracle', 'amazon'
             info("Installing puppet from yum on #{puppet_platform}")
             # need to add a CR to avoid trouble with proxy settings concatenation
             <<-INSTALL
-
+              #{custom_install_command}
               if [ ! $(which puppet) ]; then
                 #{install_puppet_yum_repo}
               fi
               #{install_eyaml}
               #{install_deep_merge}
               #{install_busser}
-              #{custom_install_command}
             INSTALL
           else
             info('Installing puppet, will try to determine platform os')
             # need to add a CR to avoid trouble with proxy settings concatenation
             <<-INSTALL
-
+              #{custom_install_command}
               if [ ! $(which puppet) ]; then
                 if [ -f /etc/centos-release ] || [ -f /etc/redhat-release ] || [ -f /etc/oracle-release ]; then
                     #{install_puppet_yum_repo}
@@ -239,7 +237,6 @@ module Kitchen
               #{install_eyaml}
               #{install_deep_merge}
               #{install_busser}
-              #{custom_install_command}
             INSTALL
           end
         end
@@ -252,6 +249,7 @@ module Kitchen
           info("Installing Puppet Collections on #{puppet_platform}")
           <<-INSTALL
           #{Util.shell_helpers}
+          #{custom_install_command}
           if [ ! -d "#{config[:puppet_coll_remote_path]}" ]; then
             if [ ! -f "#{config[:puppet_apt_collections_repo]}" ]; then
               #{sudo('apt-get')} -y install wget
@@ -264,12 +262,12 @@ module Kitchen
           #{install_eyaml("#{config[:puppet_coll_remote_path]}/puppet/bin/gem")}
           #{install_deep_merge}
           #{install_busser}
-          #{custom_install_command}
           INSTALL
         when 'redhat', 'centos', 'fedora', 'oracle', 'amazon'
           info("Installing Puppet Collections on #{puppet_platform}")
           <<-INSTALL
           #{Util.shell_helpers}
+          #{custom_install_command}
           if [ ! -d "#{config[:puppet_coll_remote_path]}" ]; then
             echo "-----> #{sudo_env('yum')} -y localinstall #{config[:puppet_yum_collections_repo]}"
             #{sudo_env('yum')} -y localinstall #{config[:puppet_yum_collections_repo]}
@@ -278,12 +276,12 @@ module Kitchen
           #{install_eyaml("#{config[:puppet_coll_remote_path]}/puppet/bin/gem")}
           #{install_deep_merge}
           #{install_busser}
-          #{custom_install_command}
           INSTALL
         else
           info('Installing Puppet Collections, will try to determine platform os')
           <<-INSTALL
             #{Util.shell_helpers}
+            #{custom_install_command}
             if [ ! -d "#{config[:puppet_coll_remote_path]}" ]; then
               if [ -f /etc/centos-release ] || [ -f /etc/redhat-release ] || [ -f /etc/oracle-release ] || \
                  [ -f /etc/system-release ] || [ grep -q 'Amazon Linux' /etc/system-release ]; then
@@ -301,7 +299,6 @@ module Kitchen
             #{install_eyaml("#{config[:puppet_coll_remote_path]}/puppet/bin/gem")}
             #{install_deep_merge}
             #{install_busser}
-            #{custom_install_command}
           INSTALL
         end
       end
