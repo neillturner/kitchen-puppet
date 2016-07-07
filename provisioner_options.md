@@ -11,8 +11,9 @@ It installs it in the following order:
    
 * If require_puppet_collections is set to true
    
-   Install from the puppet collection.
+   Installs from the puppet collection.
    This is required if you wish to install puppet version 4.
+
    You get the version of puppet in the collection. To influence which puppet version is install modify either
    * puppet_yum_collections_repo
    * puppet_apt_collections_repo
