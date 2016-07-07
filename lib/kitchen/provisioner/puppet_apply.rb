@@ -63,6 +63,7 @@ module Kitchen
       default_config :chef_bootstrap_url, 'https://www.getchef.com/chef/install.sh'
       default_config :puppet_logdest, nil
       default_config :custom_install_command, nil
+      default_config :custom_pre_install_command, nil
       default_config :puppet_whitelist_exit_code, nil
       default_config :require_puppet_omnibus, false
       default_config :puppet_omnibus_url, 'https://raw.githubusercontent.com/petems/puppet-install-shell/master/install_puppet.sh'
@@ -185,6 +186,7 @@ module Kitchen
             # need to add a CR to avoid trouble with proxy settings concatenation
             <<-INSTALL
 
+              #{custom_pre_install_command}
               if [ ! $(which puppet) ]; then
                 #{sudo('apt-get')} -y install wget
                 #{sudo('wget')} #{wget_proxy_parm} #{puppet_apt_repo}
@@ -205,6 +207,7 @@ module Kitchen
             # need to add a CR to avoid trouble with proxy settings concatenation
             <<-INSTALL
 
+              #{custom_pre_install_command}
               if [ ! $(which puppet) ]; then
                 #{install_puppet_yum_repo}
               fi
@@ -218,6 +221,7 @@ module Kitchen
             # need to add a CR to avoid trouble with proxy settings concatenation
             <<-INSTALL
 
+              #{custom_pre_install_command}
               if [ ! $(which puppet) ]; then
                 if [ -f /etc/centos-release ] || [ -f /etc/redhat-release ] || [ -f /etc/oracle-release ]; then
                     #{install_puppet_yum_repo}
@@ -251,7 +255,9 @@ module Kitchen
         when 'debian', 'ubuntu'
           info("Installing Puppet Collections on #{puppet_platform}")
           <<-INSTALL
+
           #{Util.shell_helpers}
+          #{custom_pre_install_command}
           if [ ! -d "#{config[:puppet_coll_remote_path]}" ]; then
             if [ ! -f "#{config[:puppet_apt_collections_repo]}" ]; then
               #{sudo('apt-get')} -y install wget
@@ -269,6 +275,7 @@ module Kitchen
         when 'redhat', 'centos', 'fedora', 'oracle', 'amazon'
           info("Installing Puppet Collections on #{puppet_platform}")
           <<-INSTALL
+
           #{Util.shell_helpers}
           if [ ! -d "#{config[:puppet_coll_remote_path]}" ]; then
             echo "-----> #{sudo_env('yum')} -y localinstall #{config[:puppet_yum_collections_repo]}"
@@ -283,7 +290,9 @@ module Kitchen
         else
           info('Installing Puppet Collections, will try to determine platform os')
           <<-INSTALL
+
             #{Util.shell_helpers}
+            #{custom_pre_install_command}
             if [ ! -d "#{config[:puppet_coll_remote_path]}" ]; then
               if [ -f /etc/centos-release ] || [ -f /etc/redhat-release ] || [ -f /etc/oracle-release ] || \
                  [ -f /etc/system-release ] || [ grep -q 'Amazon Linux' /etc/system-release ]; then
@@ -350,6 +359,10 @@ module Kitchen
 
       def install_omnibus_command
         info('Installing puppet using puppet omnibus')
+
+        version = ''
+        version = "-v #{config[:puppet_version]}" unless config[:puppet_version].nil?
+
         <<-INSTALL
         #{Util.shell_helpers}
         if [ ! $(which puppet) ]; then
@@ -357,7 +370,7 @@ module Kitchen
           #{export_http_proxy_parm}
           #{export_https_proxy_parm}
           do_download #{config[:puppet_omnibus_url]} /tmp/install_puppet.sh
-          #{sudo_env('sh')} /tmp/install_puppet.sh
+          #{sudo_env('sh')} /tmp/install_puppet.sh #{version}
         fi
         INSTALL
       end
@@ -405,6 +418,12 @@ module Kitchen
             #{update_packages_redhat_cmd}
             #{sudo_env('yum')} -y install puppet#{puppet_redhat_version}
           fi
+        INSTALL
+      end
+
+      def custom_pre_install_command
+        <<-INSTALL
+          #{config[:custom_pre_install_command]}
         INSTALL
       end
 
