@@ -6,16 +6,21 @@ Kitchen-puppet is very flexible in how it installs puppet:
 It installs it in the following order:
 
 * if require_puppet_omnibus is set to true
-    Installs using the omnibus_puppet script and passes the puppet_version if specied as -v option.
+
+   Installs using the omnibus_puppet script and passes the puppet_version if specied as -v option.
+   
 * If require_puppet_collections is set to true
-    Install from the puppet collection.
-    This is required if you wish to install puppet version 4.
-    You get the version of puppet in the collection. To influence which puppet version is install modify either
-      puppet_yum_collections_repo
-      puppet_apt_collections_repo
-    to an new collection. At time of writing there was only one collection PC1.
+   
+   Install from the puppet collection.
+   This is required if you wish to install puppet version 4.
+   You get the version of puppet in the collection. To influence which puppet version is install modify either
+   * puppet_yum_collections_repo
+   * puppet_apt_collections_repo
+   to an new collection. At time of writing there was only one collection PC1.
+
 * if require_puppet_repo is set to true (the default)
-    Installs from the operation system repository with the puppet version that is in the particular repository.
+ 
+   Installs from the operation system repository with the puppet version that is in the particular repository.
 
 # Puppet Apply Provisioner Options
 
