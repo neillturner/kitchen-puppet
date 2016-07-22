@@ -145,6 +145,10 @@ describe Kitchen::Provisioner::PuppetApply do
         expect(provisioner[:manifests_path]).to eq(nil)
       end
 
+      it 'Should not ignore additional paths when copying the module under test' do
+        expect(provisioner[:ignored_paths_from_root]).to eq([])
+      end
+
       it 'Should find files path' do
         expect(provisioner[:files_path]).to eq('files')
       end
@@ -247,6 +251,10 @@ describe Kitchen::Provisioner::PuppetApply do
 
       it 'should keep default hiera package name' do
         expect(provisioner[:hiera_package]).to eq('hiera-puppet')
+      end
+
+      it 'should run puppet with sudo' do
+        expect(provisioner[:puppet_no_sudo]).to eq(false)
       end
     end
 
@@ -578,9 +586,14 @@ CUSTOM_COMMAND
       expect(provisioner.run_command).to match(/; \[ \$\? -eq 2 \] && exit 0$/)
     end
 
-    it 'whitelists multiple exit codes' do
-      config[:puppet_whitelist_exit_code] = ['2', '4']
-      expect(provisioner.run_command).to match(/; \[ \$\? -eq \["2", "4"\] \] && exit 0$/)
+    it 'can run without sudo' do
+      config[:puppet_no_sudo] = true
+      expect(provisioner.run_command).not_to include('sudo -E')
+    end
+
+    it 'can run with sudo' do
+      config[:puppet_no_sudo] = false
+      expect(provisioner.run_command).to include('sudo -E')
     end
   end
 

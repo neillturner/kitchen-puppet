@@ -1,4 +1,28 @@
 
+# Puppet Apply Install Options
+
+Kitchen-puppet is very flexible in how it installs puppet:
+
+It installs it in the following order:
+
+* if require_puppet_omnibus is set to true
+
+   Installs using the omnibus_puppet script and passes the puppet_version if specied as -v option.
+   
+* If require_puppet_collections is set to true
+   
+   Installs from the puppet collection.
+   This is required if you wish to install puppet version 4.
+
+   You get the version of puppet in the collection. To influence which puppet version is install modify either
+   * puppet_yum_collections_repo
+   * puppet_apt_collections_repo
+   to an new collection. At time of writing there was only one collection PC1.
+
+* if require_puppet_repo is set to true (the default)
+ 
+   Installs from the operation system repository with the puppet version that is in the particular repository.
+
 # Puppet Apply Provisioner Options
 
 key | default value | Notes
@@ -23,7 +47,7 @@ puppet_coll_remote_path | "/opt/puppetlabs" | Server Installation location of a 
 puppet_detailed_exitcodes | nil | Provide transaction information via exit codes. See `--detailed-exitcodes` section of `puppet help apply`
 manifests_path | | puppet repo manifests directory
 manifest | 'site.pp' | manifest for puppet apply to run
-modules_path | | puppet repo manifests directory
+modules_path | | puppet repo manifests directory. Can be multiple directories separated by colons and then they will be merged
 files_path | | directory to place at /tmp/kitchen/files
 fileserver_config_path | | file to place fileserver.conf
 hiera_config_path | | path to hiera.yaml
@@ -55,9 +79,16 @@ http_proxy | nil | use http proxy when installing puppet, packages and running p
 https_proxy | nil | use https proxy when installing puppet, packages and running puppet
 puppet_logdest | nil | _Array_ of log destinations. Include 'console' if wanted
 custom_options | | custom options to add to puppet apply command.
-custom_install_command | nil | Custom shell command to be used at install stage. Can be multiline. See examples below.
+custom_pre_install_command | nil | Custom shell command to be used at beginning of install stage. Can be multiline.
+custom_install_command | nil | Custom shell command to be used at end of install stage. Can be multiline. See examples below.
 puppet_whitelist_exit_code | nil | Whitelist exit code expected from puppet run. Intended to be used together with `puppet_detailed_exitcodes`.
-
+require_puppet_omnibus | false | Set if using omnibus puppet install
+puppet_omnibus_url | https://raw.githubusercontent.com/ petems/puppet-install-shell/ master/install_puppet.sh | omnibus puppet v3 install location.
+_for puppet v4 change to_ | https://raw.githubusercontent.com/ petems/puppet-install-shell/ master/install_puppet_agent.sh |
+puppet_enc | | path for external node classifier script
+puppet_no_sudo | false | allow puppet command to run without sudo if required
+ignore_spec_fixtures | false | don't copy spec/fixtures to avoid problems with symlinks
+ignored_paths_from_root | [] | allow extra paths to be ignored when copying from puppet repository
 
 ## Puppet Apply Configuring Provisioner Options
 
@@ -174,7 +205,7 @@ puppet_agent_command | nil | Overwrite the puppet agent command. Needs "sudo -E 
 require_chef_for_busser | true | Install chef as currently needed by busser to run tests. NOTE: kitchen 1.4 only requires ruby to run busser so this is not required.
 puppet_config_path | | path of custom puppet.conf file
 http_proxy | nil | use http proxy when installing puppet and packages
-
+ignore_spec_fixtures | | ignore spec/fixtures directory
 
 NOTE: Puppet Collections Support not in puppet agent yet
 

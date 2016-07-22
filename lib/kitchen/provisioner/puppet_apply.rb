@@ -63,7 +63,12 @@ module Kitchen
       default_config :chef_bootstrap_url, 'https://www.getchef.com/chef/install.sh'
       default_config :puppet_logdest, nil
       default_config :custom_install_command, nil
+      default_config :custom_pre_install_command, nil
       default_config :puppet_whitelist_exit_code, nil
+      default_config :require_puppet_omnibus, false
+      default_config :puppet_omnibus_url, 'https://raw.githubusercontent.com/petems/puppet-install-shell/master/install_puppet.sh'
+      default_config :puppet_enc, nil
+      default_config :ignore_spec_fixtures, false
 
       default_config :puppet_apply_command, nil
 
@@ -73,6 +78,7 @@ module Kitchen
       default_config :http_proxy, nil
       default_config :https_proxy, nil
 
+      default_config :ignored_paths_from_root, []
       default_config :hiera_data_remote_path, '/var/lib/hiera'
       default_config :manifest, 'site.pp'
 
@@ -151,6 +157,7 @@ module Kitchen
       end
 
       default_config :hiera_deep_merge, false
+      default_config :puppet_no_sudo, false
 
       def calculate_path(path, type = :directory)
         base = config[:test_base_path]
@@ -165,15 +172,21 @@ module Kitchen
         end
       end
 
+      # rubocop:disable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       def install_command
-        return unless config[:require_puppet_collections] || config[:require_puppet_repo]
-        if config[:require_puppet_collections]
+        return unless config[:require_puppet_collections] || config[:require_puppet_repo] || config[:require_puppet_omnibus]
+        if config[:require_puppet_omnibus]
+          install_omnibus_command
+        elsif config[:require_puppet_collections]
           install_command_collections
         else
           case puppet_platform
           when 'debian', 'ubuntu'
             info("Installing puppet on #{config[:platform]}")
+            # need to add a CR to avoid trouble with proxy settings concatenation
             <<-INSTALL
+
+              #{custom_pre_install_command}
               if [ ! $(which puppet) ]; then
                 #{sudo('apt-get')} -y install wget
                 #{sudo('wget')} #{wget_proxy_parm} #{puppet_apt_repo}
@@ -191,7 +204,10 @@ module Kitchen
             INSTALL
           when 'redhat', 'centos', 'fedora', 'oracle', 'amazon'
             info("Installing puppet from yum on #{puppet_platform}")
+            # need to add a CR to avoid trouble with proxy settings concatenation
             <<-INSTALL
+
+              #{custom_pre_install_command}
               if [ ! $(which puppet) ]; then
                 #{install_puppet_yum_repo}
               fi
@@ -225,7 +241,10 @@ module Kitchen
             INSTALL
           else
             info('Installing puppet, will try to determine platform os')
+            # need to add a CR to avoid trouble with proxy settings concatenation
             <<-INSTALL
+
+              #{custom_pre_install_command}
               if [ ! $(which puppet) ]; then
                 if [ -f /etc/centos-release ] || [ -f /etc/redhat-release ] || [ -f /etc/oracle-release ]; then
                     #{install_puppet_yum_repo}
@@ -252,13 +271,16 @@ module Kitchen
           end
         end
       end
+      # rubocop:enable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
 
       def install_command_collections
         case puppet_platform
         when 'debian', 'ubuntu'
           info("Installing Puppet Collections on #{puppet_platform}")
           <<-INSTALL
+
           #{Util.shell_helpers}
+          #{custom_pre_install_command}
           if [ ! -d "#{config[:puppet_coll_remote_path]}" ]; then
             if [ ! -f "#{config[:puppet_apt_collections_repo]}" ]; then
               #{sudo('apt-get')} -y install wget
@@ -276,6 +298,7 @@ module Kitchen
         when 'redhat', 'centos', 'fedora', 'oracle', 'amazon'
           info("Installing Puppet Collections on #{puppet_platform}")
           <<-INSTALL
+
           #{Util.shell_helpers}
           if [ ! -d "#{config[:puppet_coll_remote_path]}" ]; then
             echo "-----> #{sudo_env('yum')} -y localinstall #{config[:puppet_yum_collections_repo]}"
@@ -290,7 +313,9 @@ module Kitchen
         else
           info('Installing Puppet Collections, will try to determine platform os')
           <<-INSTALL
+
             #{Util.shell_helpers}
+            #{custom_pre_install_command}
             if [ ! -d "#{config[:puppet_coll_remote_path]}" ]; then
               if [ -f /etc/centos-release ] || [ -f /etc/redhat-release ] || [ -f /etc/oracle-release ] || \
                  [ -f /etc/system-release ] || [ grep -q 'Amazon Linux' /etc/system-release ]; then
@@ -368,6 +393,24 @@ module Kitchen
       end
       end
 
+      def install_omnibus_command
+        info('Installing puppet using puppet omnibus')
+
+        version = ''
+        version = "-v #{config[:puppet_version]}" unless config[:puppet_version].nil?
+
+        <<-INSTALL
+        #{Util.shell_helpers}
+        if [ ! $(which puppet) ]; then
+          echo "-----> Installing Puppet Omnibus"
+          #{export_http_proxy_parm}
+          #{export_https_proxy_parm}
+          do_download #{config[:puppet_omnibus_url]} /tmp/install_puppet.sh
+          #{sudo_env('sh')} /tmp/install_puppet.sh #{version}
+        fi
+        INSTALL
+      end
+
       def install_hiera
         return unless config[:install_hiera]
         <<-INSTALL
@@ -414,6 +457,12 @@ module Kitchen
         INSTALL
       end
 
+      def custom_pre_install_command
+        <<-INSTALL
+          #{config[:custom_pre_install_command]}
+        INSTALL
+      end
+
       def custom_install_command
         <<-INSTALL
           #{config[:custom_install_command]}
@@ -421,7 +470,7 @@ module Kitchen
       end
 
       def init_command
-        todelete = %w(modules manifests files hiera hiera.yaml facter spec)
+        todelete = %w(modules manifests files hiera hiera.yaml facter spec enc)
                .map { |dir| File.join(config[:root_path], dir) }
         todelete += [hiera_data_remote_path,
           '/etc/hiera.yaml',
@@ -449,6 +498,7 @@ module Kitchen
         prepare_hiera_config
         prepare_fileserver_config
         prepare_hiera_data
+        prepare_enc
         prepare_spec_files
         info('Finished Preparing files for transfer')
       end
@@ -476,18 +526,21 @@ module Kitchen
         end
 
         if puppet_git_pr
-          commands << [sudo('git'),
-                       '--git-dir=/etc/puppet/.git/',
-                       'fetch -f',
-                       'origin',
-                       "pull/#{puppet_git_pr}/head:pr_#{puppet_git_pr}"
-                      ].join(' ')
+          commands << [
+            sudo('git'),
+            '--git-dir=/etc/puppet/.git/',
+            'fetch -f',
+            'origin',
+            "pull/#{puppet_git_pr}/head:pr_#{puppet_git_pr}"
+          ].join(' ')
 
-          commands << [sudo('git'), '--git-dir=/etc/puppet/.git/',
-                       '--work-tree=/etc/puppet/',
-                       'checkout',
-                       "pr_#{puppet_git_pr}"
-                      ].join(' ')
+          commands << [
+            sudo('git'),
+            '--git-dir=/etc/puppet/.git/',
+            '--work-tree=/etc/puppet/',
+            'checkout',
+            "pr_#{puppet_git_pr}"
+          ].join(' ')
         end
 
         if puppet_config
@@ -557,6 +610,12 @@ module Kitchen
           ].join(' ')
         end
 
+        if config[:puppet_enc]
+          commands << [
+            sudo('chmod 755'), File.join("#{config[:root_path]}/enc", File.basename(config[:puppet_enc]))
+          ].join(' ')
+        end
+
         command = powershell_shell? ? commands.join('; ') : commands.join(' && ')
         debug(command)
         command
@@ -578,6 +637,7 @@ module Kitchen
             custom_options,
             puppet_environment_flag,
             puppet_noop_flag,
+            puppet_enc_flag,
             puppet_detailed_exitcodes_flag,
             puppet_verbose_flag,
             puppet_debug_flag,
@@ -683,11 +743,15 @@ module Kitchen
       end
 
       def puppet_cmd
+        puppet_bin = powershell_shell? ? 'C:\Program Files\Puppet Labs\Puppet\bin\puppet' : 'puppet'
         if config[:require_puppet_collections]
-          sudo_env("#{config[:puppet_coll_remote_path]}/bin/puppet")
+          puppet_bin = "#{config[:puppet_coll_remote_path]}/bin/puppet"
+        end
+
+        if config[:puppet_no_sudo]
+          puppet_bin
         else
-          return sudo_env('$env:Path += ";C:\Program Files\Puppet Labs\Puppet\bin"; puppet') if powershell_shell?
-          sudo_env('puppet')
+          sudo_env(puppet_bin)
         end
       end
 
@@ -824,6 +888,10 @@ module Kitchen
         end
         debug(environment_vars)
         environment_vars
+      end
+
+      def puppet_enc_flag
+        config[:puppet_enc] ? "--node_terminus=exec --external_nodes=#{config[:root_path]}/enc/#{File.basename(config[:puppet_enc])}" : nil
       end
 
       def puppet_detailed_exitcodes_flag
@@ -985,7 +1053,16 @@ module Kitchen
         FileUtils.mkdir_p(tmpmodules_dir)
         resolve_with_librarian if File.exist?(puppetfile) && config[:resolve_with_librarian_puppet]
 
-        if modules && File.directory?(modules)
+        if modules && modules.include?(':')
+          debug('Found multiple directories in module path merging.....')
+          modules_array = modules.split(':')
+          modules_array.each do |m|
+            if File.directory?(m)
+              debug("Copying modules from #{m} to #{tmpmodules_dir}")
+              FileUtils.cp_r(Dir.glob("#{m}/*"), tmpmodules_dir, remove_destination: true)
+            end
+          end
+        elsif modules && File.directory?(modules)
           debug("Copying modules from #{modules} to #{tmpmodules_dir}")
           FileUtils.cp_r(Dir.glob("#{modules}/*"), tmpmodules_dir, remove_destination: true)
         else
@@ -1011,8 +1088,11 @@ module Kitchen
         return unless module_name
         module_target_path = File.join(sandbox_path, 'modules', module_name)
         FileUtils.mkdir_p(module_target_path)
+
+        excluded_paths = %w(modules spec pkg) + config[:ignored_paths_from_root]
+
         FileUtils.cp_r(
-          Dir.glob(File.join(config[:kitchen_root], '*')).reject { |entry| entry =~ /modules$|spec$|pkg$/ },
+          Dir.glob(File.join(config[:kitchen_root], '*')).reject { |entry| entry =~ /#{excluded_paths.join('$|')}$/ },
           module_target_path,
           remove_destination: true
         )
@@ -1025,6 +1105,14 @@ module Kitchen
         debug("Using puppet config from #{puppet_config}")
 
         FileUtils.cp_r(puppet_config, File.join(sandbox_path, 'puppet.conf'))
+      end
+
+      def prepare_enc
+        return unless config[:puppet_enc]
+        info 'Copying enc file'
+        enc_dir = File.join(sandbox_path, 'enc')
+        FileUtils.mkdir_p(enc_dir)
+        FileUtils.cp_r(config[:puppet_enc], File.join(enc_dir, '/'))
       end
 
       def prepare_hiera_config
@@ -1065,7 +1153,8 @@ module Kitchen
         tmp_spec_dir = File.join(sandbox_path, 'spec')
         debug("Copying specs from #{spec_files_path} to #{tmp_spec_dir}")
         FileUtils.mkdir_p(tmp_spec_dir)
-        FileUtils.cp_r(Dir.glob("#{spec_files_path}/*"), tmp_spec_dir)
+        FileUtils.cp_r(Dir.glob(File.join(spec_files_path, '*')).reject { |entry| entry =~ /fixtures$/ }, tmp_spec_dir) if config[:ignore_spec_fixtures]
+        FileUtils.cp_r(Dir.glob("#{spec_files_path}/*"), tmp_spec_dir) unless config[:ignore_spec_fixtures]
       end
 
       def resolve_with_librarian
