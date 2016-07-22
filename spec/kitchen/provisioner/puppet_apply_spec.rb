@@ -572,5 +572,27 @@ CUSTOM_COMMAND
       config[:puppet_whitelist_exit_code] = '2'
       expect(provisioner.run_command).to match(/; \[ \$\? -eq 2 \] && exit 0$/)
     end
+
+    it 'whitelists multiple exit codes' do
+      config[:puppet_whitelist_exit_code] = ['2', '4']
+      expect(provisioner.run_command).to match(/; \[ \$\? -eq \["2", "4"\] \] && exit 0$/)
+    end
+  end
+
+  context 'run command on windows' do
+    before do
+      allow_any_instance_of(Kitchen::Configurable).to receive(:powershell_shell?).and_return(true)
+      allow_any_instance_of(Kitchen::Configurable).to receive(:windows_os?).and_return(true)
+    end
+
+    it 'whitelists exit code' do
+      config[:puppet_whitelist_exit_code] = '2'
+      expect(provisioner.run_command).to match(/; if\(@\(2\) -contains \$LASTEXITCODE\) {exit 0} else {exit \$LASTEXITCODE}$/)
+    end
+
+    it 'whitelists multiple exit codes' do
+      config[:puppet_whitelist_exit_code] = ['2', '4']
+      expect(provisioner.run_command).to match(/; if\(@\(2, 4\) -contains \$LASTEXITCODE\) {exit 0} else {exit \$LASTEXITCODE}$/)
+    end
   end
 end
