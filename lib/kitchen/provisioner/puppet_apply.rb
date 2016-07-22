@@ -231,11 +231,6 @@ module Kitchen
                   Exit 1
               }
 
-              if($env:Path -notcontains 'C:\\Program Files\\Puppet Labs\\Puppet\\bin' ) {
-                $env:Path += ';C:\\Program Files\\Puppet Labs\\Puppet\\bin'
-                [Environment]::SetEnvironmentVariable('Path', $env:Path, 'Machine')
-              }
-
               #{install_busser}
             INSTALL
           else
