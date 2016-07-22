@@ -743,7 +743,7 @@ module Kitchen
       end
 
       def puppet_cmd
-        puppet_bin = powershell_shell? ? 'C:\Program Files\Puppet Labs\Puppet\bin\puppet' : 'puppet'
+        puppet_bin = powershell_shell? ? '& "C:\Program Files\Puppet Labs\Puppet\bin\puppet"' : 'puppet'
         if config[:require_puppet_collections]
           puppet_bin = "#{config[:puppet_coll_remote_path]}/bin/puppet"
         end

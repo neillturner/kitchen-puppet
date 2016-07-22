@@ -633,6 +633,7 @@ CUSTOM_COMMAND
     context 'When using powershell' do
       before do
         allow_any_instance_of(Kitchen::Configurable).to receive(:powershell_shell?).and_return(true)
+        allow_any_instance_of(Kitchen::Configurable).to receive(:windows_os?).and_return(true)
       end
 
       describe 'puppet_dir' do
@@ -668,6 +669,12 @@ CUSTOM_COMMAND
       describe 'get_rm_command_paths(path1, path2)' do
         it 'is rm -force -recurse "path1", "path2"' do
           expect(provisioner.send(:get_rm_command_paths, ['path1', 'path2'])).to eq('rm -force -recurse "path1", "path2"')
+        end
+      end
+
+      describe 'puppet_cmd' do
+        it 'is & "C:\Program Files\Puppet Labs\Puppet\bin\puppet"' do
+          expect(provisioner.send(:puppet_cmd)).to eq('& "C:\Program Files\Puppet Labs\Puppet\bin\puppet"')
         end
       end
     end
@@ -706,6 +713,12 @@ CUSTOM_COMMAND
       describe 'get_rm_command_paths(path1, path2)' do
         it 'is sudo -E rm -rf path1 path2' do
           expect(provisioner.send(:get_rm_command_paths, ['path1', 'path2'])).to eq('sudo -E rm -rf path1 path2')
+        end
+      end
+
+      describe 'puppet_cmd' do
+        it 'is puppet' do
+          expect(provisioner.send(:puppet_cmd)).to eq('sudo -E puppet')
         end
       end
     end
