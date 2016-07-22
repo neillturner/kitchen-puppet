@@ -837,7 +837,7 @@ module Kitchen
       def puppet_whitelist_exit_code
         return "; exit $LASTEXITCODE" if config[:puppet_whitelist_exit_code].nil? && powershell_shell?
         return nil if config[:puppet_whitelist_exit_code].nil?
-        return "; if(@(#{config[:puppet_whitelist_exit_code].join(', ')}) -contains $LASTEXITCODE) {exit 0} else {exit $LASTEXITCODE} " if powershell_shell?
+        return "; if(@(#{[config[:puppet_whitelist_exit_code]].join(', ')}) -contains $LASTEXITCODE) {exit 0} else {exit $LASTEXITCODE}" if powershell_shell?
         "; [ $? -eq #{config[:puppet_whitelist_exit_code]} ] && exit 0"
       end
 
