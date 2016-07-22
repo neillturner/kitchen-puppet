@@ -563,6 +563,11 @@ CUSTOM_COMMAND
       expect(provisioner.run_command).to include("export FACTERLIB='/tmp/kitchen/facter';")
     end
 
+    it 'exports custom_facts' do
+      config[:custom_facts] = {fact1: 'value1', fact2: 'value2'}
+      expect(provisioner.run_command).to include("export FACTER_fact1=value1 FACTER_fact2=value2;")
+    end
+
     it 'custom options should appear in run command' do
       config[:custom_options] = '--no-stringify_facts'
       expect(provisioner.run_command).to include('--no-stringify_facts')
@@ -583,6 +588,16 @@ CUSTOM_COMMAND
     before do
       allow_any_instance_of(Kitchen::Configurable).to receive(:powershell_shell?).and_return(true)
       allow_any_instance_of(Kitchen::Configurable).to receive(:windows_os?).and_return(true)
+    end
+
+    it 'exports custom_facts' do
+      config[:custom_facts] = {fact1: 'value1', fact2: 'value2'}
+      expect(provisioner.run_command).to include("\$env:FACTER_fact1='value1'; \$env:FACTER_fact2='value2';")
+    end
+
+    it 'custom options should appear in run command' do
+      config[:custom_options] = '--no-stringify_facts'
+      expect(provisioner.run_command).to include('--no-stringify_facts')
     end
 
     it 'does not whitelist exit codes by default' do
