@@ -600,4 +600,24 @@ CUSTOM_COMMAND
       expect(provisioner.run_command).to match(/; if\(@\(2, 4\) -contains \$LASTEXITCODE\) {exit 0} else {exit \$LASTEXITCODE}$/)
     end
   end
+
+  context 'puppet_dir' do
+    before do
+      allow_any_instance_of(Kitchen::Configurable).to receive(:powershell_shell?).and_return(true)
+    end
+
+    it 'is C:/ProgramData/PuppetLabs/puppet/etc' do
+      expect(provisioner.send(:puppet_dir)).to eq('C:/ProgramData/PuppetLabs/puppet/etc')
+    end
+  end
+
+  context 'hiera_config_dir' do
+    before do
+      allow_any_instance_of(Kitchen::Configurable).to receive(:powershell_shell?).and_return(true)
+    end
+
+    it 'is C:/ProgramData/PuppetLabs/puppet/etc' do
+      expect(provisioner.send(:hiera_config_dir)).to eq('C:/ProgramData/PuppetLabs/puppet/etc')
+    end
+  end
 end
