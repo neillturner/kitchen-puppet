@@ -585,7 +585,12 @@ CUSTOM_COMMAND
       allow_any_instance_of(Kitchen::Configurable).to receive(:windows_os?).and_return(true)
     end
 
-    it 'whitelists exit code' do
+    it 'does not whitelist exit codes by default' do
+      config[:puppet_whitelist_exit_code] = nil
+      expect(provisioner.run_command).to match(/; exit \$LASTEXITCODE$/)
+    end
+
+    it 'whitelists a single exit code' do
       config[:puppet_whitelist_exit_code] = '2'
       expect(provisioner.run_command).to match(/; if\(@\(2\) -contains \$LASTEXITCODE\) {exit 0} else {exit \$LASTEXITCODE}$/)
     end
