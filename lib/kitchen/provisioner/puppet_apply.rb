@@ -236,7 +236,6 @@ module Kitchen
                 [Environment]::SetEnvironmentVariable('Path', $env:Path, 'Machine')
               }
 
-              puppet config set stringify_facts false
               #{install_busser}
             INSTALL
           else
