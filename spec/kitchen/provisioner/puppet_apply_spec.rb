@@ -616,23 +616,85 @@ CUSTOM_COMMAND
     end
   end
 
-  context 'puppet_dir' do
-    before do
-      allow_any_instance_of(Kitchen::Configurable).to receive(:powershell_shell?).and_return(true)
+  describe 'protected methods' do
+    context 'When using powershell' do
+      before do
+        allow_any_instance_of(Kitchen::Configurable).to receive(:powershell_shell?).and_return(true)
+      end
+
+      describe 'puppet_dir' do
+        it 'is C:/ProgramData/PuppetLabs/puppet/etc' do
+          expect(provisioner.send(:puppet_dir)).to eq('C:/ProgramData/PuppetLabs/puppet/etc')
+        end
+      end
+
+      describe 'hiera_config_dir' do
+        it 'is C:/ProgramData/PuppetLabs/puppet/etc' do
+          expect(provisioner.send(:hiera_config_dir)).to eq('C:/ProgramData/PuppetLabs/puppet/etc')
+        end
+      end
+
+      describe 'get_cp_command' do
+        it 'is cp -force' do
+          expect(provisioner.send(:get_cp_command)).to eq('cp -force')
+        end
+      end
+
+      describe 'get_rm_command' do
+        it 'is rm -force -recurse' do
+          expect(provisioner.send(:get_rm_command)).to eq('rm -force -recurse')
+        end
+      end
+
+      describe 'get_mkdir_command' do
+        it 'is mkdir -force -path' do
+          expect(provisioner.send(:get_mkdir_command)).to eq('mkdir -force -path')
+        end
+      end
+
+      describe 'get_rm_command_paths(path1, path2)' do
+        it 'is rm -force -recurse "path1", "path2"' do
+          expect(provisioner.send(:get_rm_command_paths, ['path1', 'path2'])).to eq('rm -force -recurse "path1", "path2"')
+        end
+      end
     end
 
-    it 'is C:/ProgramData/PuppetLabs/puppet/etc' do
-      expect(provisioner.send(:puppet_dir)).to eq('C:/ProgramData/PuppetLabs/puppet/etc')
-    end
-  end
+    context 'When NOT using powershell' do
+      describe 'puppet_dir' do
+        it 'is /etc/puppet' do
+          expect(provisioner.send(:puppet_dir)).to eq('/etc/puppet')
+        end
+      end
 
-  context 'hiera_config_dir' do
-    before do
-      allow_any_instance_of(Kitchen::Configurable).to receive(:powershell_shell?).and_return(true)
-    end
+      describe 'hiera_config_dir' do
+        it 'is /etc/puppet' do
+          expect(provisioner.send(:hiera_config_dir)).to eq('/etc/puppet')
+        end
+      end
 
-    it 'is C:/ProgramData/PuppetLabs/puppet/etc' do
-      expect(provisioner.send(:hiera_config_dir)).to eq('C:/ProgramData/PuppetLabs/puppet/etc')
+      describe 'get_cp_command' do
+        it 'is cp' do
+          expect(provisioner.send(:get_cp_command)).to eq('cp')
+        end
+      end
+
+      describe 'get_rm_command' do
+        it 'is sudo -E rm -rf' do
+          expect(provisioner.send(:get_rm_command)).to eq('sudo -E rm -rf')
+        end
+      end
+
+      describe 'get_mkdir_command' do
+        it 'is sudo -E mkdir -p' do
+          expect(provisioner.send(:get_mkdir_command)).to eq('sudo -E mkdir -p')
+        end
+      end
+
+      describe 'get_rm_command_paths(path1, path2)' do
+        it 'is sudo -E rm -rf path1 path2' do
+          expect(provisioner.send(:get_rm_command_paths, ['path1', 'path2'])).to eq('sudo -E rm -rf path1 path2')
+        end
+      end
     end
   end
 end
