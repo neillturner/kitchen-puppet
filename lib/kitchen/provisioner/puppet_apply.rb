@@ -472,9 +472,9 @@ module Kitchen
           "#{spec_files_remote_path}",
           "#{puppet_dir}/fileserver.conf"]
         todelete += File.join(puppet_dir, config[:puppet_environment]) if config[:puppet_environment]
-        cmd = "#{get_rm_command_paths(todelete)};"
+        cmd = "#{sudo(get_rm_command_paths(todelete))};"
         cmd += " #{get_mkdir_command} #{config[:root_path]};"
-        cmd += " #{get_mkdir_command} #{puppet_dir}"
+        cmd += " #{sudo(get_mkdir_command)} #{puppet_dir}"
         debug(cmd)
         cmd
       end
@@ -1166,12 +1166,12 @@ module Kitchen
 
       def get_rm_command
         return 'rm -force -recurse' if powershell_shell?
-        return "#{sudo('rm')} -rf"
+        return 'rm -rf'
       end
 
       def get_mkdir_command
         return 'mkdir -force -path' if powershell_shell?
-        return "#{sudo('mkdir')} -p"
+        return 'mkdir -p'
       end
 
       def get_rm_command_paths(paths)

@@ -700,19 +700,19 @@ CUSTOM_COMMAND
 
       describe 'get_rm_command' do
         it 'is sudo -E rm -rf' do
-          expect(provisioner.send(:get_rm_command)).to eq('sudo -E rm -rf')
+          expect(provisioner.send(:get_rm_command)).to eq('rm -rf')
         end
       end
 
       describe 'get_mkdir_command' do
         it 'is sudo -E mkdir -p' do
-          expect(provisioner.send(:get_mkdir_command)).to eq('sudo -E mkdir -p')
+          expect(provisioner.send(:get_mkdir_command)).to eq('mkdir -p')
         end
       end
 
       describe 'get_rm_command_paths(path1, path2)' do
         it 'is sudo -E rm -rf path1 path2' do
-          expect(provisioner.send(:get_rm_command_paths, ['path1', 'path2'])).to eq('sudo -E rm -rf path1 path2')
+          expect(provisioner.send(:get_rm_command_paths, ['path1', 'path2'])).to eq('rm -rf path1 path2')
         end
       end
 
