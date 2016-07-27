@@ -897,12 +897,10 @@ module Kitchen
       def puppet_whitelist_exit_code
         if config[:puppet_whitelist_exit_code].nil?
           return powershell_shell? ? '; exit $LASTEXITCODE' : nil
+        elsif powershell_shell?
+          return "; if(@(#{[config[:puppet_whitelist_exit_code]].join(', ')}) -contains $LASTEXITCODE) {exit 0} else {exit $LASTEXITCODE}"
         else
-          if powershell_shell? 
-            return "; if(@(#{[config[:puppet_whitelist_exit_code]].join(', ')}) -contains $LASTEXITCODE) {exit 0} else {exit $LASTEXITCODE}"
-          else  
-            return "; [ $? -eq #{config[:puppet_whitelist_exit_code]} ] && exit 0"
-          end  
+          return "; [ $? -eq #{config[:puppet_whitelist_exit_code]} ] && exit 0"
         end
       end
 
@@ -1073,7 +1071,7 @@ module Kitchen
           module_name = File.basename(f)
           target = "#{destination}/#{module_name}"
           FileUtils.mkdir_p(target) unless File.exist? target
-          FileUtils.cp_r(Dir.glob("#{source}/#{module_name}/*").reject {|entry| entry =~ /#{excluded_paths.join('$|')}$/}, target, remove_destination: true)
+          FileUtils.cp_r(Dir.glob("#{source}/#{module_name}/*").reject { |entry| entry =~ /#{excluded_paths.join('$|')}$/ }, target, remove_destination: true)
         end
       end
 
