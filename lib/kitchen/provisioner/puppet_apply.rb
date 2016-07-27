@@ -369,7 +369,7 @@ module Kitchen
 
           INSTALL
         else
-        <<-INSTALL
+          <<-INSTALL
           #{Util.shell_helpers}
           # install chef omnibus so that busser works as this is needed to run tests :(
           # TODO: work out how to install enough ruby
@@ -383,7 +383,7 @@ module Kitchen
             do_download #{chef_url} /tmp/install.sh
             #{sudo('sh')} /tmp/install.sh
           fi
-        INSTALL
+          INSTALL
         end
       end
 
@@ -467,10 +467,10 @@ module Kitchen
         todelete = %w(modules manifests files hiera hiera.yaml facter spec enc)
                    .map { |dir| File.join(config[:root_path], dir) }
         todelete += [hiera_data_remote_path,
-                    '/etc/hiera.yaml',
-                    "#{puppet_dir}/hiera.yaml",
-                    "#{spec_files_remote_path}",
-                    "#{puppet_dir}/fileserver.conf"]
+                     '/etc/hiera.yaml',
+                     "#{puppet_dir}/hiera.yaml",
+                     spec_files_remote_path.to_s,
+                     "#{puppet_dir}/fileserver.conf"]
         todelete += File.join(puppet_dir, config[:puppet_environment]) if config[:puppet_environment]
         cmd = "#{sudo(rm_command_paths(todelete))};"
         cmd += " #{mkdir_command} #{config[:root_path]};"
@@ -898,9 +898,11 @@ module Kitchen
         if config[:puppet_whitelist_exit_code].nil?
           return powershell_shell? ? '; exit $LASTEXITCODE' : nil
         else
-          return powershell_shell? ?
-            "; if(@(#{[config[:puppet_whitelist_exit_code]].join(', ')}) -contains $LASTEXITCODE) {exit 0} else {exit $LASTEXITCODE}" :
-            "; [ $? -eq #{config[:puppet_whitelist_exit_code]} ] && exit 0"
+          if powershell_shell? 
+            return "; if(@(#{[config[:puppet_whitelist_exit_code]].join(', ')}) -contains $LASTEXITCODE) {exit 0} else {exit $LASTEXITCODE}" :
+          else  
+            return "; [ $? -eq #{config[:puppet_whitelist_exit_code]} ] && exit 0"
+          end  
         end
       end
 
@@ -1070,7 +1072,7 @@ module Kitchen
         Dir.glob("#{source}/*").each do |f|
           module_name = File.basename(f)
           target = "#{destination}/#{module_name}"
-          FileUtils.mkdir_p(target) unless File.exists? target
+          FileUtils.mkdir_p(target) unless File.exist? target
           FileUtils.cp_r(Dir.glob("#{source}/#{module_name}/*").reject {|entry| entry =~ /#{excluded_paths.join('$|')}$/}, target, remove_destination: true)
         end
       end
@@ -1188,7 +1190,6 @@ module Kitchen
         return "#{rm_command} \"#{paths.join('", "')}\"" if powershell_shell?
         "#{rm_command} #{paths.join(' ')}"
       end
-
     end
   end
 end

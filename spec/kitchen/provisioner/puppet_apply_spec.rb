@@ -668,7 +668,7 @@ CUSTOM_COMMAND
 
       describe 'get_rm_command_paths(path1, path2)' do
         it 'is rm -force -recurse "path1", "path2"' do
-          expect(provisioner.send(:get_rm_command_paths, %w(path1,path2})).to eq('rm -force -recurse "path1", "path2"')
+          expect(provisioner.send(:get_rm_command_paths, %w(path1,path2))).to eq('rm -force -recurse "path1", "path2"')
         end
       end
 
