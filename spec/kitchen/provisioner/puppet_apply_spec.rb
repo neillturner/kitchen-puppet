@@ -712,7 +712,7 @@ CUSTOM_COMMAND
 
       describe 'rm_command_paths(path1, path2)' do
         it 'is sudo -E rm -rf path1 path2' do
-          expect(provisioner.send(:rm_command_paths, %w(path1,path2))).to eq('rm -rf path1 path2')
+          expect(provisioner.send(:rm_command_paths, [ 'path1', 'path2' ])).to eq('rm -rf path1 path2')
         end
       end
 
