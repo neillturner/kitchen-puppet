@@ -172,7 +172,7 @@ module Kitchen
         end
       end
 
-      # rubocop:disable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
+      # ruboxxxxxxxxxxxxxxxcop:disable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       def install_command
         return unless config[:require_puppet_collections] || config[:require_puppet_repo] || config[:require_puppet_omnibus]
         if config[:require_puppet_omnibus]
@@ -265,7 +265,7 @@ module Kitchen
           end
         end
       end
-      # rubocop:enable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
+      # ruboxxxxxxxxxxxxxcop:enable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
 
       def install_command_collections
         case puppet_platform
@@ -506,7 +506,7 @@ module Kitchen
         instance.remote_exec remove_repo
       end
 
-      # rubocop:disable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
+      # ruboxxxxxxxxxxxcop:disable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       def prepare_command
         commands = []
         if puppet_git_init
@@ -899,7 +899,7 @@ module Kitchen
           return powershell_shell? ? '; exit $LASTEXITCODE' : nil
         else
           if powershell_shell? 
-            return "; if(@(#{[config[:puppet_whitelist_exit_code]].join(', ')}) -contains $LASTEXITCODE) {exit 0} else {exit $LASTEXITCODE}" :
+            return "; if(@(#{[config[:puppet_whitelist_exit_code]].join(', ')}) -contains $LASTEXITCODE) {exit 0} else {exit $LASTEXITCODE}"
           else  
             return "; [ $? -eq #{config[:puppet_whitelist_exit_code]} ] && exit 0"
           end  
