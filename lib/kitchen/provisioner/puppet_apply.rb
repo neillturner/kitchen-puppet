@@ -172,7 +172,7 @@ module Kitchen
         end
       end
 
-      # ruboxxxxxxxxxxxxxxxcop:disable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
+      # rubocop:disable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       def install_command
         return unless config[:require_puppet_collections] || config[:require_puppet_repo] || config[:require_puppet_omnibus]
         if config[:require_puppet_omnibus]
@@ -265,7 +265,7 @@ module Kitchen
           end
         end
       end
-      # ruboxxxxxxxxxxxxxcop:enable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
+      # rubocop:enable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
 
       def install_command_collections
         case puppet_platform
@@ -506,7 +506,7 @@ module Kitchen
         instance.remote_exec remove_repo
       end
 
-      # ruboxxxxxxxxxxxcop:disable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
+      # rubocop:disable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       def prepare_command
         commands = []
         if puppet_git_init
