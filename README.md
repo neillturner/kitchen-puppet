@@ -61,6 +61,16 @@ For PuppetAgent a server with a puppet master is required that can resolve the h
 
 You can also use the PuppetApply driver with a docker container, provided the necessary box requirements to install puppet are included inside the container. The easiest way to do this is to supply Kitchen-Docker with a custom dockerfile to install the needed dependencies for puppet installation.
 
+## Windows Support
+
+There is windows/winrm support, currently not all functionality is supported.
+  * `require_chef_for_busser: false` (it is possible to call rspec over winrm to run the tests)
+  * `resolve_with_librarian_puppet: false` (librarian-puppet is not working on windows server)
+
+Sample Puppet Repositories
+  * A sample hello world example puppet repository: https://github.com/neillturner/puppet_windows_repo
+  * A more extensive sample installing virtualbox on windows: https://github.com/red-gate/puppet-virtualbox_windows
+
 ## Test-Kitchen Serverspec
 
 To run the verify step with the test-kitchen serverspec setup your puppet repository as follows:
@@ -136,7 +146,7 @@ To implement this with test-kitchen setup the puppet repository with:
 
 * the spec_helper in the spec folder.
 
-* install kitchen-verifier-serverspec on your workstation i.e. 'gem install kitchen-verifier-serverspec' 
+* install kitchen-verifier-serverspec on your workstation i.e. 'gem install kitchen-verifier-serverspec'
 
 
 See example [https://github.com/neillturner/puppet_repo](https://github.com/neillturner/puppet_repo)
