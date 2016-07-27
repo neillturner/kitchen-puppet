@@ -648,27 +648,27 @@ CUSTOM_COMMAND
         end
       end
 
-      describe 'get_cp_command' do
+      describe 'cp_command' do
         it 'is cp -force' do
-          expect(provisioner.send(:get_cp_command)).to eq('cp -force')
+          expect(provisioner.send(:cp_command)).to eq('cp -force')
         end
       end
 
-      describe 'get_rm_command' do
+      describe 'rm_command' do
         it 'is rm -force -recurse' do
-          expect(provisioner.send(:get_rm_command)).to eq('rm -force -recurse')
+          expect(provisioner.send(:rm_command)).to eq('rm -force -recurse')
         end
       end
 
-      describe 'get_mkdir_command' do
+      describe 'mkdir_command' do
         it 'is mkdir -force -path' do
-          expect(provisioner.send(:get_mkdir_command)).to eq('mkdir -force -path')
+          expect(provisioner.send(:mkdir_command)).to eq('mkdir -force -path')
         end
       end
 
-      describe 'get_rm_command_paths(path1, path2)' do
+      describe 'rm_command_paths(path1, path2)' do
         it 'is rm -force -recurse "path1", "path2"' do
-          expect(provisioner.send(:get_rm_command_paths, %w(path1,path2))).to eq('rm -force -recurse "path1", "path2"')
+          expect(provisioner.send(:rm_command_paths, %w(path1,path2))).to eq('rm -force -recurse "path1", "path2"')
         end
       end
 
@@ -692,27 +692,27 @@ CUSTOM_COMMAND
         end
       end
 
-      describe 'get_cp_command' do
+      describe 'cp_command' do
         it 'is cp' do
-          expect(provisioner.send(:get_cp_command)).to eq('cp')
+          expect(provisioner.send(:cp_command)).to eq('cp')
         end
       end
 
-      describe 'get_rm_command' do
+      describe 'rm_command' do
         it 'is sudo -E rm -rf' do
-          expect(provisioner.send(:get_rm_command)).to eq('rm -rf')
+          expect(provisioner.send(:rm_command)).to eq('rm -rf')
         end
       end
 
-      describe 'get_mkdir_command' do
+      describe 'mkdir_command' do
         it 'is sudo -E mkdir -p' do
-          expect(provisioner.send(:get_mkdir_command)).to eq('mkdir -p')
+          expect(provisioner.send(:mkdir_command)).to eq('mkdir -p')
         end
       end
 
-      describe 'get_rm_command_paths(path1, path2)' do
+      describe 'rm_command_paths(path1, path2)' do
         it 'is sudo -E rm -rf path1 path2' do
-          expect(provisioner.send(:get_rm_command_paths, %w(path1,path2))).to eq('rm -rf path1 path2')
+          expect(provisioner.send(:rm_command_paths, %w(path1,path2))).to eq('rm -rf path1 path2')
         end
       end
 
