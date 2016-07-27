@@ -624,7 +624,7 @@ CUSTOM_COMMAND
     end
 
     it 'whitelists multiple exit codes' do
-      config[:puppet_whitelist_exit_code] = %w(2,4)
+      config[:puppet_whitelist_exit_code] = %w(2 4)
       expect(provisioner.run_command).to match(/; if\(@\(2, 4\) -contains \$LASTEXITCODE\) {exit 0} else {exit \$LASTEXITCODE}$/)
     end
   end
