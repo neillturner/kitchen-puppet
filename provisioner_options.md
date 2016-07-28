@@ -31,7 +31,7 @@ chef_bootstrap_url |"https://www.getchef.com/chef/install.sh"| the chef (needed 
 custom_facts| Hash.new | Hash to set the puppet facts before running puppet apply
 custom_options | | custom options to add to puppet apply command.
 custom_install_command | nil | Custom shell command to be used at end of install stage. Can be multiline. See examples below.
-custom_post_apply_command | nil | Custom shell command to be used at end of puppet apply stage. Can be multiline. See examples below.
+custom_pre_apply_command | nil | Custom shell command to be used before the puppet apply stage. Can be multiline. See examples below.
 custom_pre_install_command | nil | Custom shell command to be used at beginning of install stage. Can be multiline.
 facter_file | nil | yaml file of custom facter_files to be provided to the puppet-apply command
 facter_version | "latest"| desired version, affects apt installs.
