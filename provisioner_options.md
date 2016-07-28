@@ -27,68 +27,69 @@ It installs it in the following order:
 
 key | default value | Notes
 ----|---------------|--------
-puppet_version | "latest"| desired version, affects apt installs.
+chef_bootstrap_url |"https://www.getchef.com/chef/install.sh"| the chef (needed for busser to run tests) NOTE: kitchen 1.4 only requires ruby to run busser so this is not required.
+custom_facts| Hash.new | Hash to set the puppet facts before running puppet apply
+custom_options | | custom options to add to puppet apply command.
+custom_install_command | nil | Custom shell command to be used at end of install stage. Can be multiline. See examples below.
+custom_post_apply_command | nil | Custom shell command to be used at end of puppet apply stage. Can be multiline. See examples below.
+custom_pre_install_command | nil | Custom shell command to be used at beginning of install stage. Can be multiline.
+facter_file | nil | yaml file of custom facter_files to be provided to the puppet-apply command
 facter_version | "latest"| desired version, affects apt installs.
-platform | platform_name kitchen.yml parameter | OS platform of server
-hiera_version | "latest"| desired version, affects apt installs.
-install_hiera | false | Installs `hiera-puppet` package. Not needed for puppet > 3.x.x
-hiera_package | 'hiera-puppet' | Only used if `install_hiera` is set
-require_puppet_repo | true | Set if using a puppet install from yum or apt repo
-puppet_apt_repo | "http://apt.puppetlabs.com/puppetlabs-release-precise.deb"| apt repo Ubuntu12
-_for Ubuntu15 change to_ | "http://apt.puppetlabs.com/puppetlabs-release-jessie.deb" |
-puppet_yum_repo | "https://yum.puppetlabs.com/puppetlabs-release-el-6.noarch.rpm"| yum repo RH/Centos6
-_for RH/Centos7 change to_ | "https://yum.puppetlabs.com/puppetlabs-release-el-7.noarch.rpm" |
-require_puppet_collections | false | Set if using puppet collections install (Puppet v4)
-puppet_yum_collections_repo | "http://yum.puppetlabs.com/puppetlabs-release-pc1-el-6.noarch.rpm" | yum collections repo RH/Centos6
-_for RH/Centos7 change to_ | "https://yum.puppetlabs.com/puppetlabs-release-pc1-el-7.noarch.rpm" |
-puppet_apt_collections_repo | "http://apt.puppetlabs.com/puppetlabs-release-pc1-wheezy.deb" | apt collections repo
-_for Ubuntu15 change to_ | "http://apt.puppetlabs.com/puppetlabs-release-pc1-jessie.deb" |
-puppet_coll_remote_path | "/opt/puppetlabs" | Server Installation location of a puppet collections install.
-puppet_detailed_exitcodes | nil | Provide transaction information via exit codes. See `--detailed-exitcodes` section of `puppet help apply`
-manifests_path | | puppet repo manifests directory
-manifest | 'site.pp' | manifest for puppet apply to run
-modules_path | | puppet repo manifests directory. Can be multiple directories separated by colons and then they will be merged
 files_path | | directory to place at /tmp/kitchen/files
 fileserver_config_path | | file to place fileserver.conf
 hiera_config_path | | path to hiera.yaml
 hiera_data_path | | puppet repo hiera data directory
 hiera_data_remote_path | "/var/lib/hiera" | Hiera data directory on server
-puppet_debug| false| Enable full debugging logging on puppet run
-puppet_verbose| false| Extra information logging on puppet run
-puppet_noop| false| puppet runs in a no-op or dry-run mode
-puppet_git_init | nil | initialize puppet from GIT repository, e.g. "git@github.com:example/puppet-repo.git"
-puppet_git_pr | nil | checkout specific Pull Request from repository specified in puppet_git_init, e.g. "324"
-update_package_repos| true| update OS repository metadata
-custom_facts| Hash.new | Hash to set the puppet facts before running puppet apply
-install_custom_facts| false | Install custom facts to yaml file at "/tmp/kitchen/facter/kitchen.rb"
-facter_file | nil | yaml file of custom facter_files to be provided to the puppet-apply command
-chef_bootstrap_url |"https://www.getchef.com/chef/install.sh"| the chef (needed for busser to run tests) NOTE: kitchen 1.4 only requires ruby to run busser so this is not required.
-puppetfile_path | | Path to Puppetfile
-puppet_apply_command | nil | Overwrite the puppet apply command. Needs "sudo -E puppet apply" as a prefix.
-require_chef_for_busser | true | Install chef as currently needed by busser to run tests
-resolve_with_librarian_puppet | true | Use librarian_puppet to resolve modules if a Puppetfile is found
-librarian_puppet_ssl_file | nil | ssl certificate file for librarian-puppet
-puppet_config_path | | path of custom puppet.conf file
-puppet_environment | nil | puppet environment for running puppet apply (Must set if using Puppet v4)
-remove_puppet_repo | false | remove copy of puppet repository and puppet configuration on server after running puppet
+hiera_deep_merge | false | install the deep_merge gem to support hiera deep merge mode
 hiera_eyaml | false | use hiera-eyaml to encrypt hiera data
 hiera_eyaml_key_remote_path | "/etc/puppet/secure/keys" | directory of hiera-eyaml keys on server
 hiera_eyaml_key_path  | "hiera_keys" | directory of hiera-eyaml keys on workstation
-hiera_deep_merge | false | install the deep_merge gem to support hiera deep merge mode
+hiera_package | 'hiera-puppet' | Only used if `install_hiera` is set
+hiera_version | "latest"| desired version, affects apt installs.
 http_proxy | nil | use http proxy when installing puppet, packages and running puppet
 https_proxy | nil | use https proxy when installing puppet, packages and running puppet
+ignored_paths_from_root | [] | allow extra paths to be ignored when copying from puppet repository
+ignore_spec_fixtures | false | don't copy spec/fixtures to avoid problems with symlinks
+install_custom_facts| false | Install custom facts to yaml file at "/tmp/kitchen/facter/kitchen.rb"
+install_hiera | false | Installs `hiera-puppet` package. Not needed for puppet > 3.x.x
+librarian_puppet_ssl_file | nil | ssl certificate file for librarian-puppet
+manifest | 'site.pp' | manifest for puppet apply to run
+manifests_path | | puppet repo manifests directory
+modules_path | | puppet repo manifests directory. Can be multiple directories separated by colons and then they will be merged
+platform | platform_name kitchen.yml parameter | OS platform of server
+puppet_apply_command | nil | Overwrite the puppet apply command. Needs "sudo -E puppet apply" as a prefix.
+puppet_apt_repo | "http://apt.puppetlabs.com/puppetlabs-release-precise.deb"| apt repo Ubuntu12
+_for Ubuntu15 change to_ | "http://apt.puppetlabs.com/puppetlabs-release-jessie.deb" |
+puppet_apt_collections_repo | "http://apt.puppetlabs.com/puppetlabs-release-pc1-wheezy.deb" | apt collections repo
+_for Ubuntu15 change to_ | "http://apt.puppetlabs.com/puppetlabs-release-pc1-jessie.deb" |
+puppet_coll_remote_path | "/opt/puppetlabs" | Server Installation location of a puppet collections install.
+puppet_config_path | | path of custom puppet.conf file
+puppet_debug| false| Enable full debugging logging on puppet run
+puppet_detailed_exitcodes | nil | Provide transaction information via exit codes. See `--detailed-exitcodes` section of `puppet help apply`
+puppet_enc | | path for external node classifier script
+puppet_environment | nil | puppet environment for running puppet apply (Must set if using Puppet v4)
+puppet_git_init | nil | initialize puppet from GIT repository, e.g. "git@github.com:example/puppet-repo.git"
+puppet_git_pr | nil | checkout specific Pull Request from repository specified in puppet_git_init, e.g. "324"
 puppet_logdest | nil | _Array_ of log destinations. Include 'console' if wanted
-custom_options | | custom options to add to puppet apply command.
-custom_pre_install_command | nil | Custom shell command to be used at beginning of install stage. Can be multiline.
-custom_install_command | nil | Custom shell command to be used at end of install stage. Can be multiline. See examples below.
-puppet_whitelist_exit_code | nil | Whitelist exit code expected from puppet run. Intended to be used together with `puppet_detailed_exitcodes`.
-require_puppet_omnibus | false | Set if using omnibus puppet install
 puppet_omnibus_url | https://raw.githubusercontent.com/ petems/puppet-install-shell/ master/install_puppet.sh | omnibus puppet v3 install location.
 _for puppet v4 change to_ | https://raw.githubusercontent.com/ petems/puppet-install-shell/ master/install_puppet_agent.sh |
-puppet_enc | | path for external node classifier script
+puppet_noop| false| puppet runs in a no-op or dry-run mode
 puppet_no_sudo | false | allow puppet command to run without sudo if required
-ignore_spec_fixtures | false | don't copy spec/fixtures to avoid problems with symlinks
-ignored_paths_from_root | [] | allow extra paths to be ignored when copying from puppet repository
+puppet_verbose| false| Extra information logging on puppet run
+puppet_version | "latest"| desired version, affects apt installs.
+puppet_whitelist_exit_code | nil | Whitelist exit code expected from puppet run. Intended to be used together with `puppet_detailed_exitcodes`.
+puppet_yum_repo | "https://yum.puppetlabs.com/puppetlabs-release-el-6.noarch.rpm"| yum repo RH/Centos6
+_for RH/Centos7 change to_ | "https://yum.puppetlabs.com/puppetlabs-release-el-7.noarch.rpm" |
+puppet_yum_collections_repo | "http://yum.puppetlabs.com/puppetlabs-release-pc1-el-6.noarch.rpm" | yum collections repo RH/Centos6
+_for RH/Centos7 change to_ | "https://yum.puppetlabs.com/puppetlabs-release-pc1-el-7.noarch.rpm" |
+puppetfile_path | | Path to Puppetfile
+remove_puppet_repo | false | remove copy of puppet repository and puppet configuration on server after running puppet
+require_chef_for_busser | true | Install chef as currently needed by busser to run tests
+require_puppet_collections | false | Set if using puppet collections install (Puppet v4)
+require_puppet_omnibus | false | Set if using omnibus puppet install
+require_puppet_repo | true | Set if using a puppet install from yum or apt repo
+resolve_with_librarian_puppet | true | Use librarian_puppet to resolve modules if a Puppetfile is found
+update_package_repos| true| update OS repository metadata
 
 ## Puppet Apply Configuring Provisioner Options
 
