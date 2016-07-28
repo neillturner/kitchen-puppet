@@ -216,6 +216,23 @@ module Kitchen
               #{install_busser}
               #{custom_install_command}
             INSTALL
+          when /^windows.*/
+            info("Installing puppet on #{puppet_platform}")
+            <<-INSTALL
+              if(Get-Command puppet -ErrorAction 0) { return; }
+              if( [Environment]::Is64BitOperatingSystem ) {
+                  $MsiUrl = "https://downloads.puppetlabs.com/windows/puppet-#{puppet_windows_version}-x64.msi"
+              } else {
+                  $MsiUrl = "https://downloads.puppetlabs.com/windows/puppet-#{puppet_windows_version}.msi"
+              }
+              $process = Start-Process -FilePath msiexec.exe -Wait -PassThru -ArgumentList '/qn', '/norestart', '/i', $MsiUrl
+              if ($process.ExitCode -ne 0) {
+                  Write-Host "Installer failed."
+                  Exit 1
+              }
+
+              #{install_busser}
+            INSTALL
           else
             info('Installing puppet, will try to determine platform os')
             # need to add a CR to avoid trouble with proxy settings concatenation
@@ -340,7 +357,19 @@ module Kitchen
 
       def install_busser
         return unless config[:require_chef_for_busser]
-        <<-INSTALL
+        info("Install busser on #{puppet_platform}")
+        case puppet_platform
+        when /^windows.*/
+          # https://raw.githubusercontent.com/opscode/knife-windows/master/lib/chef/knife/bootstrap/windows-chef-client-msi.erb
+          <<-INSTALL
+            $webclient = New-Object System.Net.WebClient;  $webclient.DownloadFile('https://opscode-omnibus-packages.s3.amazonaws.com/windows/2008r2/x86_64/chef-windows-11.12.8-1.windows.msi','chef-windows-11.12.8-1.windows.msi')
+            msiexec /qn /i chef-windows-11.12.8-1.windows.msi
+
+            cmd.exe /C "SET PATH=%PATH%;`"C:\\opscode\\chef\\embedded\\bin`";`"C:\\tmp\\busser\\gems\\bin`""
+
+          INSTALL
+        else
+          <<-INSTALL
           #{Util.shell_helpers}
           # install chef omnibus so that busser works as this is needed to run tests :(
           # TODO: work out how to install enough ruby
@@ -354,7 +383,8 @@ module Kitchen
             do_download #{chef_url} /tmp/install.sh
             #{sudo('sh')} /tmp/install.sh
           fi
-        INSTALL
+          INSTALL
+        end
       end
 
       def install_omnibus_command
@@ -434,14 +464,17 @@ module Kitchen
       end
 
       def init_command
-        dirs = %w(modules manifests files hiera hiera.yaml facter spec enc)
-               .map { |dir| File.join(config[:root_path], dir) }.join(' ')
-        cmd = "#{sudo('rm')} -rf #{dirs} #{hiera_data_remote_path} \
-              /etc/hiera.yaml #{puppet_dir}/hiera.yaml \
-              #{spec_files_remote_path} \
-              #{puppet_dir}/fileserver.conf;"
-        cmd += config[:puppet_environment] ? "#{sudo('rm')} -f #{File.join(puppet_dir, config[:puppet_environment])};" : ''
-        cmd += " mkdir -p #{config[:root_path]}; #{sudo('mkdir')} -p #{puppet_dir}"
+        todelete = %w(modules manifests files hiera hiera.yaml facter spec enc)
+                   .map { |dir| File.join(config[:root_path], dir) }
+        todelete += [hiera_data_remote_path,
+                     '/etc/hiera.yaml',
+                     "#{puppet_dir}/hiera.yaml",
+                     spec_files_remote_path.to_s,
+                     "#{puppet_dir}/fileserver.conf"]
+        todelete += File.join(puppet_dir, config[:puppet_environment]) if config[:puppet_environment]
+        cmd = "#{sudo(rm_command_paths(todelete))};"
+        cmd += " #{mkdir_command} #{config[:root_path]};"
+        cmd += " #{sudo(mkdir_command)} #{puppet_dir}"
         debug(cmd)
         cmd
       end
@@ -506,7 +539,7 @@ module Kitchen
 
         if puppet_config
           commands << [
-            sudo('cp'),
+            sudo(cp_command),
             File.join(config[:root_path], 'puppet.conf'),
             puppet_dir
           ].join(' ')
@@ -514,17 +547,17 @@ module Kitchen
 
         if hiera_config
           commands << [
-            sudo('cp'), File.join(config[:root_path], 'hiera.yaml'), '/etc/'
+            sudo(cp_command), File.join(config[:root_path], 'hiera.yaml'), '/etc/'
           ].join(' ')
 
           commands << [
-            sudo('cp'), File.join(config[:root_path], 'hiera.yaml'), hiera_config_dir
+            sudo(cp_command), File.join(config[:root_path], 'hiera.yaml'), hiera_config_dir
           ].join(' ')
         end
 
         if fileserver_config
           commands << [
-            sudo('cp'),
+            sudo(cp_command),
             File.join(config[:root_path], 'fileserver.conf'),
             puppet_dir
           ].join(' ')
@@ -532,25 +565,25 @@ module Kitchen
 
         if hiera_data && hiera_data_remote_path == '/var/lib/hiera'
           commands << [
-            sudo('cp -r'), File.join(config[:root_path], 'hiera'), '/var/lib/'
+            sudo("#{cp_command} -r"), File.join(config[:root_path], 'hiera'), '/var/lib/'
           ].join(' ')
         end
 
         if hiera_data && hiera_data_remote_path != '/var/lib/hiera'
           commands << [
-            sudo('mkdir -p'), hiera_data_remote_path
+            sudo(mkdir_command), hiera_data_remote_path
           ].join(' ')
           commands << [
-            sudo('cp -r'), File.join(config[:root_path], 'hiera/*'), hiera_data_remote_path
+            sudo("#{cp_command} -r"), File.join(config[:root_path], 'hiera/*'), hiera_data_remote_path
           ].join(' ')
         end
 
         if hiera_eyaml
           commands << [
-            sudo('mkdir -p'), hiera_eyaml_key_remote_path
+            sudo(mkdir_command), hiera_eyaml_key_remote_path
           ].join(' ')
           commands << [
-            sudo('cp -r'), File.join(config[:root_path], 'hiera_keys/*'), hiera_eyaml_key_remote_path
+            sudo("#{cp_command} -r"), File.join(config[:root_path], 'hiera_keys/*'), hiera_eyaml_key_remote_path
           ].join(' ')
         end
 
@@ -562,10 +595,10 @@ module Kitchen
 
         if spec_files_path && spec_files_remote_path
           commands << [
-            sudo('mkdir -p'), spec_files_remote_path
+            sudo(mkdir_command), spec_files_remote_path
           ].join(' ')
           commands << [
-            sudo('cp -r'), File.join(config[:root_path], 'spec/*'), spec_files_remote_path
+            sudo("#{cp_command} -r"), File.join(config[:root_path], 'spec/*'), spec_files_remote_path
           ].join(' ')
         end
 
@@ -575,7 +608,7 @@ module Kitchen
           ].join(' ')
         end
 
-        command = commands.join(' && ')
+        command = powershell_shell? ? commands.join('; ') : commands.join(' && ')
         debug(command)
         command
       end
@@ -702,7 +735,7 @@ module Kitchen
       end
 
       def puppet_cmd
-        puppet_bin = 'puppet'
+        puppet_bin = powershell_shell? ? '& "C:\Program Files\Puppet Labs\Puppet\bin\puppet"' : 'puppet'
         if config[:require_puppet_collections]
           puppet_bin = "#{config[:puppet_coll_remote_path]}/bin/puppet"
         end
@@ -715,19 +748,15 @@ module Kitchen
       end
 
       def puppet_dir
-        if config[:require_puppet_collections]
-          '/etc/puppetlabs/puppet'
-        else
-          '/etc/puppet'
-        end
+        return '/etc/puppetlabs/puppet' if config[:require_puppet_collections]
+        return '/etc/puppet' unless powershell_shell?
+        'C:/ProgramData/PuppetLabs/puppet/etc'
       end
 
       def hiera_config_dir
-        if config[:require_puppet_collections]
-          '/etc/puppetlabs/code'
-        else
-          '/etc/puppet'
-        end
+        return '/etc/puppetlabs/code' if config[:require_puppet_collections]
+        return '/etc/puppet' unless powershell_shell?
+        'C:/ProgramData/PuppetLabs/puppet/etc'
       end
 
       def puppet_debian_version
@@ -750,6 +779,10 @@ module Kitchen
         end
       end
 
+      def puppet_windows_version
+        config[:puppet_version] ? config[:puppet_version].to_s : '3.8.6'
+      end
+
       def puppet_environment_flag
         if config[:puppet_version] =~ /^2/
           config[:puppet_environment] ? "--environment=#{config[:puppet_environment]}" : nil
@@ -761,6 +794,7 @@ module Kitchen
       def puppet_manifestdir
         return nil if config[:require_puppet_collections]
         return nil if config[:puppet_environment]
+        return nil if powershell_shell?
         bash_vars = "export MANIFESTDIR='#{File.join(config[:root_path], 'manifests')}';"
         debug(bash_vars)
         bash_vars
@@ -837,10 +871,15 @@ module Kitchen
       def custom_facts
         return nil if config[:custom_facts].none?
         return nil if config[:install_custom_facts]
-        bash_vars = config[:custom_facts].map { |k, v| "FACTER_#{k}=#{v}" }.join(' ')
-        bash_vars = "export #{bash_vars};"
-        debug(bash_vars)
-        bash_vars
+        if powershell_shell?
+          environment_vars = config[:custom_facts].map { |k, v| "$env:FACTER_#{k}='#{v}'" }.join('; ')
+          environment_vars = "#{environment_vars};"
+        else
+          environment_vars = config[:custom_facts].map { |k, v| "FACTER_#{k}=#{v}" }.join(' ')
+          environment_vars = "export #{environment_vars};"
+        end
+        debug(environment_vars)
+        environment_vars
       end
 
       def puppet_enc_flag
@@ -856,7 +895,13 @@ module Kitchen
       end
 
       def puppet_whitelist_exit_code
-        config[:puppet_whitelist_exit_code] ? "; [ $? -eq #{config[:puppet_whitelist_exit_code]} ] && exit 0" : nil
+        if config[:puppet_whitelist_exit_code].nil?
+          return powershell_shell? ? '; exit $LASTEXITCODE' : nil
+        elsif powershell_shell?
+          return "; if(@(#{[config[:puppet_whitelist_exit_code]].join(', ')}) -contains $LASTEXITCODE) {exit 0} else {exit $LASTEXITCODE}"
+        else
+          return "; [ $? -eq #{config[:puppet_whitelist_exit_code]} ] && exit 0"
+        end
       end
 
       def puppet_apt_repo
@@ -1004,19 +1049,30 @@ module Kitchen
           debug('Found multiple directories in module path merging.....')
           modules_array = modules.split(':')
           modules_array.each do |m|
-            if File.directory?(m)
-              debug("Copying modules from #{m} to #{tmpmodules_dir}")
-              FileUtils.cp_r(Dir.glob("#{m}/*"), tmpmodules_dir, remove_destination: true)
-            end
+            copy_modules(m, tmpmodules_dir)
           end
-        elsif modules && File.directory?(modules)
-          debug("Copying modules from #{modules} to #{tmpmodules_dir}")
-          FileUtils.cp_r(Dir.glob("#{modules}/*"), tmpmodules_dir, remove_destination: true)
+        elsif modules
+          copy_modules(modules, tmpmodules_dir)
         else
           info 'nothing to do for modules'
         end
 
         copy_self_as_module
+      end
+
+      def copy_modules(source, destination)
+        return unless File.directory?(source)
+
+        debug("Copying modules from #{source} to #{destination}")
+
+        excluded_paths = %w(modules spec pkg) + config[:ignored_paths_from_root]
+
+        Dir.glob("#{source}/*").each do |f|
+          module_name = File.basename(f)
+          target = "#{destination}/#{module_name}"
+          FileUtils.mkdir_p(target) unless File.exist? target
+          FileUtils.cp_r(Dir.glob("#{source}/#{module_name}/*").reject { |entry| entry =~ /#{excluded_paths.join('$|')}$/ }, target, remove_destination: true)
+        end
       end
 
       def copy_self_as_module
@@ -1110,6 +1166,27 @@ module Kitchen
           Puppet::Librarian.new(puppetfile, tmpmodules_dir, logger).resolve
           ENV['SSL_CERT_FILE'] = '' if librarian_puppet_ssl_file
         end
+      end
+
+      def cp_command
+        return 'cp -force' if powershell_shell?
+        'cp'
+      end
+
+      def rm_command
+        return 'rm -force -recurse' if powershell_shell?
+        'rm -rf'
+      end
+
+      def mkdir_command
+        return 'mkdir -force -path' if powershell_shell?
+        'mkdir -p'
+      end
+
+      def rm_command_paths(paths)
+        return :nil if paths.length.zero?
+        return "#{rm_command} \"#{paths.join('", "')}\"" if powershell_shell?
+        "#{rm_command} #{paths.join(' ')}"
       end
     end
   end

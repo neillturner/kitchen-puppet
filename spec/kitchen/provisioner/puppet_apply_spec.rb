@@ -571,6 +571,11 @@ CUSTOM_COMMAND
       expect(provisioner.run_command).to include("export FACTERLIB='/tmp/kitchen/facter';")
     end
 
+    it 'exports custom_facts' do
+      config[:custom_facts] = { fact1: 'value1', fact2: 'value2' }
+      expect(provisioner.run_command).to include('export FACTER_fact1=value1 FACTER_fact2=value2;')
+    end
+
     it 'custom options should appear in run command' do
       config[:custom_options] = '--no-stringify_facts'
       expect(provisioner.run_command).to include('--no-stringify_facts')
@@ -589,6 +594,133 @@ CUSTOM_COMMAND
     it 'can run with sudo' do
       config[:puppet_no_sudo] = false
       expect(provisioner.run_command).to include('sudo -E')
+    end
+  end
+
+  context 'run command on windows' do
+    before do
+      allow_any_instance_of(Kitchen::Configurable).to receive(:powershell_shell?).and_return(true)
+      allow_any_instance_of(Kitchen::Configurable).to receive(:windows_os?).and_return(true)
+    end
+
+    it 'exports custom_facts' do
+      config[:custom_facts] = { fact1: 'value1', fact2: 'value2' }
+      expect(provisioner.run_command).to include("\$env:FACTER_fact1='value1'; \$env:FACTER_fact2='value2';")
+    end
+
+    it 'custom options should appear in run command' do
+      config[:custom_options] = '--no-stringify_facts'
+      expect(provisioner.run_command).to include('--no-stringify_facts')
+    end
+
+    it 'does not whitelist exit codes by default' do
+      config[:puppet_whitelist_exit_code] = nil
+      expect(provisioner.run_command).to match(/; exit \$LASTEXITCODE$/)
+    end
+
+    it 'whitelists a single exit code' do
+      config[:puppet_whitelist_exit_code] = '2'
+      expect(provisioner.run_command).to match(/; if\(@\(2\) -contains \$LASTEXITCODE\) {exit 0} else {exit \$LASTEXITCODE}$/)
+    end
+
+    it 'whitelists multiple exit codes' do
+      config[:puppet_whitelist_exit_code] = %w(2 4)
+      expect(provisioner.run_command).to match(/; if\(@\(2, 4\) -contains \$LASTEXITCODE\) {exit 0} else {exit \$LASTEXITCODE}$/)
+    end
+  end
+
+  describe 'protected methods' do
+    context 'When using powershell' do
+      before do
+        allow_any_instance_of(Kitchen::Configurable).to receive(:powershell_shell?).and_return(true)
+        allow_any_instance_of(Kitchen::Configurable).to receive(:windows_os?).and_return(true)
+      end
+
+      describe 'puppet_dir' do
+        it 'is C:/ProgramData/PuppetLabs/puppet/etc' do
+          expect(provisioner.send(:puppet_dir)).to eq('C:/ProgramData/PuppetLabs/puppet/etc')
+        end
+      end
+
+      describe 'hiera_config_dir' do
+        it 'is C:/ProgramData/PuppetLabs/puppet/etc' do
+          expect(provisioner.send(:hiera_config_dir)).to eq('C:/ProgramData/PuppetLabs/puppet/etc')
+        end
+      end
+
+      describe 'cp_command' do
+        it 'is cp -force' do
+          expect(provisioner.send(:cp_command)).to eq('cp -force')
+        end
+      end
+
+      describe 'rm_command' do
+        it 'is rm -force -recurse' do
+          expect(provisioner.send(:rm_command)).to eq('rm -force -recurse')
+        end
+      end
+
+      describe 'mkdir_command' do
+        it 'is mkdir -force -path' do
+          expect(provisioner.send(:mkdir_command)).to eq('mkdir -force -path')
+        end
+      end
+
+      describe 'rm_command_paths(path1, path2)' do
+        it 'is rm -force -recurse "path1", "path2"' do
+          expect(provisioner.send(:rm_command_paths, %w(path1 path2))).to eq('rm -force -recurse "path1", "path2"')
+        end
+      end
+
+      describe 'puppet_cmd' do
+        it 'is & "C:\Program Files\Puppet Labs\Puppet\bin\puppet"' do
+          expect(provisioner.send(:puppet_cmd)).to eq('& "C:\Program Files\Puppet Labs\Puppet\bin\puppet"')
+        end
+      end
+    end
+
+    context 'When NOT using powershell' do
+      describe 'puppet_dir' do
+        it 'is /etc/puppet' do
+          expect(provisioner.send(:puppet_dir)).to eq('/etc/puppet')
+        end
+      end
+
+      describe 'hiera_config_dir' do
+        it 'is /etc/puppet' do
+          expect(provisioner.send(:hiera_config_dir)).to eq('/etc/puppet')
+        end
+      end
+
+      describe 'cp_command' do
+        it 'is cp' do
+          expect(provisioner.send(:cp_command)).to eq('cp')
+        end
+      end
+
+      describe 'rm_command' do
+        it 'is sudo -E rm -rf' do
+          expect(provisioner.send(:rm_command)).to eq('rm -rf')
+        end
+      end
+
+      describe 'mkdir_command' do
+        it 'is sudo -E mkdir -p' do
+          expect(provisioner.send(:mkdir_command)).to eq('mkdir -p')
+        end
+      end
+
+      describe 'rm_command_paths(path1, path2)' do
+        it 'is sudo -E rm -rf path1 path2' do
+          expect(provisioner.send(:rm_command_paths, %w(path1 path2))).to eq('rm -rf path1 path2')
+        end
+      end
+
+      describe 'puppet_cmd' do
+        it 'is puppet' do
+          expect(provisioner.send(:puppet_cmd)).to eq('sudo -E puppet')
+        end
+      end
     end
   end
 end
