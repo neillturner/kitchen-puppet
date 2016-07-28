@@ -595,6 +595,20 @@ CUSTOM_COMMAND
       config[:puppet_no_sudo] = false
       expect(provisioner.run_command).to include('sudo -E')
     end
+
+    it 'runs custom shell command at post apply stage' do
+      config[:custom_post_apply_command] = 'echo "CUSTOM_SHELL"'
+      expect(provisioner.run_command).to include('echo "CUSTOM_SHELL"')
+    end
+
+    it 'runs multiline custom shell command at post apply stage' do
+      config[:custom_post_apply_command] = <<CUSTOM_COMMAND
+echo "string1"
+echo "string2"
+CUSTOM_COMMAND
+
+      expect(provisioner.run_command).to include(%(echo "string1"\necho "string2"))
+    end
   end
 
   context 'run command on windows' do
