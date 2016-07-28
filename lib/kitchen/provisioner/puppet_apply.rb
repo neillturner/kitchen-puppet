@@ -64,7 +64,7 @@ module Kitchen
       default_config :puppet_logdest, nil
       default_config :custom_install_command, nil
       default_config :custom_pre_install_command, nil
-      default_config :custom_post_apply_command, nil
+      default_config :custom_pre_apply_command, nil
       default_config :puppet_whitelist_exit_code, nil
       default_config :require_puppet_omnibus, false
       default_config :puppet_omnibus_url, 'https://raw.githubusercontent.com/petems/puppet-install-shell/master/install_puppet.sh'
@@ -637,9 +637,9 @@ module Kitchen
             puppet_logdest_flag,
             puppet_whitelist_exit_code
           ].join(' ')
-          if config[:custom_post_apply_command]
+          if config[:custom_pre_apply_command]
             result = <<-RUN
-              #{config[:custom_post_apply_command]}
+              #{config[:custom_pre_apply_command]}
               #{result}
             RUN
           end

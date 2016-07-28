@@ -597,12 +597,12 @@ CUSTOM_COMMAND
     end
 
     it 'runs custom shell command at post apply stage' do
-      config[:custom_post_apply_command] = 'echo "CUSTOM_SHELL"'
+      config[:custom_pre_apply_command] = 'echo "CUSTOM_SHELL"'
       expect(provisioner.run_command).to include('echo "CUSTOM_SHELL"')
     end
 
     it 'runs multiline custom shell command at post apply stage' do
-      config[:custom_post_apply_command] = <<CUSTOM_COMMAND
+      config[:custom_pre_apply_command] = <<CUSTOM_COMMAND
 echo "string1"
 echo "string2"
 CUSTOM_COMMAND
