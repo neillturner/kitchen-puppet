@@ -596,18 +596,38 @@ CUSTOM_COMMAND
       expect(provisioner.run_command).to include('sudo -E')
     end
 
+    it 'runs custom shell command at pre apply stage' do
+      config[:custom_pre_apply_command] = 'echo "CUSTOM_PRE_APPLY_COMMAND"'
+      expect(provisioner.run_command).to include('echo "CUSTOM_PRE_APPLY_COMMAND"')
+    end
+
+    it 'runs multiline custom shell command at pre apply stage' do
+      config[:custom_pre_apply_command] = <<CUSTOM_COMMAND
+echo "pre_string1"
+echo "pre_string2"
+CUSTOM_COMMAND
+
+      expect(provisioner.run_command).to include(%(echo "pre_string1"\necho "pre_string2"))
+    end
+
     it 'runs custom shell command at post apply stage' do
-      config[:custom_pre_apply_command] = 'echo "CUSTOM_SHELL"'
-      expect(provisioner.run_command).to include('echo "CUSTOM_SHELL"')
+      config[:custom_post_apply_command] = 'echo "CUSTOM_POST_APPLY_COMMAND"'
+      expect(provisioner.run_command).to match(/function custom_post_apply_command {\n\s*echo "CUSTOM_POST_APPLY_COMMAND"\n\s*}\n\s*trap custom_post_apply_command EXIT/)
     end
 
     it 'runs multiline custom shell command at post apply stage' do
-      config[:custom_pre_apply_command] = <<CUSTOM_COMMAND
-echo "string1"
-echo "string2"
+      config[:custom_post_apply_command] = <<CUSTOM_COMMAND
+echo "post_string1"
+echo "post_string2"
 CUSTOM_COMMAND
 
-      expect(provisioner.run_command).to include(%(echo "string1"\necho "string2"))
+      expect(provisioner.run_command).to match(/function custom_post_apply_command {\n\s*echo "post_string1"\necho "post_string2"\n+\s*}\n\s*trap custom_post_apply_command EXIT/)
+    end
+
+    it 'does not set a custom shell command at post apply stage trap if :custom_post_apply_command option is empty' do
+      config[:custom_post_apply_command] = nil
+
+      expect(provisioner.run_command).to_not match(/function custom_post_apply_command {\n+\s*}\n\s*trap custom_post_apply_command EXIT/)
     end
   end
 
