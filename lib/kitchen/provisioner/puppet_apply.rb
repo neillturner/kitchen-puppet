@@ -988,7 +988,7 @@ module Kitchen
       end
 
       def export_https_proxy_parm
-        http_proxy ? "export https_proxy=#{http_proxy}" : nil
+        https_proxy ? "export https_proxy=#{https_proxy}" : nil
       end
 
       def http_proxy
