@@ -20,14 +20,14 @@ This provider has been tested against the Ubuntu 1204 and Centos 6.5 boxes runni
 You need to download the puppet msi and install it and run everything inside the puppet window.
 
 1. Download and install puppet from the windows msi file from https://downloads.puppetlabs.com/windows
-  * I recommend the using the 32 bit version as not all ruby gems works with the 64 bit version.
+  * I recommend the using the 64 bit version now.
   * Don't do a 'gem install puppet' !!!.
 
 2. Select "Start Command Prompt with Puppet" to go to a Command Window.
 
 3. Install the Ruby DevKit:
    * Download and install devkit from http://rubyinstaller.org/downloads
-     * (Use a 32 or 64 bit version that matches version of the ruby install)
+     * (Use the 32 or 64 bit version that matches version of the puppet install)
    * In the devkit directory run “ruby dk.rb init”.
    * Edit the config.yml generated and add the the path of the ruby install for puppet
      * (it will be <install dir of puppet>/sys/ruby).
