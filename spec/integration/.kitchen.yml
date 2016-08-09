@@ -9,6 +9,7 @@ provisioner:
   manifests_path: manifests
   puppet_verbose: true
   puppet_debug: true
+  puppet_environment: production
 
 platforms:
   - name: centos
