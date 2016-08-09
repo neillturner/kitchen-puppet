@@ -472,7 +472,7 @@ module Kitchen
                      "#{puppet_dir}/hiera.yaml",
                      spec_files_remote_path.to_s,
                      "#{puppet_dir}/fileserver.conf"]
-        todelete += File.join(puppet_dir, config[:puppet_environment]) if config[:puppet_environment]
+        todelete << File.join(puppet_dir, config[:puppet_environment]) if config[:puppet_environment]
         cmd = "#{sudo(rm_command_paths(todelete))};"
         cmd += " #{mkdir_command} #{config[:root_path]};"
         cmd += " #{sudo(mkdir_command)} #{puppet_dir}"
