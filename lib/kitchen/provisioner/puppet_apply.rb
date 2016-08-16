@@ -305,6 +305,23 @@ module Kitchen
           #{install_busser}
           #{custom_install_command}
           INSTALL
+        when /^windows.*/
+          info("Installing Puppet Collections on #{puppet_platform}")
+          <<-INSTALL
+            if(Get-Command puppet -ErrorAction 0) { return; }
+            if( [Environment]::Is64BitOperatingSystem ) {
+                $MsiUrl = "https://downloads.puppetlabs.com/windows/puppet-agent-#{puppet_windows_version}-x64.msi"
+            } else {
+                $MsiUrl = "https://downloads.puppetlabs.com/windows/puppet-agent-#{puppet_windows_version}-x86.msi"
+            }
+            $process = Start-Process -FilePath msiexec.exe -Wait -PassThru -ArgumentList '/qn', '/norestart', '/i', $MsiUrl
+            if ($process.ExitCode -ne 0) {
+                Write-Host "Installer failed."
+                Exit 1
+            }
+
+            #{install_busser}
+          INSTALL
         else
           info('Installing Puppet Collections, will try to determine platform os')
           <<-INSTALL
