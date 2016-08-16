@@ -710,6 +710,10 @@ CUSTOM_COMMAND
         it 'is & "C:\Program Files\Puppet Labs\Puppet\bin\puppet"' do
           expect(provisioner.send(:puppet_cmd)).to eq('& "C:\Program Files\Puppet Labs\Puppet\bin\puppet"')
         end
+        it 'is & "C:\Program Files\Puppet Labs\Puppet\bin\puppet" when using puppet collections' do
+          config[:require_puppet_collections] = true
+          expect(provisioner.send(:puppet_cmd)).to eq('& "C:\Program Files\Puppet Labs\Puppet\bin\puppet"')
+        end
       end
     end
 
