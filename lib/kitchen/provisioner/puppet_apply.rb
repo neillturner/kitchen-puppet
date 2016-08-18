@@ -775,15 +775,13 @@ module Kitchen
       end
 
       def puppet_dir
-        return '/etc/puppetlabs/puppet' if config[:require_puppet_collections]
-        return '/etc/puppet' unless powershell_shell?
-        'C:/ProgramData/PuppetLabs/puppet/etc'
+        return 'C:/ProgramData/PuppetLabs/puppet/etc' if powershell_shell?
+        config[:require_puppet_collections] ? '/etc/puppetlabs/puppet' : '/etc/puppet'
       end
 
       def hiera_config_dir
-        return '/etc/puppetlabs/code' if config[:require_puppet_collections]
-        return '/etc/puppet' unless powershell_shell?
-        'C:/ProgramData/PuppetLabs/puppet/etc'
+        return 'C:/ProgramData/PuppetLabs/puppet/etc' if powershell_shell?
+        config[:require_puppet_collections] ? '/etc/puppetlabs/code' : '/etc/puppet'
       end
 
       def puppet_debian_version
