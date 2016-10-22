@@ -44,7 +44,7 @@ module Kitchen
           debug("Using Puppetfile from #{puppetfile}")
 
           env = ::Librarian::Puppet::Environment.new(
-            project_path: File.dirname(puppetfile)
+            project_path: File.expand_path(File.dirname(puppetfile)),
           )
 
           env.config_db.local['path'] = path
