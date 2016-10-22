@@ -41,14 +41,13 @@ module Kitchen
         def resolve
           version = ::Librarian::Puppet::VERSION
           info("Resolving module dependencies with Librarian-Puppet #{version}...")
-          info("Using Puppetfile from #{puppetfile}")
+          debug("Using Puppetfile from #{puppetfile}")
 
           env = ::Librarian::Puppet::Environment.new(
             project_path: File.dirname(puppetfile)
           )
 
           env.config_db.local['path'] = path
-          info("Env is: #{env.inspect}")
           ::Librarian::Action::Resolve.new(env).run
           ::Librarian::Action::Install.new(env).run
         end
