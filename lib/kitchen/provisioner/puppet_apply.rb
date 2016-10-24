@@ -615,44 +615,41 @@ module Kitchen
       end
 
       def run_command
-        if !config[:puppet_apply_command].nil?
-          return config[:puppet_apply_command]
-        else
-          result = [
-            facterlib,
-            custom_facts,
-            puppet_manifestdir,
-            puppet_cmd,
-            'apply',
-            File.join(config[:root_path], 'manifests', manifest),
-            "--modulepath=#{File.join(config[:root_path], 'modules')}",
-            "--fileserverconfig=#{File.join(config[:root_path], 'fileserver.conf')}",
-            custom_options,
-            puppet_environment_flag,
-            puppet_noop_flag,
-            puppet_enc_flag,
-            puppet_detailed_exitcodes_flag,
-            puppet_verbose_flag,
-            puppet_debug_flag,
-            puppet_logdest_flag,
-            puppet_whitelist_exit_code
-          ].join(' ')
-          if config[:custom_post_apply_command]
-            custom_post_apply_trap = <<-TRAP
-              function custom_post_apply_command {
-                #{config[:custom_post_apply_command]}
-              }
-              trap custom_post_apply_command EXIT
-            TRAP
-          end
-          result = <<-RUN
-            #{config[:custom_pre_apply_command]}
-            #{custom_post_apply_trap}
-            #{result}
-          RUN
-          info("Going to invoke puppet apply with: #{result}")
-          result
+        return config[:puppet_apply_command] unless config[:puppet_apply_command].nil?
+        result = [
+          facterlib,
+          custom_facts,
+          puppet_manifestdir,
+          puppet_cmd,
+          'apply',
+          File.join(config[:root_path], 'manifests', manifest),
+          "--modulepath=#{File.join(config[:root_path], 'modules')}",
+          "--fileserverconfig=#{File.join(config[:root_path], 'fileserver.conf')}",
+          custom_options,
+          puppet_environment_flag,
+          puppet_noop_flag,
+          puppet_enc_flag,
+          puppet_detailed_exitcodes_flag,
+          puppet_verbose_flag,
+          puppet_debug_flag,
+          puppet_logdest_flag,
+          puppet_whitelist_exit_code
+        ].join(' ')
+        if config[:custom_post_apply_command]
+          custom_post_apply_trap = <<-TRAP
+            function custom_post_apply_command {
+              #{config[:custom_post_apply_command]}
+            }
+            trap custom_post_apply_command EXIT
+          TRAP
         end
+        result = <<-RUN
+          #{config[:custom_pre_apply_command]}
+          #{custom_post_apply_trap}
+          #{result}
+        RUN
+        info("Going to invoke puppet apply with: #{result}")
+        result
       end
 
       protected
@@ -910,11 +907,11 @@ module Kitchen
 
       def puppet_whitelist_exit_code
         if config[:puppet_whitelist_exit_code].nil?
-          return powershell_shell? ? '; exit $LASTEXITCODE' : nil
+          powershell_shell? ? '; exit $LASTEXITCODE' : nil
         elsif powershell_shell?
-          return "; if(@(#{[config[:puppet_whitelist_exit_code]].join(', ')}) -contains $LASTEXITCODE) {exit 0} else {exit $LASTEXITCODE}"
+          "; if(@(#{[config[:puppet_whitelist_exit_code]].join(', ')}) -contains $LASTEXITCODE) {exit 0} else {exit $LASTEXITCODE}"
         else
-          return "; [ $? -eq #{config[:puppet_whitelist_exit_code]} ] && exit 0"
+          "; [ $? -eq #{config[:puppet_whitelist_exit_code]} ] && exit 0"
         end
       end
 

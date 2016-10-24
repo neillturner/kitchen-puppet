@@ -218,28 +218,25 @@ module Kitchen
       end
 
       def run_command
-        if !config[:puppet_agent_command].nil?
-          return config[:puppet_agent_command]
-        else
-          [
-            custom_facts,
-            sudo_env('puppet'),
-            'agent',
-            puppet_server_flag,
-            "--waitforcert=#{config[:puppet_waitforcert]}",
-            puppet_masterport_flag,
-            puppet_certname_flag,
-            puppet_digest_flag,
-            puppet_detailed_exitcodes_flag,
-            puppet_logdest_flag,
-            puppet_test_flag,
-            puppet_onetime_flag,
-            puppet_no_daemonize_flag,
-            puppet_noop_flag,
-            puppet_verbose_flag,
-            puppet_debug_flag
-          ].join(' ')
-        end
+        return config[:puppet_agent_command] unless config[:puppet_agent_command].nil?
+        [
+          custom_facts,
+          sudo_env('puppet'),
+          'agent',
+          puppet_server_flag,
+          "--waitforcert=#{config[:puppet_waitforcert]}",
+          puppet_masterport_flag,
+          puppet_certname_flag,
+          puppet_digest_flag,
+          puppet_detailed_exitcodes_flag,
+          puppet_logdest_flag,
+          puppet_test_flag,
+          puppet_onetime_flag,
+          puppet_no_daemonize_flag,
+          puppet_noop_flag,
+          puppet_verbose_flag,
+          puppet_debug_flag
+        ].join(' ')
       end
 
       protected
