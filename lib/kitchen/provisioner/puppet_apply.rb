@@ -221,10 +221,11 @@ module Kitchen
             info("Installing puppet on #{puppet_platform}")
             <<-INSTALL
               if(Get-Command puppet -ErrorAction 0) { return; }
-              if( [Environment]::Is64BitOperatingSystem ) {
-                  $MsiUrl = "https://downloads.puppetlabs.com/windows/puppet-#{puppet_windows_version}-x64.msi"
+              $architecture = if( [Environment]::Is64BitOperatingSystem ) { '-x64' } else { '' }
+              if( '#{puppet_windows_version}' -eq 'latest' ) {
+                  $MsiUrl = "https://downloads.puppetlabs.com/windows/puppet${architecture}-latest.msi"
               } else {
-                  $MsiUrl = "https://downloads.puppetlabs.com/windows/puppet-#{puppet_windows_version}.msi"
+                  $MsiUrl = "https://downloads.puppetlabs.com/windows/puppet-#{puppet_windows_version}${architecture}.msi"
               }
               $process = Start-Process -FilePath msiexec.exe -Wait -PassThru -ArgumentList '/qn', '/norestart', '/i', $MsiUrl
               if ($process.ExitCode -ne 0) {
@@ -309,10 +310,11 @@ module Kitchen
           info("Installing Puppet Collections on #{puppet_platform}")
           <<-INSTALL
             if(Get-Command puppet -ErrorAction 0) { return; }
-            if( [Environment]::Is64BitOperatingSystem ) {
-                $MsiUrl = "https://downloads.puppetlabs.com/windows/puppet-agent-#{puppet_windows_version}-x64.msi"
+            $architecture = if( [Environment]::Is64BitOperatingSystem ) { 'x64' } else { 'x86' }
+            if( '#{puppet_windows_version}' -eq 'latest' ) {
+                $MsiUrl = "https://downloads.puppetlabs.com/windows/puppet-agent-${architecture}-latest.msi"
             } else {
-                $MsiUrl = "https://downloads.puppetlabs.com/windows/puppet-agent-#{puppet_windows_version}-x86.msi"
+                $MsiUrl = "https://downloads.puppetlabs.com/windows/puppet-agent-#{puppet_windows_version}-${architecture}.msi"
             }
             $process = Start-Process -FilePath msiexec.exe -Wait -PassThru -ArgumentList '/qn', '/norestart', '/i', $MsiUrl
             if ($process.ExitCode -ne 0) {
@@ -805,7 +807,7 @@ module Kitchen
       end
 
       def puppet_windows_version
-        config[:puppet_version] ? config[:puppet_version].to_s : '3.8.6'
+        config[:puppet_version] ? config[:puppet_version].to_s : 'latest'
       end
 
       def puppet_environment_flag
