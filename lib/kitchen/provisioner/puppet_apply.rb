@@ -79,7 +79,7 @@ module Kitchen
       default_config :http_proxy, nil
       default_config :https_proxy, nil
 
-      default_config :ignored_paths_from_root, []
+      default_config :ignored_paths_from_root, ['spec']
       default_config :hiera_data_remote_path, '/var/lib/hiera'
       default_config :manifest, 'site.pp'
 
@@ -1076,7 +1076,7 @@ module Kitchen
 
         debug("Copying modules from #{source} to #{destination}")
 
-        excluded_paths = %w(modules spec pkg) + config[:ignored_paths_from_root]
+        excluded_paths = %w(modules pkg) + config[:ignored_paths_from_root]
 
         Dir.glob("#{source}/*").each do |f|
           module_name = File.basename(f)
@@ -1088,7 +1088,7 @@ module Kitchen
 
       def copy_self_as_module
         if File.exist?(modulefile)
-          warn('Modulefile found but this is depricated, ignoring it, see https://tickets.puppetlabs.com/browse/PUP-1188')
+          warn('Modulefile found but this is deprecated, ignoring it, see https://tickets.puppetlabs.com/browse/PUP-1188')
         end
 
         return unless File.exist?(metadata_json)
@@ -1103,7 +1103,7 @@ module Kitchen
         module_target_path = File.join(sandbox_path, 'modules', module_name)
         FileUtils.mkdir_p(module_target_path)
 
-        excluded_paths = %w(modules spec pkg) + config[:ignored_paths_from_root]
+        excluded_paths = %w(modules pkg) + config[:ignored_paths_from_root]
 
         FileUtils.cp_r(
           Dir.glob(File.join(config[:kitchen_root], '*')).reject { |entry| entry =~ /#{excluded_paths.join('$|')}$/ },

@@ -8,9 +8,9 @@ It installs it in the following order:
 * if require_puppet_omnibus is set to true
 
    Installs using the omnibus_puppet script and passes the puppet_version if specied as -v option.
-   
+
 * If require_puppet_collections is set to true
-   
+
    Installs from the puppet collection.
    This is required if you wish to install puppet version 4.
 
@@ -20,7 +20,7 @@ It installs it in the following order:
    to an new collection. At time of writing there was only one collection PC1.
 
 * if require_puppet_repo is set to true (the default)
- 
+
    Installs from the operation system repository with the puppet version that is in the particular repository.
 
 # Puppet Apply Provisioner Options
@@ -49,7 +49,7 @@ hiera_package | 'hiera-puppet' | Only used if `install_hiera` is set
 hiera_version | "latest"| desired version, affects apt installs.
 http_proxy | nil | use http proxy when installing puppet, packages and running puppet
 https_proxy | nil | use https proxy when installing puppet, packages and running puppet
-ignored_paths_from_root | [] | allow extra paths to be ignored when copying from puppet repository
+ignored_paths_from_root | ['spec'] | allow extra paths to be ignored when copying from puppet repository
 ignore_spec_fixtures | false | don't copy spec/fixtures to avoid problems with symlinks
 install_custom_facts| false | Install custom facts to yaml file at "/tmp/kitchen/facter/kitchen.rb"
 install_hiera | false | Installs `hiera-puppet` package. Not needed for puppet > 3.x.x
