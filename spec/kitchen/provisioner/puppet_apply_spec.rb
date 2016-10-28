@@ -146,7 +146,7 @@ describe Kitchen::Provisioner::PuppetApply do
       end
 
       it 'Should not ignore additional paths when copying the module under test' do
-        expect(provisioner[:ignored_paths_from_root]).to eq([])
+        expect(provisioner[:ignored_paths_from_root]).to eq(['spec'])
       end
 
       it 'Should find files path' do
