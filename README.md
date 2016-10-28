@@ -148,8 +148,10 @@ To implement this with test-kitchen setup the puppet repository with:
 
 * install kitchen-verifier-serverspec on your workstation i.e. 'gem install kitchen-verifier-serverspec'
 
+See examples:
+* [https://github.com/neillturner/puppet_vagrant_repo](https://github.com/neillturner/puppet_vagrant_repo)
 
-See example [https://github.com/neillturner/puppet_repo](https://github.com/neillturner/puppet_repo)
+* [https://github.com/neillturner/puppet_repo](https://github.com/neillturner/puppet_repo)
 
 ```
 .
