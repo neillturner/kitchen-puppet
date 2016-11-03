@@ -674,10 +674,18 @@ CUSTOM_COMMAND
         it 'is C:/ProgramData/PuppetLabs/puppet/etc' do
           expect(provisioner.send(:puppet_dir)).to eq('C:/ProgramData/PuppetLabs/puppet/etc')
         end
+        it 'is C:/ProgramData/PuppetLabs/puppet/etc when using puppet collections' do
+          config[:require_puppet_collections] = true
+          expect(provisioner.send(:puppet_dir)).to eq('C:/ProgramData/PuppetLabs/puppet/etc')
+        end
       end
 
       describe 'hiera_config_dir' do
         it 'is C:/ProgramData/PuppetLabs/puppet/etc' do
+          expect(provisioner.send(:hiera_config_dir)).to eq('C:/ProgramData/PuppetLabs/puppet/etc')
+        end
+        it 'is C:/ProgramData/PuppetLabs/puppet/etc when using puppet collections' do
+          config[:require_puppet_collections] = true
           expect(provisioner.send(:hiera_config_dir)).to eq('C:/ProgramData/PuppetLabs/puppet/etc')
         end
       end
@@ -708,6 +716,10 @@ CUSTOM_COMMAND
 
       describe 'puppet_cmd' do
         it 'is & "C:\Program Files\Puppet Labs\Puppet\bin\puppet"' do
+          expect(provisioner.send(:puppet_cmd)).to eq('& "C:\Program Files\Puppet Labs\Puppet\bin\puppet"')
+        end
+        it 'is & "C:\Program Files\Puppet Labs\Puppet\bin\puppet" when using puppet collections' do
+          config[:require_puppet_collections] = true
           expect(provisioner.send(:puppet_cmd)).to eq('& "C:\Program Files\Puppet Labs\Puppet\bin\puppet"')
         end
       end

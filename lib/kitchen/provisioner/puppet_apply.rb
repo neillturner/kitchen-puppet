@@ -221,10 +221,11 @@ module Kitchen
             info("Installing puppet on #{puppet_platform}")
             <<-INSTALL
               if(Get-Command puppet -ErrorAction 0) { return; }
-              if( [Environment]::Is64BitOperatingSystem ) {
-                  $MsiUrl = "https://downloads.puppetlabs.com/windows/puppet-#{puppet_windows_version}-x64.msi"
+              $architecture = if( [Environment]::Is64BitOperatingSystem ) { '-x64' } else { '' }
+              if( '#{puppet_windows_version}' -eq 'latest' ) {
+                  $MsiUrl = "https://downloads.puppetlabs.com/windows/puppet${architecture}-latest.msi"
               } else {
-                  $MsiUrl = "https://downloads.puppetlabs.com/windows/puppet-#{puppet_windows_version}.msi"
+                  $MsiUrl = "https://downloads.puppetlabs.com/windows/puppet-#{puppet_windows_version}${architecture}.msi"
               }
               $process = Start-Process -FilePath msiexec.exe -Wait -PassThru -ArgumentList '/qn', '/norestart', '/i', $MsiUrl
               if ($process.ExitCode -ne 0) {
@@ -304,6 +305,24 @@ module Kitchen
           #{install_deep_merge}
           #{install_busser}
           #{custom_install_command}
+          INSTALL
+        when /^windows.*/
+          info("Installing Puppet Collections on #{puppet_platform}")
+          <<-INSTALL
+            if(Get-Command puppet -ErrorAction 0) { return; }
+            $architecture = if( [Environment]::Is64BitOperatingSystem ) { 'x64' } else { 'x86' }
+            if( '#{puppet_windows_version}' -eq 'latest' ) {
+                $MsiUrl = "https://downloads.puppetlabs.com/windows/puppet-agent-${architecture}-latest.msi"
+            } else {
+                $MsiUrl = "https://downloads.puppetlabs.com/windows/puppet-agent-#{puppet_windows_version}-${architecture}.msi"
+            }
+            $process = Start-Process -FilePath msiexec.exe -Wait -PassThru -ArgumentList '/qn', '/norestart', '/i', $MsiUrl
+            if ($process.ExitCode -ne 0) {
+                Write-Host "Installer failed."
+                Exit 1
+            }
+
+            #{install_busser}
           INSTALL
         else
           info('Installing Puppet Collections, will try to determine platform os')
@@ -746,10 +765,9 @@ module Kitchen
       end
 
       def puppet_cmd
-        puppet_bin = powershell_shell? ? '& "C:\Program Files\Puppet Labs\Puppet\bin\puppet"' : 'puppet'
-        if config[:require_puppet_collections]
-          puppet_bin = "#{config[:puppet_coll_remote_path]}/bin/puppet"
-        end
+        return '& "C:\Program Files\Puppet Labs\Puppet\bin\puppet"' if powershell_shell?
+
+        puppet_bin = config[:require_puppet_collections] ? "#{config[:puppet_coll_remote_path]}/bin/puppet" : 'puppet'
 
         if config[:puppet_no_sudo]
           puppet_bin
@@ -759,15 +777,13 @@ module Kitchen
       end
 
       def puppet_dir
-        return '/etc/puppetlabs/puppet' if config[:require_puppet_collections]
-        return '/etc/puppet' unless powershell_shell?
-        'C:/ProgramData/PuppetLabs/puppet/etc'
+        return 'C:/ProgramData/PuppetLabs/puppet/etc' if powershell_shell?
+        config[:require_puppet_collections] ? '/etc/puppetlabs/puppet' : '/etc/puppet'
       end
 
       def hiera_config_dir
-        return '/etc/puppetlabs/code' if config[:require_puppet_collections]
-        return '/etc/puppet' unless powershell_shell?
-        'C:/ProgramData/PuppetLabs/puppet/etc'
+        return 'C:/ProgramData/PuppetLabs/puppet/etc' if powershell_shell?
+        config[:require_puppet_collections] ? '/etc/puppetlabs/code' : '/etc/puppet'
       end
 
       def puppet_debian_version
@@ -791,7 +807,7 @@ module Kitchen
       end
 
       def puppet_windows_version
-        config[:puppet_version] ? config[:puppet_version].to_s : '3.8.6'
+        config[:puppet_version] ? config[:puppet_version].to_s : 'latest'
       end
 
       def puppet_environment_flag
