@@ -564,13 +564,7 @@ module Kitchen
           ].join(' ')
         end
 
-        if hiera_data && hiera_data_remote_path == '/var/lib/hiera'
-          commands << [
-            sudo("#{cp_command} -r"), File.join(config[:root_path], 'hiera'), '/var/lib/'
-          ].join(' ')
-        end
-
-        if hiera_data && hiera_data_remote_path != '/var/lib/hiera'
+        if hiera_data
           commands << [
             sudo(mkdir_command), hiera_data_remote_path
           ].join(' ')
