@@ -56,6 +56,7 @@ install_hiera | false | Installs `hiera-puppet` package. Not needed for puppet >
 librarian_puppet_ssl_file | nil | ssl certificate file for librarian-puppet
 manifest | 'site.pp' | manifest for puppet apply to run
 manifests_path | | puppet repo manifests directory
+max_retries| 1 | maximum number of retry attempts of converge command 
 modules_path | | puppet repo manifests directory. Can be multiple directories separated by colons and then they will be merged
 platform | platform_name kitchen.yml parameter | OS platform of server
 puppet_apply_command | nil | Overwrite the puppet apply command. Needs "sudo -E puppet apply" as a prefix.
@@ -90,7 +91,9 @@ require_puppet_collections | false | Set if using puppet collections install (Pu
 require_puppet_omnibus | false | Set if using omnibus puppet install
 require_puppet_repo | true | Set if using a puppet install from yum or apt repo
 resolve_with_librarian_puppet | true | Use librarian_puppet to resolve modules if a Puppetfile is found
+retry_on_exit_code| [] | Array of exit codes to retry converge command against
 update_package_repos| true| update OS repository metadata
+wait_for_retry| 30 | number of seconds to wait before retrying converge command 
 
 ## Puppet Apply Configuring Provisioner Options
 
