@@ -17,10 +17,10 @@ The PuppetAgent provider works by passing the puppetmaster and other attributes 
 This provider has been tested against the Ubuntu 1204 and Centos 6.5 boxes running in vagrant/virtualbox as well as various docker.
 
 ## Resources
-* [http://ehaselwanter.com/en/blog/2014/05/08/using-test-kitchen-with-puppet](Test-Driven Infrastructure with Puppet, Test Kitchen, Serverspec and RSpec Blog)
-* [http://www.slideshare.net/MartinEtmajer/testdriven-infrastructure-with-puppet-test-kitchen-serverspec-and-rspec](Test-Driven Infrastructure with Puppet, Test Kitchen, Serverspec and RSpec Slides)
-* [http://events.linuxfoundation.org/sites/events/files/slides/ContainerCon%20-%20Test%20Driven%20Infrastructure.pdf](Test-driven Infrastructure with Puppet, Docker, Test Kitchen and Serverspec Slides)
-* [https://www.cedric-meury.ch/2016/10/test-driven-infrastructure-with-puppet-docker-test-kitchen-and-serverspec-yury-tsarev-gooddata](Test-driven Infrastructure with Puppet, Docker, Test Kitchen and Serverspec Notes)
+* [http://ehaselwanter.com/en/blog/2014/05/08/using-test-kitchen-with-puppet]
+* [http://www.slideshare.net/MartinEtmajer/testdriven-infrastructure-with-puppet-test-kitchen-serverspec-and-rspec]
+* [http://events.linuxfoundation.org/sites/events/files/slides/ContainerCon%20-%20Test%20Driven%20Infrastructure.pdf]
+* [https://www.cedric-meury.ch/2016/10/test-driven-infrastructure-with-puppet-docker-test-kitchen-and-serverspec-yury-tsarev-gooddata]
 
 ## Windows Workstation Install
 You need to download the puppet msi and install it and run everything inside the puppet window.
