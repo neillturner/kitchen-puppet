@@ -583,7 +583,12 @@ CUSTOM_COMMAND
 
     it 'whitelists exit code' do
       config[:puppet_whitelist_exit_code] = '2'
-      expect(provisioner.run_command).to match(/; \[ \$\? -eq 2 \] && exit 0$/)
+      expect(provisioner.run_command).to match(/; RC=\$\?; \[ \$RC -eq 2 \] && exit 0; exit \$RC$/)
+    end
+
+    it 'whitelists with multiple exit codes' do
+      config[:puppet_whitelist_exit_code] = %w(2 4)
+      expect(provisioner.run_command).to match(/; RC=\$\?; \[ \$RC -eq 2 -o \$RC -eq 4 \] && exit 0; exit \$RC$/)
     end
 
     it 'can run without sudo' do

@@ -79,7 +79,7 @@ puppet_noop| false| puppet runs in a no-op or dry-run mode
 puppet_no_sudo | false | allow puppet command to run without sudo if required
 puppet_verbose| false| Extra information logging on puppet run
 puppet_version | "latest"| desired version, affects apt installs.
-puppet_whitelist_exit_code | nil | Whitelist exit code expected from puppet run. Intended to be used together with `puppet_detailed_exitcodes`.
+puppet_whitelist_exit_code | nil | Whitelist exit code expected from puppet run. Intended to be used together with `puppet_detailed_exitcodes`. You can also specify a yaml list here (you should use 0 and 2 for `puppet_detailed_exitcodes` to capture puppet runtime errors and allow multiple converge runs (without changes)).
 puppet_yum_repo | "https://yum.puppetlabs.com/puppetlabs-release-el-6.noarch.rpm"| yum repo RH/Centos6
 _for RH/Centos7 change to_ | "https://yum.puppetlabs.com/puppetlabs-release-el-7.noarch.rpm" |
 puppet_yum_collections_repo | "http://yum.puppetlabs.com/puppetlabs-release-pc1-el-6.noarch.rpm" | yum collections repo RH/Centos6
@@ -293,3 +293,28 @@ Use a `Rakefile` similar to one in https://github.com/vincentbernat/serverspec-e
 With such approach we can achieve flexibility of running same test suite both in test kitchen and actual, even production, instances.
 
 Beware: kitchen-shell-verifier is not yet merged into test-kitchen upstream so using separate gem is unavoidable so far
+
+## Checking puppet apply success (with puppet_detailed_exitcodes)
+
+If you do not enable puppet_detailed_exitcodes, the provisioner only failes if the manifest can not be compiled. If the manifest contains errors (some manifests can not be executed) puppet will return exit 0 and thus the provisioner will be successfull, altought your catalog has not been fully applied. Probably this is not what you want. 
+
+When you enable `puppet_detailed_exitcodes`, you can specify the error conditions to check for with `puppet_whitelist_exit_code` also, otherwise the provisioner will fail altought everything is fine (and changes have been made).
+
+Puppet will return with one of the following codes (see https://docs.puppet.com/puppet/latest/man/agent.html) when `puppet_detailed_exitcodes` is true: 
+
+* 0: The run succeeded with no changes or failures; the system was already in the desired state.
+* 1: The run failed, or wasn't attempted due to another run already in progress.
+* 2: The run succeeded, and some resources were changed.
+* 4: The run succeeded, and some resources failed.
+* 6: The run succeeded, and included both changes and failures.
+
+If you enable `puppet_detailed_exitcodes` you should should probably set `puppet_whitelist_exit_code` to 0 and 2
+
+```yaml
+provisioner:
+  puppet_detailed_exitcodes: true
+  puppet_whitelist_exit_code:
+    - 0
+    - 2
+```
+
