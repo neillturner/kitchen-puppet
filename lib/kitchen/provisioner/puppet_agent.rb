@@ -182,8 +182,7 @@ module Kitchen
         INSTALL
       end
 
-      def init_command
-      end
+      def init_command; end
 
       def create_sandbox
         super
@@ -241,8 +240,7 @@ module Kitchen
 
       protected
 
-      def load_needed_dependencies!
-      end
+      def load_needed_dependencies!; end
 
       def puppet_config
         config[:puppet_config_path]
