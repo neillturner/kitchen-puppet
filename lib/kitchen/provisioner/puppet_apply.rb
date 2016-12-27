@@ -205,6 +205,7 @@ module Kitchen
                 #{install_hiera}
               fi
               #{install_eyaml}
+              #{install_eyaml_gpg}
               #{install_deep_merge}
               #{install_busser}
               #{custom_install_command}
@@ -219,6 +220,7 @@ module Kitchen
                 #{install_puppet_yum_repo}
               fi
               #{install_eyaml}
+              #{install_eyaml_gpg}
               #{install_deep_merge}
               #{install_busser}
               #{custom_install_command}
@@ -266,6 +268,7 @@ module Kitchen
                 fi
               fi
               #{install_eyaml}
+              #{install_eyaml_gpg}
               #{install_deep_merge}
               #{install_busser}
               #{custom_install_command}
@@ -293,6 +296,7 @@ module Kitchen
             #{sudo_env('apt-get')} -y install puppet-agent#{puppet_debian_version}
           fi
           #{install_eyaml("#{config[:puppet_coll_remote_path]}/puppet/bin/gem")}
+          #{install_eyaml_gpg("#{config[:puppet_coll_remote_path]}/puppet/bin/gem")}
           #{install_deep_merge}
           #{install_busser}
           #{custom_install_command}
@@ -308,6 +312,7 @@ module Kitchen
             #{sudo_env('yum')} -y install puppet-agent#{puppet_redhat_version}
           fi
           #{install_eyaml("#{config[:puppet_coll_remote_path]}/puppet/bin/gem")}
+          #{install_eyaml_gpg("#{config[:puppet_coll_remote_path]}/puppet/bin/gem")}
           #{install_deep_merge}
           #{install_busser}
           #{custom_install_command}
@@ -351,6 +356,7 @@ module Kitchen
               fi
             fi
             #{install_eyaml("#{config[:puppet_coll_remote_path]}/puppet/bin/gem")}
+            #{install_eyaml_gpg("#{config[:puppet_coll_remote_path]}/puppet/bin/gem")}
             #{install_deep_merge}
             #{install_busser}
             #{custom_install_command}
@@ -379,12 +385,16 @@ module Kitchen
             #{sudo(gem_cmd)} install #{gem_proxy_parm} --no-ri --no-rdoc hiera-eyaml
           fi
         INSTALL
+      end
+
+      def install_eyaml_gpg(gem_cmd = 'gem')
         return unless config[:hiera_eyaml_gpg]
         <<-INSTALL
           # A backend for Hiera that provides per-value asymmetric encryption of sensitive data
           if [[ $(#{sudo(gem_cmd)} list hiera-eyaml-gpg -i) == 'false' ]]; then
             echo '-----> Installing hiera-eyaml-gpg to provide encryption of hiera data'
             #{sudo(gem_cmd)} install #{gem_proxy_parm} --no-ri --no-rdoc highline -v 1.6.21
+            #{sudo(gem_cmd)} install #{gem_proxy_parm} --no-ri --no-rdoc hiera-eyaml
             #{sudo(gem_cmd)} install #{gem_proxy_parm} --no-ri --no-rdoc hiera-eyaml-gpg
             #{sudo(gem_cmd)} install #{gem_proxy_parm} --no-ri --no-rdoc ruby_gpg
           fi
