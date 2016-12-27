@@ -1,0 +1,25 @@
+---
+driver:
+  name: docker
+  use_sudo: <%= ENV['DOCKER_SUDO'] %>
+
+provisioner:
+  name: puppet_apply
+  modules_path: modules
+  manifests_path: manifests
+  puppet_verbose: true
+  puppet_debug: true
+  puppet_environment: production
+
+platforms:
+  - name: centos
+    driver:
+      image: centos:6.7
+  - name: fake
+    driver:
+      image: devopsil/puppet
+      platform: rhel
+
+suites:
+  - name: default
+    manifest: site.pp

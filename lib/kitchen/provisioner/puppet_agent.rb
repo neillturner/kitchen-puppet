@@ -43,6 +43,7 @@ module Kitchen
       default_config :puppet_omnibus_url, nil
       default_config :puppet_omnibus_remote_path, '/opt/puppet'
       default_config :puppet_version, nil
+      default_config :facter_version, nil
       default_config :require_puppet_repo, true
       default_config :require_chef_for_busser, true
 
@@ -72,7 +73,7 @@ module Kitchen
       default_config :puppet_test, false
       default_config :puppet_onetime, true
       default_config :puppet_no_daemonize, true
-      default_config :puppet_server, nil   # will default to 'puppet'
+      default_config :puppet_server, nil # will default to 'puppet'
       default_config :puppet_waitforcert, '0'
       default_config :puppet_certname, nil
       default_config :puppet_digest, nil
@@ -90,16 +91,13 @@ module Kitchen
         end
       end
 
-      # rubocop:disable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
+      # rubocop:disable Metrics/CyclomaticComplexity
       def install_command
         return unless config[:require_puppet_omnibus] || config[:require_puppet_repo]
         if config[:require_puppet_omnibus]
           info('Installing puppet using puppet omnibus')
-          if !config[:puppet_version].nil?
-            version = "-v #{config[:puppet_version]}"
-          else
-            version = ''
-          end
+          version = ''
+          version = "-v #{config[:puppet_version]}" if config[:puppet_version]
           <<-INSTALL
             #{Util.shell_helpers}
 
@@ -120,6 +118,7 @@ module Kitchen
                 #{sudo('wget')} #{wget_proxy_parm} #{puppet_apt_repo}
                 #{sudo('dpkg')} -i #{puppet_apt_repo_file}
                 #{update_packages_debian_cmd}
+                #{sudo_env('apt-get')} -y install facter#{facter_debian_version}
                 #{sudo('apt-get')} -y install puppet-common#{puppet_debian_version}
                 #{sudo('apt-get')} -y install puppet#{puppet_debian_version}
               fi
@@ -153,6 +152,7 @@ module Kitchen
                     #{sudo('wget')} #{wget_proxy_parm} #{puppet_apt_repo}
                     #{sudo('dpkg')} -i #{puppet_apt_repo_file}
                     #{update_packages_debian_cmd}
+                    #{sudo('apt-get')} -y install facter#{facter_debian_version}
                     #{sudo('apt-get')} -y install puppet-common#{puppet_debian_version}
                     #{sudo('apt-get')} -y install puppet#{puppet_debian_version}
                   fi
@@ -163,7 +163,7 @@ module Kitchen
           end
         end
       end
-      # rubocop:enable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
+      # rubocop:enable Metrics/CyclomaticComplexity
 
       def install_busser
         return unless config[:require_chef_for_busser]
@@ -182,8 +182,7 @@ module Kitchen
         INSTALL
       end
 
-      def init_command
-      end
+      def init_command; end
 
       def create_sandbox
         super
@@ -218,34 +217,30 @@ module Kitchen
       end
 
       def run_command
-        if !config[:puppet_agent_command].nil?
-          return config[:puppet_agent_command]
-        else
-          [
-            custom_facts,
-            sudo_env('puppet'),
-            'agent',
-            puppet_server_flag,
-            "--waitforcert=#{config[:puppet_waitforcert]}",
-            puppet_masterport_flag,
-            puppet_certname_flag,
-            puppet_digest_flag,
-            puppet_detailed_exitcodes_flag,
-            puppet_logdest_flag,
-            puppet_test_flag,
-            puppet_onetime_flag,
-            puppet_no_daemonize_flag,
-            puppet_noop_flag,
-            puppet_verbose_flag,
-            puppet_debug_flag
-          ].join(' ')
-        end
+        return config[:puppet_agent_command] unless config[:puppet_agent_command].nil?
+        [
+          custom_facts,
+          sudo_env('puppet'),
+          'agent',
+          puppet_server_flag,
+          "--waitforcert=#{config[:puppet_waitforcert]}",
+          puppet_masterport_flag,
+          puppet_certname_flag,
+          puppet_digest_flag,
+          puppet_detailed_exitcodes_flag,
+          puppet_logdest_flag,
+          puppet_test_flag,
+          puppet_onetime_flag,
+          puppet_no_daemonize_flag,
+          puppet_noop_flag,
+          puppet_verbose_flag,
+          puppet_debug_flag
+        ].join(' ')
       end
 
       protected
 
-      def load_needed_dependencies!
-      end
+      def load_needed_dependencies!; end
 
       def puppet_config
         config[:puppet_config_path]
@@ -255,8 +250,16 @@ module Kitchen
         config[:puppet_version] ? "=#{config[:puppet_version]}" : nil
       end
 
+      def facter_debian_version
+        config[:facter_version] ? "=#{config[:facter_version]}" : nil
+      end
+
       def puppet_redhat_version
-        config[:puppet_version] ? "-#{config[:puppet_version]}" : nil
+        if puppet_platform == 'amazon'
+          config[:puppet_version]
+        else
+          config[:puppet_version] ? "-#{config[:puppet_version]}" : nil
+        end
       end
 
       def puppet_noop_flag
@@ -284,7 +287,7 @@ module Kitchen
       end
 
       def sudo_env(pm)
-        http_proxy ? "#{sudo('env')} http_proxy=#{http_proxy} #{pm}" : "#{sudo(pm)}"
+        http_proxy ? "#{sudo('env')} http_proxy=#{http_proxy} #{pm}" : sudo(pm).to_s
       end
 
       def custom_facts

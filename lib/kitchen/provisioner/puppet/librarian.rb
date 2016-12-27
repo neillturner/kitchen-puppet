@@ -29,9 +29,9 @@ module Kitchen
         include Logging
 
         def initialize(puppetfile, path, logger = Kitchen.logger)
-          @puppetfile   = puppetfile
-          @path       = path
-          @logger     = logger
+          @puppetfile = puppetfile
+          @path = path
+          @logger = logger
         end
 
         def self.load!(logger = Kitchen.logger)
@@ -44,7 +44,9 @@ module Kitchen
           debug("Using Puppetfile from #{puppetfile}")
 
           env = ::Librarian::Puppet::Environment.new(
-            project_path: File.dirname(puppetfile))
+            project_path: File.expand_path(File.dirname(puppetfile))
+          )
+
           env.config_db.local['path'] = path
           ::Librarian::Action::Resolve.new(env).run
           ::Librarian::Action::Install.new(env).run
