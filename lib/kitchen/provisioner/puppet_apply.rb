@@ -803,10 +803,6 @@ module Kitchen
         config[:hiera_eyaml_gpg_remote_path]
       end
 
-      def hiera_eyaml_keys
-        config[:hiera_eyaml_keys]
-      end
-
       def hiera_eyaml_key_path
         config[:hiera_eyaml_key_path]
       end
