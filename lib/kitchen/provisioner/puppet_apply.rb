@@ -153,6 +153,12 @@ module Kitchen
       default_config :hiera_eyaml, false
       default_config :hiera_eyaml_key_remote_path, '/etc/puppet/secure/keys'
 
+      default_config :hiera_eyaml_gpg, false
+      default_config :hiera_eyaml_gpg_recipients, false
+      default_config :hiera_eyaml_gpg_secring, false
+      default_config :hiera_eyaml_gpg_pubring, false
+      default_config :hiera_eyaml_gpg_remote_path, '/home/vagrant/.gnupg'
+
       default_config :hiera_eyaml_key_path do |provisioner|
         provisioner.calculate_path('hiera_keys')
       end
@@ -199,6 +205,7 @@ module Kitchen
                 #{install_hiera}
               fi
               #{install_eyaml}
+              #{install_eyaml_gpg}
               #{install_deep_merge}
               #{install_busser}
               #{custom_install_command}
@@ -213,6 +220,7 @@ module Kitchen
                 #{install_puppet_yum_repo}
               fi
               #{install_eyaml}
+              #{install_eyaml_gpg}
               #{install_deep_merge}
               #{install_busser}
               #{custom_install_command}
@@ -260,6 +268,7 @@ module Kitchen
                 fi
               fi
               #{install_eyaml}
+              #{install_eyaml_gpg}
               #{install_deep_merge}
               #{install_busser}
               #{custom_install_command}
@@ -287,6 +296,7 @@ module Kitchen
             #{sudo_env('apt-get')} -y install puppet-agent#{puppet_debian_version}
           fi
           #{install_eyaml("#{config[:puppet_coll_remote_path]}/puppet/bin/gem")}
+          #{install_eyaml_gpg("#{config[:puppet_coll_remote_path]}/puppet/bin/gem")}
           #{install_deep_merge}
           #{install_busser}
           #{custom_install_command}
@@ -302,6 +312,7 @@ module Kitchen
             #{sudo_env('yum')} -y install puppet-agent#{puppet_redhat_version}
           fi
           #{install_eyaml("#{config[:puppet_coll_remote_path]}/puppet/bin/gem")}
+          #{install_eyaml_gpg("#{config[:puppet_coll_remote_path]}/puppet/bin/gem")}
           #{install_deep_merge}
           #{install_busser}
           #{custom_install_command}
@@ -345,6 +356,7 @@ module Kitchen
               fi
             fi
             #{install_eyaml("#{config[:puppet_coll_remote_path]}/puppet/bin/gem")}
+            #{install_eyaml_gpg("#{config[:puppet_coll_remote_path]}/puppet/bin/gem")}
             #{install_deep_merge}
             #{install_busser}
             #{custom_install_command}
@@ -371,6 +383,20 @@ module Kitchen
             echo '-----> Installing hiera-eyaml to provide encryption of hiera data'
             #{sudo(gem_cmd)} install #{gem_proxy_parm} --no-ri --no-rdoc highline -v 1.6.21
             #{sudo(gem_cmd)} install #{gem_proxy_parm} --no-ri --no-rdoc hiera-eyaml
+          fi
+        INSTALL
+      end
+
+      def install_eyaml_gpg(gem_cmd = 'gem')
+        return unless config[:hiera_eyaml_gpg]
+        <<-INSTALL
+          # A backend for Hiera that provides per-value asymmetric encryption of sensitive data
+          if [[ $(#{sudo(gem_cmd)} list hiera-eyaml-gpg -i) == 'false' ]]; then
+            echo '-----> Installing hiera-eyaml-gpg to provide encryption of hiera data'
+            #{sudo(gem_cmd)} install #{gem_proxy_parm} --no-ri --no-rdoc highline -v 1.6.21
+            #{sudo(gem_cmd)} install #{gem_proxy_parm} --no-ri --no-rdoc hiera-eyaml
+            #{sudo(gem_cmd)} install #{gem_proxy_parm} --no-ri --no-rdoc hiera-eyaml-gpg
+            #{sudo(gem_cmd)} install #{gem_proxy_parm} --no-ri --no-rdoc ruby_gpg
           fi
         INSTALL
       end
@@ -601,6 +627,21 @@ module Kitchen
           ].join(' ')
         end
 
+        if hiera_eyaml_gpg
+          commands << [
+            sudo('mkdir -p'), hiera_eyaml_gpg_remote_path
+          ].join(' ')
+          commands << [
+            sudo('cp -r'), File.join(config[:root_path], hiera_eyaml_gpg_recipients), hiera_eyaml_gpg_remote_path
+          ].join(' ')
+          commands << [
+            sudo('cp -r'), File.join(config[:root_path], hiera_eyaml_gpg_secring), hiera_eyaml_gpg_remote_path
+          ].join(' ')
+          commands << [
+            sudo('cp -r'), File.join(config[:root_path], hiera_eyaml_gpg_pubring), hiera_eyaml_gpg_remote_path
+          ].join(' ')
+        end
+
         if puppet_environment
           commands << [
             sudo('ln -s '), config[:root_path], File.join(puppet_dir, config[:puppet_environment])
@@ -740,6 +781,26 @@ module Kitchen
 
       def hiera_eyaml
         config[:hiera_eyaml]
+      end
+
+      def hiera_eyaml_gpg
+        config[:hiera_eyaml_gpg]
+      end
+
+      def hiera_eyaml_gpg_recipients
+        config[:hiera_eyaml_gpg_recipients]
+      end
+
+      def hiera_eyaml_gpg_secring
+        config[:hiera_eyaml_gpg_secring]
+      end
+
+      def hiera_eyaml_gpg_pubring
+        config[:hiera_eyaml_gpg_pubring]
+      end
+
+      def hiera_eyaml_gpg_remote_path
+        config[:hiera_eyaml_gpg_remote_path]
       end
 
       def hiera_eyaml_key_path
