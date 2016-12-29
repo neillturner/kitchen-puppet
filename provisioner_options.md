@@ -43,6 +43,10 @@ hiera_data_path | | puppet repo hiera data directory
 hiera_data_remote_path | "/var/lib/hiera" | Hiera data directory on server
 hiera_deep_merge | false | install the deep_merge gem to support hiera deep merge mode
 hiera_eyaml | false | use hiera-eyaml to encrypt hiera data
+hiera_eyaml_gpg | false | use GPG encryption backend for hiera-eyaml
+hiera_eyaml_gpg_recipients | false | recipients eg ehiera/hiera-eyaml-gpg.recipients
+hiera_eyaml_gpg_secring | false | eg hiera/secring.gpg
+hiera_eyaml_gpg_pubring | false | eg hiera/pubring.gpg
 hiera_eyaml_key_remote_path | "/etc/puppet/secure/keys" | directory of hiera-eyaml keys on server
 hiera_eyaml_key_path  | "hiera_keys" | directory of hiera-eyaml keys on workstation
 hiera_package | 'hiera-puppet' | Only used if `install_hiera` is set
@@ -56,7 +60,7 @@ install_hiera | false | Installs `hiera-puppet` package. Not needed for puppet >
 librarian_puppet_ssl_file | nil | ssl certificate file for librarian-puppet
 manifest | 'site.pp' | manifest for puppet apply to run
 manifests_path | | puppet repo manifests directory
-max_retries| 1 | maximum number of retry attempts of converge command 
+max_retries| 1 | maximum number of retry attempts of converge command
 modules_path | | puppet repo manifests directory. Can be multiple directories separated by colons and then they will be merged
 platform | platform_name kitchen.yml parameter | OS platform of server
 puppet_apply_command | nil | Overwrite the puppet apply command. Needs "sudo -E puppet apply" as a prefix.
@@ -93,7 +97,7 @@ require_puppet_repo | true | Set if using a puppet install from yum or apt repo
 resolve_with_librarian_puppet | true | Use librarian_puppet to resolve modules if a Puppetfile is found
 retry_on_exit_code| [] | Array of exit codes to retry converge command against
 update_package_repos| true| update OS repository metadata
-wait_for_retry| 30 | number of seconds to wait before retrying converge command 
+wait_for_retry| 30 | number of seconds to wait before retrying converge command
 
 ## Puppet Apply Configuring Provisioner Options
 
@@ -174,6 +178,13 @@ It can be beneficial to keep different Puppet layouts for different suites. Rath
 When specifying a puppet version, you must use this format: "3.6.2-1puppetlabs1". I have
 no idea why Puppet versioned their repository with a trailing
 "-1puppetlabs1", but there it is.
+
+
+### eyaml
+
+See https://puppet.com/blog/encrypt-your-data-using-hiera-eyaml
+
+See https://blog.benroberts.net/2014/12/setting-up-hiera-eyaml-gpg for using GPG backend allowing secrets to be protected using asymmetric keys.
 
 
 # Puppet Agent Provisioner Options
@@ -296,11 +307,11 @@ Beware: kitchen-shell-verifier is not yet merged into test-kitchen upstream so u
 
 ## Checking puppet apply success (with puppet_detailed_exitcodes)
 
-If you do not enable puppet_detailed_exitcodes, the provisioner only failes if the manifest can not be compiled. If the manifest contains errors (some manifests can not be executed) puppet will return exit 0 and thus the provisioner will be successfull, altought your catalog has not been fully applied. Probably this is not what you want. 
+If you do not enable puppet_detailed_exitcodes, the provisioner only failes if the manifest can not be compiled. If the manifest contains errors (some manifests can not be executed) puppet will return exit 0 and thus the provisioner will be successfull, altought your catalog has not been fully applied. Probably this is not what you want.
 
 When you enable `puppet_detailed_exitcodes`, you can specify the error conditions to check for with `puppet_whitelist_exit_code` also, otherwise the provisioner will fail altought everything is fine (and changes have been made).
 
-Puppet will return with one of the following codes (see https://docs.puppet.com/puppet/latest/man/agent.html) when `puppet_detailed_exitcodes` is true: 
+Puppet will return with one of the following codes (see https://docs.puppet.com/puppet/latest/man/agent.html) when `puppet_detailed_exitcodes` is true:
 
 * 0: The run succeeded with no changes or failures; the system was already in the desired state.
 * 1: The run failed, or wasn't attempted due to another run already in progress.
