@@ -235,7 +235,12 @@ module Kitchen
               } else {
                   $MsiUrl = "https://downloads.puppetlabs.com/windows/puppet-#{puppet_windows_version}${architecture}.msi"
               }
-              $process = Start-Process -FilePath msiexec.exe -Wait -PassThru -ArgumentList '/qn', '/norestart', '/i', $MsiUrl
+              if http_proxy
+                wget $MsiUrl -UseBasicParsing -OutFile "C:/puppet.msi" -Proxy #{http_proxy}
+                $process = Start-Process -FilePath msiexec.exe -Wait -PassThru -ArgumentList '/qn', '/norestart', '/i', 'C:\\puppet.msi'
+              else
+                $process = Start-Process -FilePath msiexec.exe -Wait -PassThru -ArgumentList '/qn', '/norestart', '/i', $MsiUrl
+              end
               if ($process.ExitCode -ne 0) {
                   Write-Host "Installer failed."
                   Exit 1
@@ -327,7 +332,12 @@ module Kitchen
             } else {
                 $MsiUrl = "https://downloads.puppetlabs.com/windows/puppet-agent-#{puppet_windows_version}-${architecture}.msi"
             }
-            $process = Start-Process -FilePath msiexec.exe -Wait -PassThru -ArgumentList '/qn', '/norestart', '/i', $MsiUrl
+            if http_proxy
+              wget $MsiUrl -UseBasicParsing -OutFile "C:/puppet.msi" -Proxy #{http_proxy}
+              $process = Start-Process -FilePath msiexec.exe -Wait -PassThru -ArgumentList '/qn', '/norestart', '/i', 'C:\\puppet.msi'
+            else
+              $process = Start-Process -FilePath msiexec.exe -Wait -PassThru -ArgumentList '/qn', '/norestart', '/i', $MsiUrl
+            end
             if ($process.ExitCode -ne 0) {
                 Write-Host "Installer failed."
                 Exit 1
