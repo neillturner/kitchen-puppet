@@ -13,6 +13,8 @@ HashSyntax:
   Enabled: true
 LineLength:
   Enabled: false
+BlockLength:
+  Enabled: false
 MethodLength:
   Enabled: false
 ClassLength:
