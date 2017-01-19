@@ -1056,7 +1056,7 @@ module Kitchen
       def posh_proxy_parm
         http_proxy ? "-Proxy #{http_proxy}" : nil
       end
- 
+
       def export_http_proxy_parm
         http_proxy ? "export http_proxy=#{http_proxy}" : nil
       end
