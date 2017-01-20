@@ -227,7 +227,7 @@ module Kitchen
             INSTALL
           when /^windows.*/
             info("Installing puppet on #{puppet_platform}")
-            info("Powershell is not recognised by core test-kitchen assuming it is present") if !powershell_shell?
+            info('Powershell is not recognised by core test-kitchen assuming it is present') unless powershell_shell?
             <<-INSTALL
               if(Get-Command puppet -ErrorAction 0) { return; }
               $architecture = if( [Environment]::Is64BitOperatingSystem ) { '-x64' } else { '' }
