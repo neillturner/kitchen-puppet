@@ -227,6 +227,7 @@ module Kitchen
             INSTALL
           when /^windows.*/
             info("Installing puppet on #{puppet_platform}")
+            info("Powershell is not recognised by core test-kitchen assuming it is present") if !powershell_shell?
             <<-INSTALL
               if(Get-Command puppet -ErrorAction 0) { return; }
               $architecture = if( [Environment]::Is64BitOperatingSystem ) { '-x64' } else { '' }
@@ -665,7 +666,7 @@ module Kitchen
           ].join(' ')
         end
 
-        command = powershell_shell? ? commands.join('; ') : commands.join(' && ')
+        command = powershell? ? commands.join('; ') : commands.join(' && ')
         debug(command)
         command
       end
@@ -822,7 +823,7 @@ module Kitchen
       end
 
       def puppet_cmd
-        return '& "C:\Program Files\Puppet Labs\Puppet\bin\puppet"' if powershell_shell?
+        return '& "C:\Program Files\Puppet Labs\Puppet\bin\puppet"' if powershell?
 
         puppet_bin = config[:require_puppet_collections] ? "#{config[:puppet_coll_remote_path]}/bin/puppet" : 'puppet'
 
@@ -834,12 +835,12 @@ module Kitchen
       end
 
       def puppet_dir
-        return 'C:/ProgramData/PuppetLabs/puppet/etc' if powershell_shell?
+        return 'C:/ProgramData/PuppetLabs/puppet/etc' if powershell?
         config[:require_puppet_collections] ? '/etc/puppetlabs/puppet' : '/etc/puppet'
       end
 
       def hiera_config_dir
-        return 'C:/ProgramData/PuppetLabs/puppet/etc' if powershell_shell?
+        return 'C:/ProgramData/PuppetLabs/puppet/etc' if powershell?
         config[:require_puppet_collections] ? '/etc/puppetlabs/code' : '/etc/puppet'
       end
 
@@ -878,7 +879,7 @@ module Kitchen
       def puppet_manifestdir
         return nil if config[:require_puppet_collections]
         return nil if config[:puppet_environment]
-        return nil if powershell_shell?
+        return nil if powershell?
         bash_vars = "export MANIFESTDIR='#{File.join(config[:root_path], 'manifests')}';"
         debug(bash_vars)
         bash_vars
@@ -955,7 +956,7 @@ module Kitchen
       def custom_facts
         return nil if config[:custom_facts].none?
         return nil if config[:install_custom_facts]
-        if powershell_shell?
+        if powershell?
           environment_vars = config[:custom_facts].map { |k, v| "$env:FACTER_#{k}='#{v}'" }.join('; ')
           environment_vars = "#{environment_vars};"
         else
@@ -980,8 +981,8 @@ module Kitchen
 
       def puppet_whitelist_exit_code
         if config[:puppet_whitelist_exit_code].nil?
-          powershell_shell? ? '; exit $LASTEXITCODE' : nil
-        elsif powershell_shell?
+          powershell? ? '; exit $LASTEXITCODE' : nil
+        elsif powershell?
           "; if(@(#{[config[:puppet_whitelist_exit_code]].join(', ')}) -contains $LASTEXITCODE) {exit 0} else {exit $LASTEXITCODE}"
         else
           '; RC=$?; [ ' + [config[:puppet_whitelist_exit_code]].flatten.map { |x| "\$RC -eq #{x}" }.join(' -o ') + ' ] && exit 0; exit $RC'
@@ -1055,6 +1056,12 @@ module Kitchen
 
       def posh_proxy_parm
         http_proxy ? "-Proxy #{http_proxy}" : nil
+      end
+
+      def powershell?
+        return true if powershell_shell?
+        return true if puppet_platform =~ /^windows.*/
+        false
       end
 
       def export_http_proxy_parm
@@ -1257,23 +1264,23 @@ module Kitchen
       end
 
       def cp_command
-        return 'cp -force' if powershell_shell?
+        return 'cp -force' if powershell?
         'cp'
       end
 
       def rm_command
-        return 'rm -force -recurse' if powershell_shell?
+        return 'rm -force -recurse' if powershell?
         'rm -rf'
       end
 
       def mkdir_command
-        return 'mkdir -force -path' if powershell_shell?
+        return 'mkdir -force -path' if powershell?
         'mkdir -p'
       end
 
       def rm_command_paths(paths)
         return :nil if paths.length.zero?
-        return "#{rm_command} \"#{paths.join('", "')}\"" if powershell_shell?
+        return "#{rm_command} \"#{paths.join('", "')}\"" if powershell?
         "#{rm_command} #{paths.join(' ')}"
       end
     end
