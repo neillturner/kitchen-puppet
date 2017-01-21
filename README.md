@@ -76,6 +76,7 @@ There is windows/winrm support, currently not all functionality is supported.
 
 Sample Puppet Repositories
   * A sample hello world example puppet repository: https://github.com/neillturner/puppet_windows_repo
+  * A sample hello world example puppet repository for vagrant: https://github.com/neillturner/puppet_vagrnt_windows_repo
   * A more extensive sample installing virtualbox on windows: https://github.com/red-gate/puppet-virtualbox_windows
 
 ## Test-Kitchen Serverspec
