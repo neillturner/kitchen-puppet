@@ -64,10 +64,14 @@ max_retries| 1 | maximum number of retry attempts of converge command
 modules_path | | puppet repo manifests directory. Can be multiple directories separated by colons and then they will be merged
 platform | platform_name kitchen.yml parameter | OS platform of server
 puppet_apply_command | nil | Overwrite the puppet apply command. Needs "sudo -E puppet apply" as a prefix.
-puppet_apt_repo | "http://apt.puppetlabs.com/puppetlabs-release-precise.deb"| apt repo Ubuntu12
+puppet_apt_repo | "http://apt.puppetlabs.com/puppetlabs-release-precise.deb"| apt repo Ubuntu12 see https://apt.puppetlabs.com for others
+_for Ubuntu14 change to_ |	"http://apt.puppetlabs.com/puppetlabs-release-trusty.deb" |
 _for Ubuntu15 change to_ | "http://apt.puppetlabs.com/puppetlabs-release-jessie.deb" |
+_for Ubuntu16.04 change to_ |	"http://apt.puppetlabs.com/puppetlabs-release-xenial.deb" |
 puppet_apt_collections_repo | "http://apt.puppetlabs.com/puppetlabs-release-pc1-wheezy.deb" | apt collections repo
+_for Ubuntu14 change to_ |	"http://apt.puppetlabs.com/puppetlabs-release-pc1-trusty.deb" |
 _for Ubuntu15 change to_ | "http://apt.puppetlabs.com/puppetlabs-release-pc1-jessie.deb" |
+_for Ubuntu16.04 change to_ |	"http://apt.puppetlabs.com/puppetlabs-release-pc1-xenial.deb" |
 puppet_coll_remote_path | "/opt/puppetlabs" | Server Installation location of a puppet collections install.
 puppet_config_path | | path of custom puppet.conf file
 puppet_debug| false| Enable full debugging logging on puppet run
