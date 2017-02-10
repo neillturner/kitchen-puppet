@@ -140,6 +140,7 @@ module Kitchen
       default_config :puppet_debug, false
       default_config :puppet_verbose, false
       default_config :puppet_noop, false
+      default_config :puppet_show_diff, false
       default_config :platform, &:platform_name
       default_config :update_package_repos, true
       default_config :remove_puppet_repo, false
@@ -690,6 +691,7 @@ module Kitchen
           puppet_verbose_flag,
           puppet_debug_flag,
           puppet_logdest_flag,
+          puppet_show_diff_flag,
           puppet_whitelist_exit_code
         ].join(' ')
         if config[:custom_post_apply_command]
@@ -899,6 +901,10 @@ module Kitchen
 
       def puppet_verbose_flag
         config[:puppet_verbose] ? '-v' : nil
+      end
+
+      def puppet_show_diff_flag
+        config[:puppet_show_diff] ? '--show_diff' : nil
       end
 
       def puppet_logdest_flag
