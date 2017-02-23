@@ -78,6 +78,7 @@ puppet_debug| false| Enable full debugging logging on puppet run
 puppet_detailed_exitcodes | nil | Provide transaction information via exit codes. See `--detailed-exitcodes` section of `puppet help apply`
 puppet_enc | | path for external node classifier script
 puppet_environment | nil | puppet environment for running puppet apply (Must set if using Puppet v4)
+puppet_future_parser | false | Run puppet with the future parser enabled  (see https://docs.puppet.com/puppet/3.8/experiments_future.html).
 puppet_git_init | nil | initialize puppet from GIT repository, e.g. "git@github.com:example/puppet-repo.git"
 puppet_git_pr | nil | checkout specific Pull Request from repository specified in puppet_git_init, e.g. "324"
 puppet_logdest | nil | _Array_ of log destinations. Include 'console' if wanted
