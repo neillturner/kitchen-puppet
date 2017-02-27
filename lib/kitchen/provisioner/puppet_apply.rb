@@ -1151,38 +1151,50 @@ module Kitchen
 
         FileUtils.mkdir_p(tmpmodules_dir)
         resolve_with_librarian if File.exist?(puppetfile) && config[:resolve_with_librarian_puppet]
+        modules_to_copy = {}
 
-        if modules && modules.include?(':')
-          debug('Found multiple directories in module path merging.....')
+        # If root dir (.) is a module, add it for copying
+        self_name = read_self_module_name
+        modules_to_copy[self_name] = '.' if self_name
+
+        if modules
           modules_array = modules.split(':')
-          modules_array.each do |m|
-            copy_modules(m, tmpmodules_dir)
+          modules_array.each do |m_path|
+            Dir.glob("#{m_path}/*").each do |m|
+              name = File.basename(m)
+              if modules_to_copy.include? name
+                debug("Found duplicated module: #{name}. The path taking precedence: '#{modules_to_copy[name]}', ignoring '#{m}'")
+              else
+                modules_to_copy[name] = m
+              end
+            end
           end
-        elsif modules
-          copy_modules(modules, tmpmodules_dir)
+        end
+
+        if modules_to_copy.empty?
+          info 'Nothing to do for modules'
         else
-          info 'nothing to do for modules'
+          copy_modules(modules_to_copy, tmpmodules_dir)
         end
-
-        copy_self_as_module
       end
 
-      def copy_modules(source, destination)
-        return unless File.directory?(source)
-
-        debug("Copying modules from #{source} to #{destination}")
-
+      def copy_modules(modules, destination)
         excluded_paths = %w(modules pkg) + config[:ignored_paths_from_root]
-
-        Dir.glob("#{source}/*").each do |f|
-          module_name = File.basename(f)
-          target = "#{destination}/#{module_name}"
+        debug("Copying modules to directory: #{destination}")
+        modules.each do |name, source|
+          next unless File.directory?(source)
+          debug("Copying module #{name} from #{source}...")
+          target = "#{destination}/#{name}"
           FileUtils.mkdir_p(target) unless File.exist? target
-          FileUtils.cp_r(Dir.glob("#{source}/#{module_name}/*").reject { |entry| entry =~ /#{excluded_paths.join('$|')}$/ }, target, remove_destination: true)
+          FileUtils.cp_r(
+            Dir.glob("#{source}/*").reject { |entry| entry =~ /#{excluded_paths.join('$|')}$/ },
+            target,
+            remove_destination: true
+          )
         end
       end
 
-      def copy_self_as_module
+      def read_self_module_name
         if File.exist?(modulefile)
           warn('Modulefile found but this is deprecated, ignoring it, see https://tickets.puppetlabs.com/browse/PUP-1188')
         end
@@ -1192,20 +1204,10 @@ module Kitchen
         begin
           module_name = JSON.parse(IO.read(metadata_json))['name'].split('-').last
         rescue
-          error("not able to load or parse #{metadata_json_path} for the name of the module")
+          error("not able to load or parse #{metadata_json} for the name of the module")
         end
 
-        return unless module_name
-        module_target_path = File.join(sandbox_path, 'modules', module_name)
-        FileUtils.mkdir_p(module_target_path)
-
-        excluded_paths = %w(modules pkg) + config[:ignored_paths_from_root]
-
-        FileUtils.cp_r(
-          Dir.glob(File.join(config[:kitchen_root], '*')).reject { |entry| entry =~ /#{excluded_paths.join('$|')}$/ },
-          module_target_path,
-          remove_destination: true
-        )
+        module_name
       end
 
       def prepare_puppet_config
