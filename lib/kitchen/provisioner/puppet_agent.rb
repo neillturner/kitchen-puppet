@@ -54,6 +54,8 @@ module Kitchen
       default_config :puppet_agent_command, nil
 
       default_config :http_proxy, nil
+      default_config :https_proxy, nil
+      default_config :no_proxy, nil
 
       default_config :puppet_config_path do |provisioner|
         provisioner.calculate_path('puppet.conf', :file)
@@ -287,7 +289,10 @@ module Kitchen
       end
 
       def sudo_env(pm)
-        http_proxy ? "#{sudo('env')} http_proxy=#{http_proxy} #{pm}" : sudo(pm).to_s
+        s = https_proxy ? "https_proxy=#{https_proxy}" : nil
+        p = http_proxy ? "http_proxy=#{http_proxy}" : nil
+        n = no_proxy ? "no_proxy=#{no_proxy}" : nil
+        p || s ? "#{sudo('env')} #{p} #{s} #{n} #{pm}" : sudo(pm).to_s
       end
 
       def custom_facts
@@ -359,15 +364,28 @@ module Kitchen
       end
 
       def gem_proxy_parm
-        http_proxy ? "--http-proxy #{http_proxy}" : nil
+        p = http_proxy ? "--http-proxy #{http_proxy}" : nil
+        n = no_proxy ? "--no-http-proxy #{no_proxy}" : nil
+        p ? "#{p} #{n}" : nil
       end
 
       def wget_proxy_parm
-        http_proxy ? "-e use_proxy=yes -e http_proxy=#{http_proxy}" : nil
+        s = https_proxy ? "-e https_proxy=#{https_proxy}" : nil
+        p = http_proxy ? "-e http_proxy=#{http_proxy}" : nil
+        n = no_proxy ? "-e no_proxy=#{no_proxy}" : nil
+        p || s ? "-e use_proxy=yes #{p} #{s} #{n}" : nil
       end
 
       def http_proxy
         config[:http_proxy]
+      end
+
+      def https_proxy
+        config[:https_proxy]
+      end
+
+      def no_proxy
+        config[:no_proxy]
       end
 
       def chef_url

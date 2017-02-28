@@ -62,6 +62,7 @@ manifest | 'site.pp' | manifest for puppet apply to run
 manifests_path | | puppet repo manifests directory
 max_retries| 1 | maximum number of retry attempts of converge command
 modules_path | | puppet repo manifests directory. Can be multiple directories separated by colons and then they will be merged
+no_proxy | nil | list of URLs or IPs that should be excluded from proxying 
 platform | platform_name kitchen.yml parameter | OS platform of server
 puppet_apply_command | nil | Overwrite the puppet apply command. Needs "sudo -E puppet apply" as a prefix.
 puppet_apt_repo | "http://apt.puppetlabs.com/puppetlabs-release-precise.deb"| apt repo Ubuntu12 see https://apt.puppetlabs.com for others
@@ -227,6 +228,8 @@ puppet_agent_command | nil | Overwrite the puppet agent command. Needs "sudo -E 
 require_chef_for_busser | true | Install chef as currently needed by busser to run tests. NOTE: kitchen 1.4 only requires ruby to run busser so this is not required.
 puppet_config_path | | path of custom puppet.conf file
 http_proxy | nil | use http proxy when installing puppet and packages
+https_proxy | nil | use https proxy when installing puppet and packages
+no_proxy | nil | list of URLs or IPs that should be excluded from proxying
 ignore_spec_fixtures | | ignore spec/fixtures directory
 
 NOTE: Puppet Collections Support not in puppet agent yet

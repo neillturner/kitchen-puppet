@@ -78,6 +78,7 @@ module Kitchen
 
       default_config :http_proxy, nil
       default_config :https_proxy, nil
+      default_config :no_proxy, nil
 
       default_config :ignored_paths_from_root, ['spec']
       default_config :hiera_data_remote_path, '/var/lib/hiera'
@@ -431,6 +432,7 @@ module Kitchen
             echo '-----> Installing Chef Omnibus to install busser to run tests'
             #{export_http_proxy_parm}
             #{export_https_proxy_parm}
+            #{export_no_proxy_parm}
             do_download #{chef_url} /tmp/install.sh
             #{sudo('sh')} /tmp/install.sh
           fi
@@ -450,6 +452,7 @@ module Kitchen
           echo "-----> Installing Puppet Omnibus"
           #{export_http_proxy_parm}
           #{export_https_proxy_parm}
+          #{export_no_proxy_parm}
           do_download #{config[:puppet_omnibus_url]} /tmp/install_puppet.sh
           #{sudo_env('sh')} /tmp/install_puppet.sh #{version}
         fi
@@ -938,7 +941,8 @@ module Kitchen
       def sudo_env(pm)
         s = https_proxy ? "https_proxy=#{https_proxy}" : nil
         p = http_proxy ? "http_proxy=#{http_proxy}" : nil
-        p || s ? "#{sudo('env')} #{p} #{s} #{pm}" : sudo(pm).to_s
+        n = no_proxy ? "no_proxy=#{no_proxy}" : nil
+        p || s ? "#{sudo('env')} #{p} #{s} #{n} #{pm}" : sudo(pm).to_s
       end
 
       def remove_puppet_repo
@@ -1057,13 +1061,16 @@ module Kitchen
       end
 
       def gem_proxy_parm
-        http_proxy ? "--http-proxy #{http_proxy}" : nil
+        p = http_proxy ? "--http-proxy #{http_proxy}" : nil
+        n = no_proxy ? "--no-http-proxy #{no_proxy}" : nil
+        p || n ? "#{p} #{n}" : nil
       end
 
       def wget_proxy_parm
         p = http_proxy ? "-e http_proxy=#{http_proxy}" : nil
         s = https_proxy ? "-e https_proxy=#{https_proxy}" : nil
-        p || s ? "-e use_proxy=yes #{p} #{s}" : nil
+        n = no_proxy ? "-e no_proxy=#{no_proxy}" : nil
+        p || s ? "-e use_proxy=yes #{p} #{s} #{n}" : nil
       end
 
       def posh_proxy_parm
@@ -1084,12 +1091,20 @@ module Kitchen
         https_proxy ? "export https_proxy=#{https_proxy}" : nil
       end
 
+      def export_no_proxy_parm
+        no_proxy ? "export no_proxy=#{no_proxy}" : nil
+      end
+
       def http_proxy
         config[:http_proxy]
       end
 
       def https_proxy
         config[:https_proxy]
+      end
+
+      def no_proxy
+        config[:no_proxy]
       end
 
       def chef_url
