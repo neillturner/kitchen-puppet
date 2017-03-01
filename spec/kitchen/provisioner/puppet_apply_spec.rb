@@ -133,6 +133,10 @@ describe Kitchen::Provisioner::PuppetApply do
         expect(provisioner[:http_proxy]).to eq(nil)
       end
 
+      it 'Should set nil for no proxy' do
+        expect(provisioner[:no_proxy]).to eq(nil)
+      end
+
       it 'Should set sane hiera remote data path' do
         expect(provisioner[:hiera_data_remote_path]).to eq('/var/lib/hiera')
       end
@@ -365,6 +369,11 @@ describe Kitchen::Provisioner::PuppetApply do
       it 'should set https proxy' do
         config[:https_proxy] = 'better-proxy'
         expect(provisioner[:https_proxy]).to eq('better-proxy')
+      end
+
+      it 'should set no proxy' do
+        config[:no_proxy] = 'dont-proxy'
+        expect(provisioner[:no_proxy]).to eq('dont-proxy')
       end
 
       it 'should set hiera data path' do
