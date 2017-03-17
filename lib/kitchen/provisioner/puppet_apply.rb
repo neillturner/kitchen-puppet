@@ -81,7 +81,7 @@ module Kitchen
       default_config :no_proxy, nil
 
       default_config :ignored_paths_from_root, ['spec']
-      default_config :hiera_data_remote_path, '/var/lib/hiera'
+      default_config :hiera_data_remote_path, nil
       default_config :manifest, 'site.pp'
 
       default_config :manifests_path do |provisioner|
@@ -786,7 +786,8 @@ module Kitchen
       end
 
       def hiera_data_remote_path
-        config[:hiera_data_remote_path]
+        return config[:hiera_data_remote_path] if config[:hiera_data_remote_path]
+        powershell? ? 'C:/ProgramData/PuppetLabs/hiera/var' : '/var/lib/hiera'
       end
 
       def hiera_eyaml
