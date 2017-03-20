@@ -138,7 +138,7 @@ describe Kitchen::Provisioner::PuppetApply do
       end
 
       it 'Should set sane hiera remote data path' do
-        expect(provisioner[:hiera_data_remote_path]).to eq('/var/lib/hiera')
+        expect(provisioner[:hiera_data_remote_path]).to eq(nil)
       end
 
       it 'Should set site.pp as default manifest' do
@@ -684,6 +684,12 @@ CUSTOM_COMMAND
         allow_any_instance_of(Kitchen::Configurable).to receive(:windows_os?).and_return(true)
       end
 
+      describe 'hiera_data_remote_path' do
+        it 'is C:/ProgramData/PuppetLabs/hiera/var' do
+          expect(provisioner.send(:hiera_data_remote_path)).to eq('C:/ProgramData/PuppetLabs/hiera/var')
+        end
+      end
+
       describe 'puppet_dir' do
         it 'is C:/ProgramData/PuppetLabs/puppet/etc' do
           expect(provisioner.send(:puppet_dir)).to eq('C:/ProgramData/PuppetLabs/puppet/etc')
@@ -740,6 +746,12 @@ CUSTOM_COMMAND
     end
 
     context 'When NOT using powershell' do
+      describe 'hiera_data_remote_path' do
+        it 'is /var/lib/hiera' do
+          expect(provisioner.send(:hiera_data_remote_path)).to eq('/var/lib/hiera')
+        end
+      end
+
       describe 'puppet_dir' do
         it 'is /etc/puppet' do
           expect(provisioner.send(:puppet_dir)).to eq('/etc/puppet')
