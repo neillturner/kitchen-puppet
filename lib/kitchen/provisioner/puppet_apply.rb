@@ -1276,7 +1276,7 @@ module Kitchen
         if hiera_writer
           hiera_writer.each do |file|
             file.each do |filename, hiera_hash|
-              debug("Creating hiera yaml file #{tmp_hiera_dir}/#{filename.to_s}")
+              debug("Creating hiera yaml file #{tmp_hiera_dir}/#{filename}")
               dir = File.join(tmp_hiera_dir, File.dirname(filename.to_s))
               FileUtils.mkdir_p(dir)
               output_file = open(File.join(dir, File.basename(filename.to_s)), 'w')
