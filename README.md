@@ -188,8 +188,60 @@ suites:
       - modules/mycompany_base/spec/acceptance/base_spec.rb
 ```
 
-See [busser-beaker](https://github.com/neillturner/kitchen-verifier-serverspec)
+See [kitchen-verifier-serverspec](https://github.com/neillturner/kitchen-verifier-serverspec)
 
+## hiera_writer_files option
+
+Allows creation of arbitrary YAML files in the target instance's `hieradata/`
+dir in test-kitchen configuration (eg `kitchen.yml`). Like setting chef
+attributes in `kitchen.yml`, except for Hiera YAML files.
+
+set `hiera_writer_files` in `kitchen.yml`
+
+```
+---
+driver:
+  name: vagrant
+
+provisioner:
+  #name: puppet_apply
+  name: puppet_hierawriter_apply
+  manifests_path: /repository/puppet_repo/manifests
+  modules_path: /repository/puppet_repo/modules-mycompany
+  hiera_data_path: /repository/puppet_repo/hieradata
+  hiera_writer_files:
+    - datacenter/vagrant.yaml:
+      logstash_servers: []
+      hosts:
+        10.1.2.3:
+        - puppet
+        - puppetdb
+
+platforms:
+- name: nocm_ubuntu-12.04
+  driver_plugin: vagrant
+  driver_config:
+    box: nocm_ubuntu-12.04
+    box_url: http://puppet-vagrant-boxes.puppetlabs.com/ubuntu-server-12042-x64-vbox4210-nocm.box
+
+suites:
+ - name: default
+```
+
+The above configuration will result in the creation of a file on the guest named
+`${hieradata}/datacenter/vagrant.yaml` containing:
+
+```
+---
+logstash_servers: []
+  hosts:
+    10.1.2.3:
+    - puppet
+    - puppetdb
+```
+
+It will overwrite any existing Hiera YAML files with the same name (on the
+guest), not merge.
 
 ## Provisioner Options
 Please see the Provisioner Options (https://github.com/neillturner/kitchen-puppet/blob/master/provisioner_options.md).
