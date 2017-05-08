@@ -613,11 +613,7 @@ describe Kitchen::Provisioner::PuppetApply do
     end
 
     it 'runs multiline custom shell command at pre apply stage' do
-      config[:custom_pre_apply_command] = <<CUSTOM_COMMAND
-  echo "pre_string1"
-  echo "pre_string2"
-CUSTOM_COMMAND
-
+      config[:custom_pre_apply_command] = "echo \"pre_string1\"\necho \"pre_string2\""
       expect(provisioner.run_command).to include(%(echo "pre_string1"\necho "pre_string2"))
     end
 
@@ -627,11 +623,7 @@ CUSTOM_COMMAND
     end
 
     it 'runs multiline custom shell command at post apply stage' do
-      config[:custom_post_apply_command] = <<CUSTOM_COMMAND
-  echo "post_string1"
-  echo "post_string2"
-CUSTOM_COMMAND
-
+      config[:custom_post_apply_command] = "echo \"post_string1\"\necho \"post_string2\""
       expect(provisioner.run_command).to match(/function custom_post_apply_command {\n\s*echo "post_string1"\necho "post_string2"\n+\s*}\n\s*trap custom_post_apply_command EXIT/)
     end
 
