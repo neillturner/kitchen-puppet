@@ -549,11 +549,7 @@ describe Kitchen::Provisioner::PuppetApply do
     end
 
     it 'runs multiline custom shell command at install stage' do
-      config[:custom_install_command] = <<CUSTOM_COMMAND
-  echo "string1"
-  echo "string2"
-CUSTOM_COMMAND
-
+      config[:custom_install_command] = "echo \"string1\"\necho \"string2\""
       expect(provisioner.install_command).to include(%(echo "string1"\necho "string2"))
     end
   end
