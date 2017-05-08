@@ -240,7 +240,7 @@ module Kitchen
               } else {
                   $MsiUrl = "https://downloads.puppetlabs.com/windows/puppet-#{puppet_windows_version}${architecture}.msi"
               }
-              wget $MsiUrl -UseBasicParsing -OutFile "C:/puppet.msi" #{posh_proxy_parm}
+              Invoke-WebRequest $MsiUrl -UseBasicParsing -OutFile "C:/puppet.msi" #{posh_proxy_parm}
               $process = Start-Process -FilePath msiexec.exe -Wait -PassThru -ArgumentList '/qn', '/norestart', '/i', 'C:\\puppet.msi'
               if ($process.ExitCode -ne 0) {
                   Write-Host "Installer failed."
@@ -333,7 +333,7 @@ module Kitchen
             } else {
                 $MsiUrl = "https://downloads.puppetlabs.com/windows/puppet-agent-#{puppet_windows_version}-${architecture}.msi"
             }
-            wget $MsiUrl -UseBasicParsing -OutFile "C:/puppet-agent.msi" #{posh_proxy_parm}
+            Invoke-WebRequest $MsiUrl -UseBasicParsing -OutFile "C:/puppet-agent.msi" #{posh_proxy_parm}
             $process = Start-Process -FilePath msiexec.exe -Wait -PassThru -ArgumentList '/qn', '/norestart', '/i', 'C:\\puppet-agent.msi'
             if ($process.ExitCode -ne 0) {
                 Write-Host "Installer failed."
