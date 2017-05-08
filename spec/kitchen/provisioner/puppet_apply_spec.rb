@@ -685,8 +685,14 @@ CUSTOM_COMMAND
       end
 
       describe 'hiera_data_remote_path' do
-        it 'is C:/ProgramData/PuppetLabs/hiera/var' do
+        it 'is C:/ProgramData/PuppetLabs/hiera/var when using puppet v3' do
+          config[:require_puppet_collections] = false
           expect(provisioner.send(:hiera_data_remote_path)).to eq('C:/ProgramData/PuppetLabs/hiera/var')
+        end
+
+        it 'is C:/ProgramData/PuppetLabs/code/environments/production/hieradata when using puppet v4' do
+          config[:require_puppet_collections] = true
+          expect(provisioner.send(:hiera_data_remote_path)).to eq('C:/ProgramData/PuppetLabs/code/environments/production/hieradata')
         end
       end
 
@@ -747,8 +753,14 @@ CUSTOM_COMMAND
 
     context 'When NOT using powershell' do
       describe 'hiera_data_remote_path' do
-        it 'is /var/lib/hiera' do
+        it 'is /var/lib/hiera when using puppet v3' do
+          config[:require_puppet_collections] = false
           expect(provisioner.send(:hiera_data_remote_path)).to eq('/var/lib/hiera')
+        end
+
+        it 'is /etc/puppetlabs/code/environments/production/hieradata when using puppet v4' do
+          config[:require_puppet_collections] = true
+          expect(provisioner.send(:hiera_data_remote_path)).to eq('/etc/puppetlabs/code/environments/production/hieradata')
         end
       end
 

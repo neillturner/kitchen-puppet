@@ -788,7 +788,12 @@ module Kitchen
 
       def hiera_data_remote_path
         return config[:hiera_data_remote_path] if config[:hiera_data_remote_path]
-        powershell? ? 'C:/ProgramData/PuppetLabs/hiera/var' : '/var/lib/hiera'
+
+        if config[:require_puppet_collections]
+          powershell? ? 'C:/ProgramData/PuppetLabs/code/environments/production/hieradata' : '/etc/puppetlabs/code/environments/production/hieradata'
+        else
+          powershell? ? 'C:/ProgramData/PuppetLabs/hiera/var' : '/var/lib/hiera'
+        end
       end
 
       def hiera_writer
