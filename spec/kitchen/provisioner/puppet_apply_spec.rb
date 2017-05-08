@@ -1,4 +1,5 @@
 # encoding: utf-8
+
 require_relative '../../spec_helper.rb'
 
 require 'kitchen/provisioner/puppet_apply'
@@ -10,7 +11,7 @@ describe Kitchen::Busser do
   let(:busser) { Kitchen::Busser.new }
 
   it 'should return non suite dirs' do
-    expect(busser.non_suite_dirs).to eq(%w(data data_bags environments nodes roles puppet))
+    expect(busser.non_suite_dirs).to eq(%w[data data_bags environments nodes roles puppet])
   end
 end
 
@@ -23,8 +24,8 @@ describe Kitchen::Provisioner::PuppetApply do
   let(:verifier)      { Kitchen::Verifier::Dummy.new }
   let(:transport)     { Kitchen::Transport::Dummy.new }
   let(:state_file)    { double('state_file') }
-  let(:state)         { Hash.new }
-  let(:env)           { Hash.new }
+  let(:state)         { {} }
+  let(:env)           { {} }
   let(:driver) { Kitchen::Driver::Dummy.new }
 
   let(:provisioner_object) { Kitchen::Provisioner::PuppetApply.new(config) }
@@ -549,8 +550,8 @@ describe Kitchen::Provisioner::PuppetApply do
 
     it 'runs multiline custom shell command at install stage' do
       config[:custom_install_command] = <<CUSTOM_COMMAND
-echo "string1"
-echo "string2"
+  echo "string1"
+  echo "string2"
 CUSTOM_COMMAND
 
       expect(provisioner.install_command).to include(%(echo "string1"\necho "string2"))
@@ -596,7 +597,7 @@ CUSTOM_COMMAND
     end
 
     it 'whitelists with multiple exit codes' do
-      config[:puppet_whitelist_exit_code] = %w(2 4)
+      config[:puppet_whitelist_exit_code] = %w[2 4]
       expect(provisioner.run_command).to match(/; RC=\$\?; \[ \$RC -eq 2 -o \$RC -eq 4 \] && exit 0; exit \$RC$/)
     end
 
@@ -617,8 +618,8 @@ CUSTOM_COMMAND
 
     it 'runs multiline custom shell command at pre apply stage' do
       config[:custom_pre_apply_command] = <<CUSTOM_COMMAND
-echo "pre_string1"
-echo "pre_string2"
+  echo "pre_string1"
+  echo "pre_string2"
 CUSTOM_COMMAND
 
       expect(provisioner.run_command).to include(%(echo "pre_string1"\necho "pre_string2"))
@@ -672,7 +673,7 @@ CUSTOM_COMMAND
     end
 
     it 'whitelists multiple exit codes' do
-      config[:puppet_whitelist_exit_code] = %w(2 4)
+      config[:puppet_whitelist_exit_code] = %w[2 4]
       expect(provisioner.run_command).to match(/; if\(@\(2, 4\) -contains \$LASTEXITCODE\) {exit 0} else {exit \$LASTEXITCODE}$/)
     end
   end
@@ -736,7 +737,7 @@ CUSTOM_COMMAND
 
       describe 'rm_command_paths(path1, path2)' do
         it 'is rm -force -recurse "path1", "path2"' do
-          expect(provisioner.send(:rm_command_paths, %w(path1 path2))).to eq('rm -force -recurse "path1", "path2"')
+          expect(provisioner.send(:rm_command_paths, %w[path1 path2])).to eq('rm -force -recurse "path1", "path2"')
         end
       end
 
@@ -796,7 +797,7 @@ CUSTOM_COMMAND
 
       describe 'rm_command_paths(path1, path2)' do
         it 'is sudo -E rm -rf path1 path2' do
-          expect(provisioner.send(:rm_command_paths, %w(path1 path2))).to eq('rm -rf path1 path2')
+          expect(provisioner.send(:rm_command_paths, %w[path1 path2])).to eq('rm -rf path1 path2')
         end
       end
 

@@ -1,4 +1,5 @@
 # -*- encoding: utf-8 -*-
+
 #
 # Author:: Chris Lundquist (<chris.lundquist@github.com>) Neill Turner (<neillwturner@gmail.com>)
 #
@@ -28,7 +29,7 @@ require 'kitchen/provisioner/puppet/librarian'
 module Kitchen
   class Busser
     def non_suite_dirs
-      %w(data data_bags environments nodes roles puppet)
+      %w[data data_bags environments nodes roles puppet]
     end
   end
 
@@ -519,7 +520,7 @@ module Kitchen
       end
 
       def init_command
-        todelete = %w(modules manifests files hiera hiera.yaml facter spec enc)
+        todelete = %w[modules manifests files hiera hiera.yaml facter spec enc]
                    .map { |dir| File.join(config[:root_path], dir) }
         todelete += [hiera_data_remote_path,
                      '/etc/hiera.yaml',
@@ -1205,7 +1206,7 @@ module Kitchen
       end
 
       def copy_modules(modules, destination)
-        excluded_paths = %w(modules pkg) + config[:ignored_paths_from_root]
+        excluded_paths = %w[modules pkg] + config[:ignored_paths_from_root]
         debug("Copying modules to directory: #{destination}")
         modules.each do |name, source|
           next unless File.directory?(source)

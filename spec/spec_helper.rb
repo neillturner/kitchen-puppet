@@ -1,4 +1,5 @@
 # encoding: utf-8
+
 require 'simplecov'
 
 # Filter out our tests from code coverage
