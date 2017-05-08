@@ -632,8 +632,8 @@ CUSTOM_COMMAND
 
     it 'runs multiline custom shell command at post apply stage' do
       config[:custom_post_apply_command] = <<CUSTOM_COMMAND
-echo "post_string1"
-echo "post_string2"
+  echo "post_string1"
+  echo "post_string2"
 CUSTOM_COMMAND
 
       expect(provisioner.run_command).to match(/function custom_post_apply_command {\n\s*echo "post_string1"\necho "post_string2"\n+\s*}\n\s*trap custom_post_apply_command EXIT/)

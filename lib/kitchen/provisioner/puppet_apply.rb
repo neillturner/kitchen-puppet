@@ -971,7 +971,7 @@ module Kitchen
 
       def facterlib
         factpath = nil
-        factpath = File.join(config[:root_path], 'facter').to_s if config[:install_custom_facts] && !config[:custom_facts].none?
+        factpath = File.join(config[:root_path], 'facter').to_s if config[:install_custom_facts] && config[:custom_facts].any?
         factpath = File.join(config[:root_path], 'facter').to_s if config[:facter_file]
         factpath = "#{factpath}:" if config[:facterlib] && !factpath.nil?
         factpath = "#{factpath}#{config[:facterlib]}" if config[:facterlib]

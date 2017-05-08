@@ -23,9 +23,13 @@ Gem::Specification.new do |s|
     s.add_dependency 'net-ssh', '~> 2.9'
   end
   s.description = <<-EOF
-Puppet Provisioner for Test Kitchen
+  == DESCRIPTION:
 
-Supports puppet apply, puppet agent, hiera, hiera-eyaml, hiera-eyaml-gpg, custom facts, librarian-puppet, puppet collections (v4)
+  Puppet Provisioner for Test Kitchen
+
+  == FEATURES:
+
+  Supports puppet apply, puppet agent, hiera, hiera-eyaml, hiera-eyaml-gpg, custom facts, librarian-puppet, puppet collections (v4)
 
 EOF
 end
