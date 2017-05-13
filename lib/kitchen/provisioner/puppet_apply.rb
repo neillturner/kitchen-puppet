@@ -313,6 +313,7 @@ module Kitchen
           <<-INSTALL
 
           #{Util.shell_helpers}
+          #{custom_pre_install_command}
           if [ ! -d "#{config[:puppet_coll_remote_path]}" ]; then
             echo "-----> #{sudo_env('yum')} -y install #{config[:puppet_yum_collections_repo]}"
             #{sudo_env('yum')} -y install #{config[:puppet_yum_collections_repo]}
