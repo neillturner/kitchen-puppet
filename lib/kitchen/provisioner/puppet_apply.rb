@@ -60,6 +60,15 @@ module Kitchen
       default_config :require_chef_for_busser, true
       default_config :resolve_with_librarian_puppet, true
       default_config :puppet_environment, nil
+      default_config :puppet_environment_config_path do |provisioner|
+        provisioner.calculate_path('environment.conf')
+      end
+      default_config :puppet_environment_remote_modules_path, 'modules'
+      default_config :puppet_environment_remote_manifests_path, 'manifests'
+      default_config :puppet_environment_remote_hieradata_path, 'hieradata'
+      default_config :puppet_environment_hiera_config_path do |provisioner|
+        provisioner.calculate_path('hiera.yaml', :file)
+      end
       default_config :puppet_apt_repo, 'http://apt.puppetlabs.com/puppetlabs-release-precise.deb'
       default_config :puppet_yum_repo, 'https://yum.puppetlabs.com/puppetlabs-release-el-6.noarch.rpm'
       default_config :chef_bootstrap_url, 'https://www.getchef.com/chef/install.sh'
@@ -112,6 +121,7 @@ module Kitchen
       end
 
       default_config :hiera_config_path do |provisioner|
+        provisioner.calculate_path('hiera.global.yaml', :file) ||
         provisioner.calculate_path('hiera.yaml', :file)
       end
 
@@ -157,6 +167,7 @@ module Kitchen
 
       default_config :hiera_eyaml, false
       default_config :hiera_eyaml_key_remote_path, '/etc/puppet/secure/keys'
+      default_config :puppet_environmentpath_remote_path, nil
 
       default_config :hiera_eyaml_gpg, false
       default_config :hiera_eyaml_gpg_recipients, false
@@ -521,14 +532,15 @@ module Kitchen
       end
 
       def init_command
-        todelete = %w[modules manifests files hiera hiera.yaml facter spec enc]
+        todelete = %w[modules manifests files hiera hiera.yaml hiera.global.yaml facter spec enc environment]
                    .map { |dir| File.join(config[:root_path], dir) }
         todelete += [hiera_data_remote_path,
                      '/etc/hiera.yaml',
                      "#{puppet_dir}/hiera.yaml",
                      spec_files_remote_path.to_s,
                      "#{puppet_dir}/fileserver.conf"]
-        todelete << File.join(puppet_dir, config[:puppet_environment]) if config[:puppet_environment]
+        todelete << File.join(puppet_dir, puppet_environment) if puppet_environment
+        todelete << File.join(puppet_environmentpath_remote_path, puppet_environment) if puppet_environment_config && puppet_environment
         cmd = "#{sudo(rm_command_paths(todelete))};"
         cmd += " #{mkdir_command} #{config[:root_path]};"
         cmd += " #{sudo(mkdir_command)} #{puppet_dir}"
@@ -547,6 +559,7 @@ module Kitchen
         prepare_facts
         prepare_puppet_config
         prepare_hiera_config
+        prepare_puppet_environment
         prepare_fileserver_config
         prepare_hiera_data
         prepare_enc
@@ -602,16 +615,6 @@ module Kitchen
           ].join(' ')
         end
 
-        if hiera_config
-          commands << [
-            sudo(cp_command), File.join(config[:root_path], 'hiera.yaml'), '/etc/'
-          ].join(' ')
-
-          commands << [
-            sudo(cp_command), File.join(config[:root_path], 'hiera.yaml'), hiera_config_dir
-          ].join(' ')
-        end
-
         if fileserver_config
           commands << [
             sudo(cp_command),
@@ -655,7 +658,31 @@ module Kitchen
 
         if puppet_environment
           commands << [
-            sudo('ln -s '), config[:root_path], File.join(puppet_dir, config[:puppet_environment])
+            sudo('ln -s '), config[:root_path], File.join(puppet_dir, puppet_environment)
+          ].join(' ')
+        end
+
+        if puppet_environment_config && puppet_environment
+          commands << [
+            sudo(mkdir_command), puppet_environmentpath_remote_path
+          ].join(' ')
+          commands << [
+            sudo(mkdir_command), File.join(puppet_environmentpath_remote_path, puppet_environment)
+          ].join(' ')
+          commands << [
+            sudo('ln -s '), File.join(config[:root_path], 'modules'), File.join(puppet_environmentpath_remote_path, puppet_environment, puppet_environment_remote_modules_path)
+          ].join(' ')
+          commands << [
+            sudo('ln -s '), File.join(config[:root_path], 'manifests'), File.join(puppet_environmentpath_remote_path, puppet_environment, puppet_environment_remote_manifests_path)
+          ].join(' ')
+          commands << [
+            sudo('ln -s '), File.join(config[:root_path], 'hiera'), File.join(puppet_environmentpath_remote_path, puppet_environment, puppet_environment_remote_hieradata_path)
+          ].join(' ')
+          commands << [
+            sudo('cp'), File.join(config[:root_path], 'environment', 'environment.conf'), File.join(puppet_environmentpath_remote_path, puppet_environment, 'environment.conf')
+          ].join(' ')
+          commands << [
+            sudo('cp'), File.join(config[:root_path], 'environment', 'hiera.yaml'), File.join(puppet_environmentpath_remote_path, puppet_environment, 'hiera.yaml')
           ].join(' ')
         end
 
@@ -694,6 +721,7 @@ module Kitchen
           puppet_environment_flag,
           puppet_noop_flag,
           puppet_enc_flag,
+          puppet_hiera_flag,
           puppet_detailed_exitcodes_flag,
           puppet_verbose_flag,
           puppet_debug_flag,
@@ -768,6 +796,25 @@ module Kitchen
         config[:puppet_environment]
       end
 
+      def puppet_environment_config
+        if config[:puppet_environment_config_path] && !puppet_environment
+          raise("ERROR: found environment config '#{config[:puppet_environment_config_path]}', however no 'puppet_environment' is specified. Please specify 'puppet_environment' or unset 'puppet_environment_config_path' in .kitchen.yml")
+        end
+        config[:puppet_environment_config_path]
+      end
+
+      def puppet_environment_remote_modules_path
+        config[:puppet_environment_remote_modules_path]
+      end
+
+      def puppet_environment_remote_manifests_path
+        config[:puppet_environment_remote_manifests_path]
+      end
+
+      def puppet_environment_remote_hieradata_path
+        config[:puppet_environment_remote_hieradata_path]
+      end
+
       def puppet_git_init
         config[:puppet_git_init]
       end
@@ -778,6 +825,10 @@ module Kitchen
 
       def hiera_config
         config[:hiera_config_path]
+      end
+
+      def puppet_environment_hiera_config
+        config[:puppet_environment_hiera_config_path]
       end
 
       def fileserver_config
@@ -859,6 +910,15 @@ module Kitchen
         config[:require_puppet_collections] ? '/etc/puppetlabs/puppet' : '/etc/puppet'
       end
 
+      def puppet_environmentpath_remote_path
+        return config[:puppet_environmentpath_remote_path] if config[:puppet_environmentpath_remote_path]
+        if config[:puppet_version] =~ /^3/
+          powershell? ? 'C:/ProgramData/PuppetLabs/puppet/etc' : '/etc/puppet/environments'
+        else
+          powershell? ? 'C:/ProgramData/PuppetLabs/code/environments' : '/etc/puppetlabs/code/environments'
+        end
+      end
+
       def hiera_config_dir
         return 'C:/ProgramData/PuppetLabs/puppet/etc' if powershell?
         config[:require_puppet_collections] ? '/etc/puppetlabs/code' : '/etc/puppet'
@@ -890,9 +950,9 @@ module Kitchen
 
       def puppet_environment_flag
         if config[:puppet_version] =~ /^2/
-          config[:puppet_environment] ? "--environment=#{config[:puppet_environment]}" : nil
+          config[:puppet_environment] ? "--environment=#{puppet_environment}" : nil
         else
-          config[:puppet_environment] ? "--environment=#{config[:puppet_environment]} --environmentpath=#{puppet_dir}" : nil
+          config[:puppet_environment] ? "--environment=#{puppet_environment} --environmentpath=#{puppet_environmentpath_remote_path}" : nil
         end
       end
 
@@ -998,6 +1058,10 @@ module Kitchen
 
       def puppet_enc_flag
         config[:puppet_enc] ? "--node_terminus=exec --external_nodes=#{config[:root_path]}/enc/#{File.basename(config[:puppet_enc])}" : nil
+      end
+
+      def puppet_hiera_flag
+        hiera_config ? "--hiera_config=#{config[:root_path]}/hiera.global.yaml" : nil
       end
 
       def puppet_detailed_exitcodes_flag
@@ -1255,13 +1319,29 @@ module Kitchen
         FileUtils.cp_r(config[:puppet_enc], File.join(enc_dir, '/'))
       end
 
+      def prepare_puppet_environment
+        return unless puppet_environment_config
+
+        info('Preparing Environment Config')
+        environment_dir = File.join(sandbox_path, 'environment')
+        FileUtils.mkdir_p(environment_dir)
+        debug("Using Environment Config environment.conf from #{puppet_environment_config}")
+        FileUtils.cp_r(puppet_environment_config, File.join(environment_dir, 'environment.conf'))
+        if puppet_environment_hiera_config
+          debug("Using Environment Hiera Config hiera.yaml from #{puppet_environment_hiera_config}")
+          FileUtils.cp_r(puppet_environment_hiera_config, File.join(environment_dir, 'hiera.yaml'))
+        else
+          info('No Environment hiera.yaml found')
+        end
+      end
+
       def prepare_hiera_config
         return unless hiera_config
 
-        info('Preparing hiera')
+        info('Preparing hiera (global layer)')
         debug("Using hiera from #{hiera_config}")
 
-        FileUtils.cp_r(hiera_config, File.join(sandbox_path, 'hiera.yaml'))
+        FileUtils.cp_r(hiera_config, File.join(sandbox_path, 'hiera.global.yaml'))
       end
 
       def prepare_fileserver_config

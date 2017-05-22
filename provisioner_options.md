@@ -38,7 +38,7 @@ facter_file | nil | yaml file of custom facter_files to be provided to the puppe
 facter_version | "latest"| desired version, affects apt installs.
 files_path | | directory to place at /tmp/kitchen/files
 fileserver_config_path | | file to place fileserver.conf
-hiera_config_path | | path to hiera.yaml
+hiera_config_path | hiera.global.yaml then hiera.yaml | path to hiera.yaml
 hiera_data_path | | puppet repo hiera data directory
 hiera_data_remote_path | "/var/lib/hiera" | Hiera data directory on server
 hiera_deep_merge | false | install the deep_merge gem to support hiera deep merge mode
@@ -80,6 +80,13 @@ puppet_debug| false| Enable full debugging logging on puppet run
 puppet_detailed_exitcodes | nil | Provide transaction information via exit codes. See `--detailed-exitcodes` section of `puppet help apply`
 puppet_enc | | path for external node classifier script
 puppet_environment | nil | puppet environment for running puppet apply (Must set if using Puppet v4)
+puppet_environment_config_path | "environment.conf" | Puppet environment config file
+puppet_environment_hiera_config_path | "hiera.yaml" | Environment layer hiera config file (see Puppet 4.10), only used if puppet_environmentpath = true
+puppet_environment_remote_hieradata_path | "hieradata" | Path in `puppet_environmentpath_remote_path` to contains the hiera data.
+puppet_environment_remote_modules_path | "modules" | Path in `puppet_environmentpath_remote_path` to contains the modules.
+puppet_environment_remote_manifests_path | "manifests" | Path in `puppet_environmentpath_remote_path` to contains the manifests.
+puppet_environmentpath_remote_path | "/etc/puppet/environments" (v3), "/etc/puppetlabs/code/environments" (v4) | The remote path for environments if `puppet_environmentpath` is true
+
 puppet_future_parser | false | Run puppet with the future parser enabled  (see https://docs.puppet.com/puppet/3.8/experiments_future.html).
 puppet_git_init | nil | initialize puppet from GIT repository, e.g. "git@github.com:example/puppet-repo.git"
 puppet_git_pr | nil | checkout specific Pull Request from repository specified in puppet_git_init, e.g. "324"
