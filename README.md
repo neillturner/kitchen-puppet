@@ -22,6 +22,7 @@ This provider has been tested against the Ubuntu 1204 and Centos 6.5 boxes runni
 * http://www.slideshare.net/YuryTsarev/containercon-test-driven-infrastructure
 * http://events.linuxfoundation.org/sites/events/files/slides/ContainerCon%20-%20Test%20Driven%20Infrastructure_0.pdf
 * https://www.cedric-meury.ch/2016/10/test-driven-infrastructure-with-puppet-docker-test-kitchen-and-serverspec-yury-tsarev-gooddata
+* https://docs.puppet.com/puppet/latest/puppet_platform.html
 
 ## Windows Workstation Install
 You need to download the puppet msi and install it and run everything inside the puppet window.
