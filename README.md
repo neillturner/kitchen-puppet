@@ -205,18 +205,17 @@ driver:
   name: vagrant
 
 provisioner:
-  #name: puppet_apply
-  name: puppet_hierawriter_apply
+  name: puppet_apply
   manifests_path: /repository/puppet_repo/manifests
   modules_path: /repository/puppet_repo/modules-mycompany
   hiera_data_path: /repository/puppet_repo/hieradata
   hiera_writer_files:
     - datacenter/vagrant.yaml:
-      logstash_servers: []
-      hosts:
-        10.1.2.3:
-        - puppet
-        - puppetdb
+        logstash_servers: []
+        hosts:
+          10.1.2.3:
+          - puppet
+          - puppetdb
 
 platforms:
 - name: nocm_ubuntu-12.04
