@@ -46,7 +46,7 @@ module Kitchen
     class PuppetApply < Base
       attr_accessor :tmp_dir
 
-      default_config :require_puppet_collections, false
+      default_config :require_puppet_collections, true
       default_config :puppet_yum_collections_repo, 'http://yum.puppetlabs.com/puppetlabs-release-pc1-el-6.noarch.rpm'
       default_config :puppet_apt_collections_repo, 'http://apt.puppetlabs.com/puppetlabs-release-pc1-wheezy.deb'
       default_config :puppet_coll_remote_path, '/opt/puppetlabs'

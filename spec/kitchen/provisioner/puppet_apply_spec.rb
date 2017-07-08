@@ -67,7 +67,7 @@ describe Kitchen::Provisioner::PuppetApply do
       end
 
       it 'should not include puppet collections' do
-        expect(provisioner[:require_puppet_collections]).to eq(false)
+        expect(provisioner[:require_puppet_collections]).to eq(true)
       end
 
       it 'should set yum collections repo' do
@@ -265,8 +265,8 @@ describe Kitchen::Provisioner::PuppetApply do
 
     context 'non-default sets' do
       it 'requires puppet collections' do
-        config[:require_puppet_collections] = true
-        expect(provisioner[:require_puppet_collections]).to eq(true)
+        config[:require_puppet_collections] = false
+        expect(provisioner[:require_puppet_collections]).to eq(false)
       end
 
       it 'sets yum collections repo' do
@@ -754,14 +754,14 @@ describe Kitchen::Provisioner::PuppetApply do
       end
 
       describe 'puppet_dir' do
-        it 'is /etc/puppet' do
-          expect(provisioner.send(:puppet_dir)).to eq('/etc/puppet')
+        it 'is /etc/puppetlabs/puppet' do
+          expect(provisioner.send(:puppet_dir)).to eq('/etc/puppetlabs/puppet')
         end
       end
 
       describe 'hiera_config_dir' do
-        it 'is /etc/puppet' do
-          expect(provisioner.send(:hiera_config_dir)).to eq('/etc/puppet')
+        it 'is /etc/puppetlabs/code' do
+          expect(provisioner.send(:hiera_config_dir)).to eq('/etc/puppetlabs/code')
         end
       end
 
@@ -790,8 +790,8 @@ describe Kitchen::Provisioner::PuppetApply do
       end
 
       describe 'puppet_cmd' do
-        it 'is puppet' do
-          expect(provisioner.send(:puppet_cmd)).to eq('sudo -E puppet')
+        it 'is /opt/puppetlabs/bin/puppet' do
+          expect(provisioner.send(:puppet_cmd)).to eq('sudo -E /opt/puppetlabs/bin/puppet')
         end
       end
     end

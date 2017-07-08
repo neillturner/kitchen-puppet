@@ -9,7 +9,7 @@ It installs it in the following order:
 
    Installs using the omnibus_puppet script and passes the puppet_version if specied as -v option.
 
-* If require_puppet_collections is set to true
+* If require_puppet_collections is set to true (the default)
 
    Installs from the puppet collection.
    This is required if you wish to install puppet version 4.
@@ -105,7 +105,7 @@ _for RH/Centos7 change to_ | "https://yum.puppetlabs.com/puppetlabs-release-pc1-
 puppetfile_path | | Path to Puppetfile
 remove_puppet_repo | false | remove copy of puppet repository and puppet configuration on server after running puppet
 require_chef_for_busser | true | Install chef as currently needed by busser to run tests
-require_puppet_collections | false | Set if using puppet collections install (Puppet v4)
+require_puppet_collections | true | Set if using puppet collections install (Puppet v4)
 require_puppet_omnibus | false | Set if using omnibus puppet install
 require_puppet_repo | true | Set if using a puppet install from yum or apt repo
 resolve_with_librarian_puppet | true | Use librarian_puppet to resolve modules if a Puppetfile is found
