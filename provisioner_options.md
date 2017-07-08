@@ -19,7 +19,7 @@ It installs it in the following order:
    * puppet_apt_collections_repo
    to an new collection. At time of writing there was only one collection PC1.
 
-* if require_puppet_repo is set to true (the default)
+* if require_puppet_repo is set to true 
 
    Installs from the operation system repository with the puppet version that is in the particular repository.
 
