@@ -71,11 +71,11 @@ describe Kitchen::Provisioner::PuppetApply do
       end
 
       it 'should set yum collections repo' do
-        expect(provisioner[:puppet_yum_collections_repo]).to eq('http://yum.puppetlabs.com/puppetlabs-release-pc1-el-6.noarch.rpm')
+        expect(provisioner[:puppet_yum_collections_repo]).to eq('http://yum.puppetlabs.com/puppet5/puppet-release-el-6.noarch.rpm')
       end
 
       it 'should set apt collections repo' do
-        expect(provisioner[:puppet_apt_collections_repo]).to eq('http://apt.puppetlabs.com/puppetlabs-release-pc1-wheezy.deb')
+        expect(provisioner[:puppet_apt_collections_repo]).to eq('http://apt.puppetlabs.com/puppet5-release-wheezy.deb')
       end
 
       it 'should set puppet collections remote path' do

@@ -12,14 +12,14 @@ It installs it in the following order:
 * If require_puppet_collections is set to true (the default)
 
    Installs from the puppet collection.
-   This is required if you wish to install puppet version 4.
+   This is required if you wish to install puppet version 4 or 5.
 
    You get the version of puppet in the collection. To influence which puppet version is install modify either
    * puppet_yum_collections_repo
    * puppet_apt_collections_repo
-   to an new collection. At time of writing there was only one collection PC1.
+   to an new collection. At time of writing there are only 2 collections PC1 and puppet5.
 
-* if require_puppet_repo is set to true 
+* if require_puppet_repo is set to true (the default)
 
    Installs from the operation system repository with the puppet version that is in the particular repository.
 
@@ -70,10 +70,10 @@ puppet_apt_repo | "http://apt.puppetlabs.com/puppetlabs-release-precise.deb"| ap
 _for Ubuntu14 change to_ |      "http://apt.puppetlabs.com/puppetlabs-release-trusty.deb" |
 _for Ubuntu15 change to_ | "http://apt.puppetlabs.com/puppetlabs-release-jessie.deb" |
 _for Ubuntu16.04 change to_ |   "http://apt.puppetlabs.com/puppetlabs-release-xenial.deb" |
-puppet_apt_collections_repo | "http://apt.puppetlabs.com/puppetlabs-release-pc1-wheezy.deb" | apt collections repo
-_for Ubuntu14 change to_ |      "http://apt.puppetlabs.com/puppetlabs-release-pc1-trusty.deb" |
-_for Ubuntu15 change to_ | "http://apt.puppetlabs.com/puppetlabs-release-pc1-jessie.deb" |
-_for Ubuntu16.04 change to_ |   "http://apt.puppetlabs.com/puppetlabs-release-pc1-xenial.deb" |
+puppet_apt_collections_repo | "http://apt.puppetlabs.com/puppet5-release-wheezy.deb" | apt collections repo
+_for Ubuntu14 change to_ |      "http://apt.puppetlabs.com/puppet5-release-trusty.deb" |
+_for Ubuntu15 change to_ | "http://apt.puppetlabs.com/puppet5-release-jessie.deb" |
+_for Ubuntu16.04 change to_ |   "http://apt.puppetlabs.com/puppet5-release-xenial.deb" |
 puppet_coll_remote_path | "/opt/puppetlabs" | Server Installation location of a puppet collections install.
 puppet_config_path | | path of custom puppet.conf file
 puppet_debug| false| Enable full debugging logging on puppet run
@@ -90,7 +90,8 @@ puppet_future_parser | false | Run puppet with the future parser enabled  (see h
 puppet_git_init | nil | initialize puppet from GIT repository, e.g. "git@github.com:example/puppet-repo.git"
 puppet_git_pr | nil | checkout specific Pull Request from repository specified in puppet_git_init, e.g. "324"
 puppet_logdest | nil | _Array_ of log destinations. Include 'console' if wanted
-puppet_omnibus_url | https://raw.githubusercontent.com/ petems/puppet-install-shell/ master/install_puppet.sh | omnibus puppet v3 install location.
+puppet_omnibus_url | https://raw.githubusercontent.com/ petems/puppet-install-shell/ master/install_puppet_5_agent.sh | omnibus puppet v5 install location.
+_for puppet v3 change to_ | https://raw.githubusercontent.com/ petems/puppet-install-shell/ master/install_puppet.sh |
 _for puppet v4 change to_ | https://raw.githubusercontent.com/ petems/puppet-install-shell/ master/install_puppet_agent.sh |
 puppet_noop| false| puppet runs in a no-op or dry-run mode
 puppet_no_sudo | false | allow puppet command to run without sudo if required
@@ -100,8 +101,8 @@ puppet_version | "latest"| desired version, affects apt installs.
 puppet_whitelist_exit_code | nil | Whitelist exit code expected from puppet run. Intended to be used together with `puppet_detailed_exitcodes`. You can also specify a yaml list here (you should use 0 and 2 for `puppet_detailed_exitcodes` to capture puppet runtime errors and allow multiple converge runs (without changes)).
 puppet_yum_repo | "https://yum.puppetlabs.com/puppetlabs-release-el-6.noarch.rpm"| yum repo RH/Centos6
 _for RH/Centos7 change to_ | "https://yum.puppetlabs.com/puppetlabs-release-el-7.noarch.rpm" |
-puppet_yum_collections_repo | "http://yum.puppetlabs.com/puppetlabs-release-pc1-el-6.noarch.rpm" | yum collections repo RH/Centos6
-_for RH/Centos7 change to_ | "https://yum.puppetlabs.com/puppetlabs-release-pc1-el-7.noarch.rpm" |
+puppet_yum_collections_repo | "http://yum.puppetlabs.com/puppet5/puppet-release-el-6.noarch.rpm" | yum collections repo RH/Centos6
+_for RH/Centos7 change to_ | "http://yum.puppetlabs.com/puppet5/puppet-release-el-7.noarch.rpm" |
 puppetfile_path | | Path to Puppetfile
 remove_puppet_repo | false | remove copy of puppet repository and puppet configuration on server after running puppet
 require_chef_for_busser | true | Install chef as currently needed by busser to run tests
