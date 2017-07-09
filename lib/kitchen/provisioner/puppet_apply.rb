@@ -47,8 +47,8 @@ module Kitchen
       attr_accessor :tmp_dir
 
       default_config :require_puppet_collections, true
-      default_config :puppet_yum_collections_repo, 'http://yum.puppetlabs.com/puppetlabs-release-pc1-el-6.noarch.rpm'
-      default_config :puppet_apt_collections_repo, 'http://apt.puppetlabs.com/puppetlabs-release-pc1-wheezy.deb'
+      default_config :puppet_yum_collections_repo, 'http://yum.puppetlabs.com/puppet5/puppet-release-el-6.noarch.rpm'
+      default_config :puppet_apt_collections_repo, 'http://apt.puppetlabs.com/puppet5-release-wheezy.deb'
       default_config :puppet_coll_remote_path, '/opt/puppetlabs'
       default_config :puppet_version, nil
       default_config :facter_version, nil
@@ -78,7 +78,7 @@ module Kitchen
       default_config :custom_pre_apply_command, nil
       default_config :puppet_whitelist_exit_code, nil
       default_config :require_puppet_omnibus, false
-      default_config :puppet_omnibus_url, 'https://raw.githubusercontent.com/petems/puppet-install-shell/master/install_puppet.sh'
+      default_config :puppet_omnibus_url, 'https://raw.githubusercontent.com/petems/puppet-install-shell/master/install_puppet_5_agent.sh'
       default_config :puppet_enc, nil
       default_config :ignore_spec_fixtures, false
 
@@ -342,9 +342,9 @@ module Kitchen
             if(Get-Command puppet -ErrorAction 0) { return; }
             $architecture = if( [Environment]::Is64BitOperatingSystem ) { 'x64' } else { 'x86' }
             if( '#{puppet_windows_version}' -eq 'latest' ) {
-                $MsiUrl = "https://downloads.puppetlabs.com/windows/puppet-agent-${architecture}-latest.msi"
+                $MsiUrl = "https://downloads.puppetlabs.com/windows/puppet5/puppet-agent-${architecture}-latest.msi"
             } else {
-                $MsiUrl = "https://downloads.puppetlabs.com/windows/puppet-agent-#{puppet_windows_version}-${architecture}.msi"
+                $MsiUrl = "https://downloads.puppetlabs.com/windows/puppet5/puppet-agent-#{puppet_windows_version}-${architecture}.msi"
             }
             Invoke-WebRequest $MsiUrl -UseBasicParsing -OutFile "C:/puppet-agent.msi" #{posh_proxy_parm}
             $process = Start-Process -FilePath msiexec.exe -Wait -PassThru -ArgumentList '/qn', '/norestart', '/i', 'C:\\puppet-agent.msi'
