@@ -249,6 +249,8 @@ module Kitchen
               $architecture = if( [Environment]::Is64BitOperatingSystem ) { '-x64' } else { '' }
               if( '#{puppet_windows_version}' -eq 'latest' ) {
                   $MsiUrl = "https://downloads.puppetlabs.com/windows/puppet${architecture}-latest.msi"
+              } elseif( '#{puppet_windows_version}' -like '5.*' ) {
+                  $MsiUrl = "https://downloads.puppetlabs.com/windows/puppet5/puppet-agent-#{puppet_windows_version}-${architecture}.msi"
               } else {
                   $MsiUrl = "https://downloads.puppetlabs.com/windows/puppet-#{puppet_windows_version}${architecture}.msi"
               }
@@ -338,13 +340,16 @@ module Kitchen
           INSTALL
         when /^windows.*/
           info("Installing Puppet Collections on #{puppet_platform}")
+          info('Powershell is not recognised by core test-kitchen assuming it is present') unless powershell_shell?
           <<-INSTALL
             if(Get-Command puppet -ErrorAction 0) { return; }
             $architecture = if( [Environment]::Is64BitOperatingSystem ) { 'x64' } else { 'x86' }
             if( '#{puppet_windows_version}' -eq 'latest' ) {
-                $MsiUrl = "https://downloads.puppetlabs.com/windows/puppet5/puppet-agent-${architecture}-latest.msi"
-            } else {
+                $MsiUrl = "https://downloads.puppetlabs.com/windows/puppet-agent-${architecture}-latest.msi"
+            } elseif( '#{puppet_windows_version}' -like '5.*' ) {
                 $MsiUrl = "https://downloads.puppetlabs.com/windows/puppet5/puppet-agent-#{puppet_windows_version}-${architecture}.msi"
+            } else {
+                $MsiUrl = "https://downloads.puppetlabs.com/windows/puppet-agent-#{puppet_windows_version}${architecture}.msi"
             }
             Invoke-WebRequest $MsiUrl -UseBasicParsing -OutFile "C:/puppet-agent.msi" #{posh_proxy_parm}
             $process = Start-Process -FilePath msiexec.exe -Wait -PassThru -ArgumentList '/qn', '/norestart', '/i', 'C:\\puppet-agent.msi'
@@ -945,7 +950,7 @@ module Kitchen
       end
 
       def puppet_windows_version
-        config[:puppet_version] ? config[:puppet_version].to_s : 'latest'
+        config[:puppet_version] ? config[:puppet_version].to_s : '5.0.0'
       end
 
       def puppet_environment_flag
