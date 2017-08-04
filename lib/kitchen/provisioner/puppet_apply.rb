@@ -1231,12 +1231,16 @@ module Kitchen
         facter_dir = File.join(sandbox_path, 'facter')
         FileUtils.mkdir_p(facter_dir)
         tmp_facter_file = File.join(facter_dir, 'kitchen.rb')
-        facter_facts = Hash[config[:custom_facts].map { |k, v| [k.to_s, v.to_s] }]
+        facter_facts = Hash[config[:custom_facts]]
         File.open(tmp_facter_file, 'a') do |out|
           facter_facts.each do |k, v|
             out.write "\nFacter.add(:#{k}) do\n"
             out.write "  setcode do\n"
-            out.write "    \"#{v}\"\n"
+            if v.is_a?(Hash)
+              out.write "    #{v}\n"
+            else
+              out.write "    \"#{v}\"\n"
+            end
             out.write "  end\n"
             out.write "end\n"
           end
