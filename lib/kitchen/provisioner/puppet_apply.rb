@@ -93,7 +93,7 @@ module Kitchen
 
       default_config :ignored_paths_from_root, ['spec']
       default_config :hiera_data_remote_path, nil
-      default_config :manifest, 'site.pp'
+      default_config :manifest, ''
 
       default_config :manifests_path do |provisioner|
         provisioner.calculate_path('manifests') ||

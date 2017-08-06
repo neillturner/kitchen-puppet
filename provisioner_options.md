@@ -59,8 +59,8 @@ ignore_spec_fixtures | false | don't copy spec/fixtures to avoid problems with s
 install_custom_facts| false | Install custom facts to yaml file at "/tmp/kitchen/facter/kitchen.rb"
 install_hiera | false | Installs `hiera-puppet` package. Not needed for puppet > 3.x.x
 librarian_puppet_ssl_file | nil | ssl certificate file for librarian-puppet
-manifest | 'site.pp' | manifest for puppet apply to run
-manifests_path | | puppet repo manifests directory
+manifest | puppet parses every .pp file in the manifests_path directory and its subdirectories | manifest(s) for puppet apply to run. If set to a file like 'site.pp' it will use the file in the mainfests_path.
+manifests_path | 'mainfests' | puppet repo manifests directory
 max_retries| 1 | maximum number of retry attempts of converge command
 modules_path | | puppet repo manifests directory. Can be multiple directories separated by colons and then they will be merged
 no_proxy | nil | list of URLs or IPs that should be excluded from proxying
