@@ -142,8 +142,8 @@ describe Kitchen::Provisioner::PuppetApply do
         expect(provisioner[:hiera_data_remote_path]).to eq(nil)
       end
 
-      it 'Should set site.pp as default manifest' do
-        expect(provisioner[:manifest]).to eq('site.pp')
+      it 'Should set \'\' as default manifest' do
+        expect(provisioner[:manifest]).to eq('')
       end
 
       it 'Should fail to find mainfests path' do
