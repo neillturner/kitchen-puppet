@@ -1236,7 +1236,7 @@ module Kitchen
           facter_facts.each do |k, v|
             out.write "\nFacter.add(:#{k}) do\n"
             out.write "  setcode do\n"
-            if v.is_a?(Hash)
+            if [Array, Hash].include? v.class
               out.write "    #{v}\n"
             else
               out.write "    \"#{v}\"\n"
