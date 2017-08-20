@@ -24,35 +24,9 @@ This provider has been tested against the Ubuntu 1204 and Centos 6.5 boxes runni
 * https://www.cedric-meury.ch/2016/10/test-driven-infrastructure-with-puppet-docker-test-kitchen-and-serverspec-yury-tsarev-gooddata
 * https://docs.puppet.com/puppet/latest/puppet_platform.html
 
-## Windows Workstation Install
-You need to download the puppet msi and install it and run everything inside the puppet window.
+## Install
 
-1. Download and install puppet from the windows msi file from https://downloads.puppetlabs.com/windows
-  * I recommend the using the 64 bit version now.
-  * Don't do a 'gem install puppet' !!!.
-
-2. Select "Start Command Prompt with Puppet" to go to a Command Window.
-
-3. Install the Ruby DevKit:
-   * Download and install devkit from http://rubyinstaller.org/downloads
-     * (Use the 32 or 64 bit version that matches version of the puppet install)
-   * In the devkit directory run “ruby dk.rb init”.
-   * Edit the config.yml generated and add the the path of the ruby install for puppet
-     * (it will be <install dir of puppet>/sys/ruby).
-   * Run “ruby dk.rb install” to bind it to the puppet ruby installation.
-
-4. From a Command prompt:
-  * gem install librarian-puppet
-  * gem install test-kitchen
-  * gem install kitchen-puppet
-
-## Mac-OSX Workstation Install
-
-1. Download and install the mac packages from https://downloads.puppetlabs.com/mac/
-  * The most recent Facter package (facter-<VERSION>.dmg)
-  * The most recent Hiera package (hiera-<VERSION>.dmg)
-  * The most recent Puppet package (puppet-<VERSION>.dmg)
-  * See [How to Install Software from DMG Files on a Mac](http://www.ofzenandcomputing.com/how-to-install-dmg-files-mac/) for details.
+1. install the latest Ruby on your workstations (for windows see https://rubyinstaller.org/downloads/)
 
 2. From a Command prompt:
   * gem install librarian-puppet
