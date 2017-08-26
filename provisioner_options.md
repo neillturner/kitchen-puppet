@@ -34,7 +34,7 @@ custom_pre_install_command | nil | Custom shell command to be used at beginning 
 custom_install_command | nil | Custom shell command to be used at end of install stage. Can be multiline. See examples below.
 custom_pre_apply_command | nil | Custom shell command to be used before the puppet apply stage. Can be multiline. See examples below.
 custom_post_apply_command | nil | Custom shell command to be used after the puppet apply stage. Can be multiline. See examples below.
-facter_file | nil | yaml file of custom facter_files to be provided to the puppet-apply command
+facter_file | nil | custom facter_file to be provided to the puppet-apply command
 facter_version | "latest"| desired version, affects apt installs.
 files_path | | directory to place at /tmp/kitchen/files
 fileserver_config_path | | file to place fileserver.conf
