@@ -241,7 +241,7 @@ module Kitchen
           puppet_environment_flag,
           puppet_verbose_flag,
           puppet_debug_flag
-        ].join(' ')
+        ].compact.join(' ')
       end
 
       protected
