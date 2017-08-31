@@ -1,47 +1,52 @@
-v0.0.27
+# Kitchen-Puppet Changelog
+
+## Unreleased
+* Fixes gh-173 - Adds environment support for puppet_agent provisioner [@logicminds]
+
+## v0.0.27
 * Support Centos 7 install of puppet
 * document use of busser without a chef install in kitchen 1.4
 
-v0.0.26
+## v0.0.26
 * puppet collections (v4) support
 * https_proxy support
 
-v0.0.24
+## v0.0.24
 * for eyaml install ruby 187 compatible version of highline
 
-v0.0.23
+## v0.0.23
 * yaml add deep merge option
 * fix eyaml install bug
 
-v0.0.22
+## v0.0.22
 * Add logdest provisioner option
 
-v0.0.19
+## v0.0.19
 *  travis Ci support
 *  puppet_detailed_exitcodes to puppet_apply
 
 
-v0.0.18
+## v0.0.18
 * Add http_proxy support
 
-v0.0.17
+## v0.0.17
 * Syntax fix with file resource
 * Update and Fix all syntax errors
 * Adds facter_file config parameter to puppet_apply
 * Regex fix when testing module in kitchen_root
 
-v0.0.16
+## v0.0.16
 * Add hiera-eyaml support for encrypted hiera data
 * improve removed repo option to remove puppet configuration
 * Add option to configured SSL certificate when calling librarian-puppet
 
-v0.0.15
+## v0.0.15
 * Add Puppet Agent support
 
-v0.0.14
+##  v0.0.14
 * Add Puppet environment option
 
-v0.0.13
+## v0.0.13
 * Resolve with librarian-puppet moved back to *before* copying modules directory as librarian-puppet was clobbering the copied modules.
   Note: you should adopt a naming convention where the modules in the modules directory are prefix with a company prefix so they don't
   conflict with the librarian puppet module names. ie mycompany-module.
@@ -61,21 +66,26 @@ v0.0.13
 
 * Detect Oracle Linux
 
-v0.0.12 June 4, 2014
+## v0.0.12
+June 4, 2014
 * Resolve with librarian-puppet *after* copying modules directory in order to avoid errors copying modules after having done
  `librarian-puppet install` on the host.
 
-v0.0.11 May 25, 2014
+## v0.0.11
+May 25, 2014
 * enable the per suite manifest
 
-v0.0.10 May 19, 2014
+## v0.0.10
+May 19, 2014
 * auto detect if this is meant to be a module and copy it as just another module
 
-v0.0.9 May 14, 2014
+## v0.0.9
+May 14, 2014
 * Provide platform flexibility in installing puppet/chef
 * Configure Puppet's fileserver config for local delivery
 * Define puppet_gem_version
 * remove destination before copying modules
 
-v0.0.8 May 12, 2014
+## v0.0.8
+May 12, 2014
 * initial version
