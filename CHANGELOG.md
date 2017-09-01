@@ -1,6 +1,6 @@
 # Kitchen-Puppet Changelog
 
-## Unreleased
+## v 3.1.2
 * Fixes gh-173 - Adds environment support for puppet_agent provisioner [@logicminds]
 
 ## v0.0.27
