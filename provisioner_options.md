@@ -219,6 +219,7 @@ puppet_omnibus_remote_path | "/opt/puppet" | Server Installation location of an 
 puppet_detailed_exitcodes | nil | Provide transaction information via exit codes.
 puppet_logdest | nil | Where to send messages. Choose between syslog, the console, and a log file.
 puppet_masterport | nil | The port on which to contact the puppet master.
+puppet_environment | nil | The puppet environment to run the agent under
 puppet_test | false | Enable the most common options used for testing.
 puppet_onetime | true | Run the configuration once.
 puppet_no_daemonize | true | Do not send the process into the background.
@@ -346,4 +347,3 @@ provisioner:
     - 0
     - 2
 ```
-

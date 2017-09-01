@@ -22,6 +22,7 @@
 #
 
 require 'json'
+require 'kitchen'
 require 'kitchen/provisioner/base'
 require 'kitchen/provisioner/puppet/librarian'
 
@@ -42,6 +43,7 @@ module Kitchen
       default_config :require_puppet_omnibus, false
       # TODO: use something like https://github.com/fnichol/omnibus-puppet
       default_config :puppet_omnibus_url, nil
+      default_config :puppet_environment, nil
       default_config :puppet_omnibus_remote_path, '/opt/puppet'
       default_config :puppet_version, nil
       default_config :facter_version, nil
@@ -236,14 +238,19 @@ module Kitchen
           puppet_onetime_flag,
           puppet_no_daemonize_flag,
           puppet_noop_flag,
+          puppet_environment_flag,
           puppet_verbose_flag,
           puppet_debug_flag
-        ].join(' ')
+        ].compact.join(' ')
       end
 
       protected
 
       def load_needed_dependencies!; end
+
+      def puppet_environment_flag
+        config[:puppet_environment] ? "--environment=\"#{config[:puppet_environment]}\"" : nil
+      end
 
       def puppet_config
         config[:puppet_config_path]
