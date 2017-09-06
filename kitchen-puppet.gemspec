@@ -16,16 +16,9 @@ Gem::Specification.new do |s|
   s.platform      = Gem::Platform::RUBY
   s.require_paths = ['lib']
   s.rubyforge_project = '[none]'
-  if RUBY_VERSION < '2.3'
-    s.add_dependency 'test-kitchen', '<= 1.16.0', '>= 1.4'
-  else
-    s.add_dependency 'test-kitchen', '>= 1.17.0'
-  end
-  if RUBY_VERSION >= '2.0'
-    s.add_dependency 'net-ssh', '>= 3'
-  else
-    s.add_dependency 'net-ssh', '~> 2.9'
-  end
+  s.required_ruby_version = ">= 2.0"
+  s.add_dependency 'test-kitchen', '~> 1.4'
+  s.add_dependency 'net-ssh', '>= 3'
   s.description = <<-EOF
   == DESCRIPTION:
 
