@@ -30,7 +30,7 @@ This provider has been tested against the Ubuntu 1204 and Centos 6.5 boxes runni
 
 2. From a Command prompt:
   * gem install librarian-puppet
-  * gem install test-kitchen  (Add parameter -v 1.16.0 if using ruby version less than 2.3) 
+  * gem install test-kitchen  (or gem install test-kitchen -v 1.16.0 if using ruby version less than 2.3) 
   * gem install kitchen-puppet
 
 ## Requirements
