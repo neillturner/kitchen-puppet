@@ -27,7 +27,7 @@ It installs it in the following order:
 
 key | default value | Notes
 ----|---------------|--------
-chef_bootstrap_url |"https://www.getchef.com/chef/install.sh"| the chef (needed for busser to run tests) NOTE: kitchen 1.4 only requires ruby to run busser so this is not required.
+chef_bootstrap_url | https://www.getchef.com/ chef/install.sh | the chef (needed for busser to run tests) NOTE: kitchen 1.4 only requires ruby to run busser so this is not required.
 custom_facts| Hash.new | Hash to set the puppet facts before running puppet apply
 custom_options | | custom options to add to puppet apply command.
 custom_pre_install_command | nil | Custom shell command to be used at beginning of install stage. Can be multiline.
