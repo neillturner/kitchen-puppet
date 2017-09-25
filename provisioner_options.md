@@ -85,8 +85,8 @@ puppet_environment _hiera_config_path | "hiera.yaml" | Environment layer hiera c
 puppet_environment _remote_hieradata_path | "hieradata" | Path in `puppet_environmentpath_remote_path` to contains the hiera data.
 puppet_environment _remote_modules_path | "modules" | Path in `puppet_environmentpath_remote_path` to contains the modules.
 puppet_environment _remote_manifests_path | "manifests" | Path in `puppet_environmentpath_remote_path` to contains the manifests.
-puppet _environmentpath_remote_path | "/etc/puppet/environments" (v3), "/etc/puppetlabs/code/environments" (v4) | The remote path for environments if `puppet_environmentpath` is true
-puppet_future_parser | false | Run puppet with the future parser enabled  (see https://docs.puppet.com/puppet/3.8/experiments_future.html).
+puppet _environmentpath_remote_path | /etc/puppet/environments (v3), /etc/puppetlabs/code/environments (v4) | The remote path for environments if `puppet_environmentpath` is true
+puppet_future_parser | false | Run puppet with the future parser enabled  (see https://docs.puppet.com/ puppet/3.8/experiments_future.html).
 puppet_git_init | nil | initialize puppet from GIT repository, e.g. "git@github.com:example/puppet-repo.git"
 puppet_git_pr | nil | checkout specific Pull Request from repository specified in puppet_git_init, e.g. "324"
 puppet_logdest | nil | _Array_ of log destinations. Include 'console' if wanted
