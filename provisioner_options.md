@@ -66,14 +66,14 @@ modules_path | | puppet repo manifests directory. Can be multiple directories se
 no_proxy | nil | list of URLs or IPs that should be excluded from proxying
 platform | platform_name kitchen.yml parameter | OS platform of server
 puppet_apply_command | nil | Overwrite the puppet apply command. Needs "sudo -E puppet apply" as a prefix.
-puppet_apt_repo | "http://apt.puppetlabs.com/puppetlabs-release-precise.deb"| apt repo Ubuntu12 see https://apt.puppetlabs.com for others
-_for Ubuntu14 change to_ |      "http://apt.puppetlabs.com/puppetlabs-release-trusty.deb" |
-_for Ubuntu15 change to_ | "http://apt.puppetlabs.com/puppetlabs-release-jessie.deb" |
-_for Ubuntu16.04 change to_ |   "http://apt.puppetlabs.com/puppetlabs-release-xenial.deb" |
-puppet_apt_collections_repo | "http://apt.puppetlabs.com/puppet5-release-wheezy.deb" | apt collections repo
-_for Ubuntu14 change to_ |      "http://apt.puppetlabs.com/puppet5-release-trusty.deb" |
-_for Ubuntu15 change to_ | "http://apt.puppetlabs.com/puppet5-release-jessie.deb" |
-_for Ubuntu16.04 change to_ |   "http://apt.puppetlabs.com/puppet5-release-xenial.deb" |
+puppet_apt_repo | http://apt.puppetlabs.com/ puppetlabs-release-precise.deb | apt repo Ubuntu12 see https://apt.puppetlabs.com for others
+_for Ubuntu14 change to_ |      http://apt.puppetlabs.com/ puppetlabs-release-trusty.deb |
+_for Ubuntu15 change to_ | http://apt.puppetlabs.com/ puppetlabs-release-jessie.deb |
+_for Ubuntu16.04 change to_ |   http://apt.puppetlabs.com/ puppetlabs-release-xenial.deb |
+puppet_apt_collections_repo | http://apt.puppetlabs.com/ puppet5-release-wheezy.deb | apt collections repo
+_for Ubuntu14 change to_ |      http://apt.puppetlabs.com/ puppet5-release-trusty.deb |
+_for Ubuntu15 change to_ | http://apt.puppetlabs.com/ puppet5-release-jessie.deb |
+_for Ubuntu16.04 change to_ |   http://apt.puppetlabs.com/ puppet5-release-xenial.deb |
 puppet_coll_remote_path | "/opt/puppetlabs" | Server Installation location of a puppet collections install.
 puppet_config_path | | path of custom puppet.conf file
 puppet_debug| false| Enable full debugging logging on puppet run
@@ -100,10 +100,10 @@ puppet_show_diff| false| Show diffs for changes to config files during puppet ru
 puppet_version | "latest"| desired version, affects apt installs.
 _for windows defaults to_ | 5.0.0 |
 puppet_whitelist_exit_code | nil | Whitelist exit code expected from puppet run. Intended to be used together with `puppet_detailed_exitcodes`. You can also specify a yaml list here (you should use 0 and 2 for `puppet_detailed_exitcodes` to capture puppet runtime errors and allow multiple converge runs (without changes)).
-puppet_yum_repo | "https://yum.puppetlabs.com/puppetlabs-release-el-6.noarch.rpm"| yum repo RH/Centos6
-_for RH/Centos7 change to_ | "https://yum.puppetlabs.com/puppetlabs-release-el-7.noarch.rpm" |
-puppet_yum_collections_repo | "http://yum.puppetlabs.com/puppet5/puppet-release-el-6.noarch.rpm" | yum collections repo RH/Centos6
-_for RH/Centos7 change to_ | "http://yum.puppetlabs.com/puppet5/puppet-release-el-7.noarch.rpm" |
+puppet_yum_repo | https://yum.puppetlabs.com/ puppetlabs-release-el-6.noarch.rpm | yum repo RH/Centos6
+_for RH/Centos7 change to_ | https://yum.puppetlabs.com/ puppetlabs-release-el-7.noarch.rpm |
+puppet_yum_collections_repo | http://yum.puppetlabs.com/ puppet5/puppet-release-el-6.noarch.rpm | yum collections repo RH/Centos6
+_for RH/Centos7 change to_ | http://yum.puppetlabs.com/ puppet5/puppet-release-el-7.noarch.rpm |
 puppetfile_path | | Path to Puppetfile
 remove_puppet_repo | false | remove copy of puppet repository and puppet configuration on server after running puppet
 require_chef_for_busser | true | Install chef as currently needed by busser to run tests
@@ -211,8 +211,8 @@ puppet_version | "latest"| desired version, affects apt installs.
 facter_version | "latest"| desired version, affects apt installs.
 platform | platform_name kitchen.yml parameter | OS platform of server
 require_puppet_repo | true | Set if using a puppet install from yum or apt repo
-puppet_apt_repo | "http://apt.puppetlabs.com/puppetlabs-release-precise.deb"| apt repo
-puppet_yum_repo | "https://yum.puppetlabs.com/puppetlabs-release-el-6.noarch.rpm"| yum repo
+puppet_apt_repo | http://apt.puppetlabs.com/ puppetlabs-release-precise.deb| apt repo
+puppet_yum_repo | https://yum.puppetlabs.com/ puppetlabs-release-el-6.noarch.rpm| yum repo
 require_puppet_omnibus | false | Set if using omnibus puppet install
 puppet_omnibus_url | | omnibus puppet install location.
 puppet_omnibus_remote_path | "/opt/puppet" | Server Installation location of an omnibus puppet install.
