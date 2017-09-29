@@ -91,7 +91,7 @@ Create a `.kitchen.yml`, much like one the described above:
 
 Sample Puppet Repositories
   * A sample hello world example puppet repository without environents : https://github.com/neillturner/puppet_vagrant_repo
-  * A sample hello world example puppet repository with environents : https://github.com/neillturner/puppet_vagrant_environments_repo
+  * A sample hello world example puppet repository with environents : https://github.com/neillturner/puppet_vagrant_environment_repo
 
 ## Test-Kitchen Serverspec
 
