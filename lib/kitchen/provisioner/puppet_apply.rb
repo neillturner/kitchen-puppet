@@ -1295,6 +1295,7 @@ module Kitchen
         end
       end
 
+      # rubocop:disable Lint/RescueWithoutErrorClass
       def read_self_module_name
         if File.exist?(modulefile)
           warn('Modulefile found but this is deprecated, ignoring it, see https://tickets.puppetlabs.com/browse/PUP-1188')
@@ -1310,6 +1311,7 @@ module Kitchen
 
         module_name
       end
+      # rubocop:enable Lint/RescueWithoutErrorClass
 
       def prepare_puppet_config
         return unless puppet_config

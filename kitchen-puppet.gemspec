@@ -19,7 +19,7 @@ Gem::Specification.new do |s|
   s.required_ruby_version = '>= 2.0'
   s.add_dependency 'test-kitchen', '~> 1.4'
   s.add_dependency 'net-ssh', '>= 3'
-  s.description = <<-EOF
+  s.description = <<-TEXT
   == DESCRIPTION:
 
   Puppet Provisioner for Test Kitchen
@@ -28,5 +28,5 @@ Gem::Specification.new do |s|
 
   Supports puppet apply, puppet agent, hiera, hiera-eyaml, hiera-eyaml-gpg, custom facts, librarian-puppet, puppet collections (v4)
 
-EOF
+TEXT
 end

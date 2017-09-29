@@ -316,7 +316,7 @@ module Kitchen
       end
 
       def puppet_masterport_flag
-        config[:puppet_masterport] ? '--masterport=#{config[:puppet_masterport]}' : nil
+        config[:puppet_masterport] ? "--masterport=#{config[:puppet_masterport]}" : nil
       end
 
       def puppet_detailed_exitcodes_flag
