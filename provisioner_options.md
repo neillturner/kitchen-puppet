@@ -97,8 +97,7 @@ puppet_noop| false| puppet runs in a no-op or dry-run mode
 puppet_no_sudo | false | allow puppet command to run without sudo if required
 puppet_verbose| false| Extra information logging on puppet run
 puppet_show_diff| false| Show diffs for changes to config files during puppet runs.
-puppet_version | "latest"| desired version, affects apt installs.
-_for windows defaults to_ | 5.0.0 |
+puppet_version | "latest"| desired version, affects apt and most installs.
 puppet_whitelist_exit_code | nil | Whitelist exit code expected from puppet run. Intended to be used together with `puppet_detailed_exitcodes`. You can also specify a yaml list here (you should use 0 and 2 for `puppet_detailed_exitcodes` to capture puppet runtime errors and allow multiple converge runs (without changes)).
 puppet_yum_repo | https://yum.puppetlabs.com/ puppetlabs-release-el-6.noarch.rpm | yum repo RH/Centos6
 _for RH/Centos7 change to_ | https://yum.puppetlabs.com/ puppetlabs-release-el-7.noarch.rpm |
