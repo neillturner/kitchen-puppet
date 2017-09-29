@@ -30,7 +30,7 @@ This provider has been tested against the Ubuntu 1204 and Centos 6.5 boxes runni
 
 2. From a Command prompt:
   * gem install librarian-puppet
-  * gem install test-kitchen  (or gem install test-kitchen -v 1.16.0 if using ruby version less than 2.3) 
+  * gem install test-kitchen  (or gem install test-kitchen -v 1.16.0 if using ruby version less than 2.3)
   * gem install kitchen-puppet
 
 ## Requirements
@@ -53,6 +53,45 @@ Sample Puppet Repositories
   * A sample hello world example puppet repository: https://github.com/neillturner/puppet_windows_repo
   * A sample hello world example puppet repository for vagrant: https://github.com/neillturner/puppet_vagrant_windows_repo
   * A more extensive sample installing virtualbox on windows: https://github.com/red-gate/puppet-virtualbox_windows
+
+## Using Environments
+
+In the root directory for your puppet repository:
+
+Create a `.kitchen.yml`, much like one the described above:
+
+```yaml
+    ---
+    driver:
+      name: vagrant
+
+    provisioner:
+      name: puppet_apply
+      puppet_environment: dev
+# the puppet environmnt files can be in this repository
+      puppet_environment_config_path: environment/dev/environment.conf
+      manifests_path:  environment/dev/manifests
+      modules_path: environment/dev/modules_mycompany
+# or external to this repository as long as they are accessible
+#     puppet_environment_config_path: /my_environments/dev/environment.conf
+#     manifests_path:                 /my_environments/dev/manifests
+#     modules_path:                   /my_environments/dev/modules_mycompany
+      hiera_data_path: /repository/puppet_repo/hieradata
+
+    platforms:
+    - name: nocm_ubuntu-12.04
+      driver_plugin: vagrant
+      driver_config:
+        box: nocm_ubuntu-12.04
+        box_url: http://puppet-vagrant-boxes.puppetlabs.com/ubuntu-server-12042-x64-vbox4210-nocm.box
+
+    suites:
+     - name: default
+```
+
+Sample Puppet Repositories
+  * A sample hello world example puppet repository without environents : https://github.com/neillturner/puppet_vagrant_repo
+  * A sample hello world example puppet repository with environents : https://github.com/neillturner/puppet_vagrant_environments_repo
 
 ## Test-Kitchen Serverspec
 
