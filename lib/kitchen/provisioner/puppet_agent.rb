@@ -59,6 +59,7 @@ module Kitchen
       default_config :http_proxy, nil
       default_config :https_proxy, nil
       default_config :no_proxy, nil
+      default_config :puppet_whitelist_exit_code, nil
 
       default_config :puppet_config_path do |provisioner|
         provisioner.calculate_path('puppet.conf', :file)
@@ -240,7 +241,8 @@ module Kitchen
           puppet_noop_flag,
           puppet_environment_flag,
           puppet_verbose_flag,
-          puppet_debug_flag
+          puppet_debug_flag,
+          puppet_whitelist_exit_code
         ].compact.join(' ')
       end
 
@@ -394,6 +396,20 @@ module Kitchen
 
       def no_proxy
         config[:no_proxy]
+      end
+
+      def powershell?
+        powershell_shell? || !(puppet_platform =~ /^windows.*/).nil?
+      end
+
+      def puppet_whitelist_exit_code
+        if config[:puppet_whitelist_exit_code].nil?
+          powershell? ? '; exit $LASTEXITCODE' : nil
+        elsif powershell?
+          "; if(@(#{[config[:puppet_whitelist_exit_code]].join(', ')}) -contains $LASTEXITCODE) {exit 0} else {exit $LASTEXITCODE}"
+        else
+          '; RC=$?; [ ' + [config[:puppet_whitelist_exit_code]].flatten.map { |x| "\$RC -eq #{x}" }.join(' -o ') + ' ] && exit 0; exit $RC'
+        end
       end
 
       def chef_url

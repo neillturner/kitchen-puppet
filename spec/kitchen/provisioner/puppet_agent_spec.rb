@@ -462,6 +462,16 @@ describe Kitchen::Provisioner::PuppetAgent do
   end
 
   describe 'run_command' do
+    it 'whitelists exit code' do
+      config[:puppet_whitelist_exit_code] = '2'
+      expect(provisioner.run_command).to match(/; RC=\$\?; \[ \$RC -eq 2 \] && exit 0; exit \$RC$/)
+    end
+
+    it 'whitelists with multiple exit codes' do
+      config[:puppet_whitelist_exit_code] = %w[2 4]
+      expect(provisioner.run_command).to match(/; RC=\$\?; \[ \$RC -eq 2 -o \$RC -eq 4 \] && exit 0; exit \$RC$/)
+    end
+
     it 'has environment flag' do
       config[:puppet_environment] = 'dev'
       expect(provisioner.send(:run_command)).to include('--environment="dev"')
@@ -469,6 +479,34 @@ describe Kitchen::Provisioner::PuppetAgent do
 
     it 'no environment flag' do
       expect(provisioner.send(:run_command)).to_not include('--environment="dev"')
+    end
+  end
+
+  context 'run command on windows' do
+    before do
+      allow_any_instance_of(Kitchen::Configurable).to receive(:powershell_shell?).and_return(true)
+      allow_any_instance_of(Kitchen::Configurable).to receive(:windows_os?).and_return(true)
+    end
+
+    # currently windows is not fully supported with puppet_agent
+    xit 'exports custom_facts' do
+      config[:custom_facts] = { fact1: 'value1', fact2: 'value2' }
+      expect(provisioner.run_command).to include("\$env:FACTER_fact1='value1'; \$env:FACTER_fact2='value2';")
+    end
+
+    it 'does not whitelist exit codes by default' do
+      config[:puppet_whitelist_exit_code] = nil
+      expect(provisioner.run_command).to match(/; exit \$LASTEXITCODE$/)
+    end
+
+    it 'whitelists a single exit code' do
+      config[:puppet_whitelist_exit_code] = '2'
+      expect(provisioner.run_command).to match(/; if\(@\(2\) -contains \$LASTEXITCODE\) {exit 0} else {exit \$LASTEXITCODE}$/)
+    end
+
+    it 'whitelists multiple exit codes' do
+      config[:puppet_whitelist_exit_code] = %w[2 4]
+      expect(provisioner.run_command).to match(/; if\(@\(2, 4\) -contains \$LASTEXITCODE\) {exit 0} else {exit \$LASTEXITCODE}$/)
     end
   end
 end
