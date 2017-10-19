@@ -1,6 +1,11 @@
 # Kitchen-Puppet Changelog
 
-## v 3.1.2
+## Unreleased
+
+## v3.2.0
+* Adds whitelist_exit codes to puppet_agent [@logicminds]
+
+## v3.1.2
 * Fixes gh-173 - Adds environment support for puppet_agent provisioner [@logicminds]
 
 ## v0.0.27
