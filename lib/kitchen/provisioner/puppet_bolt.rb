@@ -227,8 +227,11 @@ module Kitchen
       protected
 
       def bolt_commands_to_run
-        []
-        config[:bolt_commands].is_a?(Array) ? config[:bolt_commands] : [config[:bolt_commands]] if config[:bolt_commands]
+        if config[:bolt_commands]
+          config[:bolt_commands].is_a?(Array) ? config[:bolt_commands] : [config[:bolt_commands]]
+        else
+          []
+        end
       end
 
       def bolt_platform
