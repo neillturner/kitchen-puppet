@@ -24,7 +24,6 @@ require 'json'
 require 'kitchen'
 
 module Kitchen
-
   module Configurable
     def platform_name
       instance.platform.name
@@ -36,38 +35,30 @@ module Kitchen
     # Puppet Bolt provisioner.
     #
     class PuppetBolt < Base
-#      attr_accessor :tmp_dir
+      attr_accessor :tmp_dir
 
       default_config :bolt_version, nil
-
       default_config :require_bolt_repo, true
       default_config :remove_bolt_repo, false
-
       default_config :custom_install_command, nil
       default_config :custom_pre_install_command, nil
       default_config :custom_pre_bolt_command, nil
       default_config :custom_post_bolt_command, nil
-
       default_config :require_bolt_omnibus, false
-
       default_config :bolt_commands, []
       default_config :platform, &:platform_name
-
       default_config :http_proxy, nil
       default_config :https_proxy, nil
       default_config :no_proxy, nil
-
-
       # for future use
-
       default_config :bolt_cmd, nil        # bolt command run <COMMAND>, bolt script run, bolt task run, bolt plan run, bolt file upload
       default_config :bolt_nodes, nil      # REQUIRED
       default_config :bolt_user, nil       # BOLT_USER env variable
       default_config :bolt_password, nil
       default_config :bolt_modulepath, [] # Required for tasks and plans. The path to the module containing the task. Separate multiple paths with a semicolon (;) on Windows or a colon (:) on all other platforms.
-      default_config :bolt_params,nil
-      default_config :bolt_tty,false
-      default_config :bolt_insecure,true
+      default_config :bolt_params, nil
+      default_config :bolt_tty, false
+      default_config :bolt_insecure, true
       default_config :bolt_transport, nil
 
       # Install the dependencies for your platform.
@@ -193,7 +184,7 @@ module Kitchen
       end
 
       def init_command
-        debug("Init Command")
+        debug('Init Command')
       end
 
       def create_sandbox
@@ -236,10 +227,8 @@ module Kitchen
       protected
 
       def bolt_commands_to_run
-        bolt_commands_to_run = []
-        if config[:bolt_commands]
-          bolt_commands_to_run = config[:bolt_commands].is_a?(Array) ? config[:bolt_commands] : [config[:bolt_commands]]
-        end
+        []
+        config[:bolt_commands].is_a?(Array) ? config[:bolt_commands] : [config[:bolt_commands]] if config[:bolt_commands]
       end
 
       def bolt_platform
