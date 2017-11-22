@@ -26,7 +26,7 @@ Gem::Specification.new do |s|
 
   == FEATURES:
 
-  Supports puppet apply, puppet agent, hiera, hiera-eyaml, hiera-eyaml-gpg, custom facts, librarian-puppet, puppet collections (v4)
+  Supports puppet apply, puppet agent, puppet bolt, hiera, hiera-eyaml, hiera-eyaml-gpg, custom facts, librarian-puppet, puppet collections
 
 TEXT
 end

@@ -7,14 +7,17 @@
 # kitchen-puppet
 A Test Kitchen Provisioner for Puppet
 
-The providers supports both puppet apply and puppet agent clients
+The providers supports both puppet apply and puppet agent clients and puppet bolt.
 
 The PuppetApply provider works by passing the puppet repository based on attributes in .kitchen.yml & calling puppet apply.
 
 The PuppetAgent provider works by passing the puppetmaster and other attributes in .kitchen.yml & calling puppet agent.
 
+The PuppetBolt provider works by passing the puppet bolt commands based on attributes in .kitchen.yml & calling puppet bolt.
 
-This provider has been tested against the Ubuntu 1204 and Centos 6.5 boxes running in vagrant/virtualbox as well as various docker.
+
+
+This provider has been tested against the Ubuntu 1604 and Centos 7 boxes running in docker and vagrant/virtualbox.
 
 ## Resources
 * http://ehaselwanter.com/en/blog/2014/05/08/using-test-kitchen-with-puppet
@@ -90,8 +93,10 @@ Create a `.kitchen.yml`, much like one the described above:
 ```
 
 Sample Puppet Repositories
+  * A sample hello world example puppet repository with docker : https://github.com/neillturner/puppet_docker_repo
   * A sample hello world example puppet repository without environents : https://github.com/neillturner/puppet_vagrant_repo
   * A sample hello world example puppet repository with environents : https://github.com/neillturner/puppet_vagrant_environment_repo
+  * A sample puppet bolt example puppet repository with docker : https://github.com/neillturner/bolt_docker_repo
 
 ## Test-Kitchen Serverspec
 

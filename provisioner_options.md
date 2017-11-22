@@ -346,3 +346,63 @@ provisioner:
     - 0
     - 2
 ```
+
+# Puppet Bolt Provisioner Options
+
+key | default value | Notes
+----|---------------|--------
+bolt_commands | nil | array of bolt commands to run.
+bolt_version | | desired puppet bolt version, defaults to latest.
+custom_pre_install_command | nil | Custom shell command to be used at beginning of install stage. Can be multiline.
+custom_install_command | nil | Custom shell command to be used at end of install stage. Can be multiline. See examples below.
+custom_pre_bolt_command | nil | Custom shell command to be used before the puppet bolt stage. Can be multiline.
+custom_post_bolt_command | nil | Custom shell command to be used after the puppet bolt stage. Can be multiline.
+http_proxy | nil | use http proxy when installing bolt, packages and running bolt
+https_proxy | nil | use https proxy when installing bolt, packages and running bolt
+no_proxy | nil | list of URLs or IPs that should be excluded from proxying
+platform | platform_name kitchen.yml parameter | OS platform of server
+require_bolt_omnibus | false | Set if using omnibus bolt install. (for future use)
+require_bolt_repo | true | Set if using a puppet bolt from yum or apt repo
+remove_bolt_repo | false | remove copy of bolt configuration on server after running bolt
+
+## Puppet Bolt Configuring Provisioner Options
+
+The Bolt provisioner can be configured globally or per suite, global settings act as defaults for all suites, you can then customise per suite, for example:
+
+```yaml
+---
+driver:
+  name: docker
+  use_sudo: false
+  privileged: true
+
+provisioner:
+  name: puppet_bolt
+  bolt_commands:
+    - bolt --help
+    - bolt --version
+
+platforms:
+- name: ubuntu-16.04
+  driver_config:
+    image: ubuntu:16.04
+    platform: ubuntu
+- name: centos-6.6
+  driver_config:
+    image: centos:6.6
+    platform: centos
+- name: centos-7
+  driver_config:
+    image: centos:latest
+    platform: centos
+    run_command: /usr/sbin/init
+- name: 'centos'
+  driver_plugin: docker
+  driver:
+    use_sudo: false
+    image: centos:7
+    run_command: /usr/sbin/init
+
+suites:
+  - name: base
+```
