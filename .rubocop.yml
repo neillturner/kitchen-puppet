@@ -27,3 +27,5 @@ MultilineOperationIndentation:
   Enabled: false
 RedundantFreeze:
   Enabled: false
+AllCops:
+  TargetRubyVersion: 2.0
