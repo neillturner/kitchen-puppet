@@ -1091,7 +1091,7 @@ module Kitchen
         end
       end
 
-      # rubocop:disable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
+      # rubocop:disable Metrics/CyclomaticComplexity
       def puppet_apt_repo
         platform_version = config[:platform].partition('-')[2]
         case puppet_platform
@@ -1130,7 +1130,7 @@ module Kitchen
           false
         end
       end
-      # rubocop:enable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
+      # rubocop:enable Metrics/CyclomaticComplexity
 
       def puppet_apt_repo_file
         puppet_apt_repo.split('/').last if puppet_apt_repo
