@@ -79,7 +79,8 @@ module Kitchen
       default_config :puppet_test, false
       default_config :puppet_onetime, true
       default_config :puppet_no_daemonize, true
-      default_config :puppet_server, nil # will default to 'puppet'
+      # will default to 'puppet'
+      default_config :puppet_server, nil
       default_config :puppet_waitforcert, '0'
       default_config :puppet_certname, nil
       default_config :puppet_digest, nil
