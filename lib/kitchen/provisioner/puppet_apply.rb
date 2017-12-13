@@ -1037,7 +1037,7 @@ module Kitchen
         config[:spec_files_remote_path]
       end
 
-      # rubocop:disable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
+      # rubocop:disable Metrics/CyclomaticComplexity
       def facterlib
         factpath = nil
         factpath = File.join(config[:root_path], 'facter').to_s if config[:install_custom_facts] && config[:custom_facts].any?
@@ -1049,7 +1049,7 @@ module Kitchen
         debug(bash_vars)
         bash_vars
       end
-      # rubocop:enable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
+      # rubocop:enable Metrics/CyclomaticComplexity
 
       def custom_facts
         return nil if config[:custom_facts].none?
