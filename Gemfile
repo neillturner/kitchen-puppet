@@ -7,7 +7,7 @@ gemspec
 gem 'kitchen-docker', '~> 2.6.0'
 gem 'rake', '~> 10.4.2'
 gem 'rspec', '~> 3.3.0'
-gem 'rubocop', '~> 0.49'
+gem 'rubocop', '~> 0.34'
 gem 'simplecov', '~> 0.10'
 
 # group :integration do
