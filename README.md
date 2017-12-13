@@ -19,6 +19,12 @@ The PuppetBolt provider works by passing the puppet bolt commands based on attri
 
 This provider has been tested against the Ubuntu 1604 and Centos 7 boxes running in docker and vagrant/virtualbox.
 
+## Template
+
+Template project for using kitchen for puppet development:
+
+https://github.com/scoopex/puppet-kitchen_template
+
 ## Resources
 * http://ehaselwanter.com/en/blog/2014/05/08/using-test-kitchen-with-puppet
 * http://www.slideshare.net/MartinEtmajer/testdriven-infrastructure-with-puppet-test-kitchen-serverspec-and-rspec
