@@ -711,6 +711,7 @@ module Kitchen
         debug(command)
         command
       end
+      # rubocop:enable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
 
       def run_command
         return config[:puppet_apply_command] unless config[:puppet_apply_command].nil?
