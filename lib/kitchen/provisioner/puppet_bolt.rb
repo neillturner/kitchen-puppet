@@ -52,13 +52,13 @@ module Kitchen
       default_config :no_proxy, nil
       # for future use
       # bolt command run <COMMAND>, bolt script run, bolt task run, bolt plan run, bolt file upload
-      default_config :bolt_cmd, nil        
+      default_config :bolt_cmd, nil
       default_config :bolt_nodes, nil
       # BOLT_USER env variable
-      default_config :bolt_user, nil       
+      default_config :bolt_user, nil
       default_config :bolt_password, nil
       # Required for tasks and plans. The path to the module containing the task. Separate multiple paths with a semicolon (;) on Windows or a colon (:) on all other platforms.
-      default_config :bolt_modulepath, [] 
+      default_config :bolt_modulepath, []
       default_config :bolt_params, nil
       default_config :bolt_tty, false
       default_config :bolt_insecure, true
