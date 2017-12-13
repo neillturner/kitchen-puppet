@@ -1037,6 +1037,7 @@ module Kitchen
         config[:spec_files_remote_path]
       end
 
+      # rubocop:disable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       def facterlib
         factpath = nil
         factpath = File.join(config[:root_path], 'facter').to_s if config[:install_custom_facts] && config[:custom_facts].any?
@@ -1048,6 +1049,7 @@ module Kitchen
         debug(bash_vars)
         bash_vars
       end
+      # rubocop:enable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
 
       def custom_facts
         return nil if config[:custom_facts].none?
@@ -1089,6 +1091,7 @@ module Kitchen
         end
       end
 
+      # rubocop:disable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       def puppet_apt_repo
         platform_version = config[:platform].partition('-')[2]
         case puppet_platform
@@ -1127,6 +1130,7 @@ module Kitchen
           false
         end
       end
+      # rubocop:enable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
 
       def puppet_apt_repo_file
         puppet_apt_repo.split('/').last if puppet_apt_repo
@@ -1249,6 +1253,7 @@ module Kitchen
         end
       end
 
+      # rubocop:disable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       def prepare_modules
         info('Preparing modules')
 
@@ -1280,6 +1285,7 @@ module Kitchen
           copy_modules(modules_to_copy, tmpmodules_dir)
         end
       end
+      # rubocop:enable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
 
       def copy_modules(modules, destination)
         excluded_paths = %w[modules pkg] + config[:ignored_paths_from_root]
