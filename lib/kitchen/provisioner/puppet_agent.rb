@@ -52,7 +52,7 @@ module Kitchen
 
       default_config :puppet_apt_repo, 'http://apt.puppetlabs.com/puppetlabs-release-precise.deb'
       default_config :puppet_yum_repo, 'https://yum.puppetlabs.com/puppetlabs-release-el-6.noarch.rpm'
-      default_config :chef_bootstrap_url, 'https://www.getchef.com/chef/install.sh'
+      default_config :chef_bootstrap_url, 'https://www.chef.io/chef/install.sh'
 
       default_config :puppet_agent_command, nil
 
