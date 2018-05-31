@@ -87,7 +87,7 @@ describe Kitchen::Provisioner::PuppetAgent do
       end
 
       it 'Should set correct chef bootstrap url' do
-        expect(provisioner[:chef_bootstrap_url]).to eq('https://www.getchef.com/chef/install.sh')
+        expect(provisioner[:chef_bootstrap_url]).to eq('https://www.chef.io/chef/install.sh')
       end
 
       it 'Should set nil puppet log destination' do
