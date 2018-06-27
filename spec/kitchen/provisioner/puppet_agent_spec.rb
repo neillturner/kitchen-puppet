@@ -190,6 +190,10 @@ describe Kitchen::Provisioner::PuppetAgent do
         expect(provisioner[:librarian_puppet_ssl_file]).to eq(nil)
       end
 
+      it 'should not use r10k ssl file' do
+        expect(provisioner[:r10k_ssl_file]).to eq(nil)
+      end
+
       it 'should not find hiera eyaml key path' do
         expect(provisioner[:hiera_eyaml_key_path]).to eq(nil)
       end
@@ -245,6 +249,11 @@ describe Kitchen::Provisioner::PuppetAgent do
       end
 
       it 'should not resolve with librarian puppet' do
+        config[:resolve_with_r10k] = false
+        expect(provisioner[:resolve_with_r10k]).to eq(false)
+      end
+
+      it 'should not resolve with r10k' do
         config[:resolve_with_librarian_puppet] = false
         expect(provisioner[:resolve_with_librarian_puppet]).to eq(false)
       end
