@@ -49,16 +49,13 @@ module Kitchen
 
           pf = ::R10K::Puppetfile.new(nil, path, puppetfile)
           pf.load
-          pf.modules.each do |mod|
-            mod.sync
-          end
+          pf.modules.map(&:sync)
         end
 
         attr_reader :puppetfile, :path, :logger
 
         def self.load_r10k!(logger)
           require 'r10k/puppetfile'
-          #require 'r10k/action/puppetfile'
 
           version = ::R10K::VERSION
           logger.debug("R10K #{version} library loaded")
@@ -68,7 +65,7 @@ module Kitchen
             ' `gem install r10k` or add the following to your' \
             " Gemfile if you are using Bundler: `gem 'r10k'`.")
           raise UserError,
-            "Could not load or activate R10K (#{e.message})"
+                "Could not load or activate R10K (#{e.message})"
         end
       end
     end

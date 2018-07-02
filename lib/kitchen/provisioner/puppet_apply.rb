@@ -759,7 +759,7 @@ module Kitchen
 
       def load_needed_dependencies!
         return unless File.exist?(puppetfile)
-        return unless config[:resolve_with_librarian_puppet] or config[:resolve_with_r10k]
+        return unless config[:resolve_with_librarian_puppet] || config[:resolve_with_r10k]
         if config[:resolve_with_librarian_puppet]
           require 'kitchen/provisioner/puppet/librarian'
           debug("Puppetfile found at #{puppetfile}, loading Librarian-Puppet")
@@ -1271,7 +1271,7 @@ module Kitchen
 
         FileUtils.mkdir_p(tmpmodules_dir)
         resolve_with_librarian if File.exist?(puppetfile) && config[:resolve_with_librarian_puppet]
-        resolve_with_r10k if File.exist?(puppetfile) && config[:resolve_with_r10k] &! config[:resolve_with_librarian_puppet]
+        resolve_with_r10k if File.exist?(puppetfile) && config[:resolve_with_r10k] && !config[:resolve_with_librarian_puppet]
         modules_to_copy = {}
 
         # If root dir (.) is a module, add it for copying
