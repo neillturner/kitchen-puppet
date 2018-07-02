@@ -44,6 +44,9 @@ module Kitchen
           info("Resolving module dependencies with R10K-Puppet #{version}...")
           debug("Using Puppetfile from #{puppetfile}")
 
+          ::R10K::Git::Cache.settings[:cache_root] = '.r10k/git'
+          ::R10K::Forge::ModuleRelease.settings[:cache_root] = '.r10k/cache'
+
           pf = ::R10K::Puppetfile.new(nil, path, puppetfile)
           pf.load
           pf.modules.each do |mod|
