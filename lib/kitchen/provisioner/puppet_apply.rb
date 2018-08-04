@@ -24,7 +24,6 @@
 require 'uri'
 require 'json'
 require 'kitchen'
-require 'kitchen/provisioner/puppet/librarian'
 
 module Kitchen
   class Busser
@@ -59,6 +58,7 @@ module Kitchen
       default_config :require_puppet_repo, true
       default_config :require_chef_for_busser, true
       default_config :resolve_with_librarian_puppet, true
+      default_config :resolve_with_r10k, false
       default_config :puppet_environment, nil
       default_config :puppet_environment_config_path do |provisioner|
         provisioner.calculate_path('environment.conf')
@@ -165,6 +165,7 @@ module Kitchen
       default_config :puppet_detailed_exitcodes, nil
       default_config :facter_file, nil
       default_config :librarian_puppet_ssl_file, nil
+      default_config :r10k_ssl_file, nil
 
       default_config :hiera_eyaml, false
       default_config :hiera_eyaml_key_remote_path, '/etc/puppet/secure/keys'
@@ -758,9 +759,16 @@ module Kitchen
 
       def load_needed_dependencies!
         return unless File.exist?(puppetfile)
-        return unless config[:resolve_with_librarian_puppet]
-        debug("Puppetfile found at #{puppetfile}, loading Librarian-Puppet")
-        Puppet::Librarian.load!(logger)
+        return unless config[:resolve_with_librarian_puppet] || config[:resolve_with_r10k]
+        if config[:resolve_with_librarian_puppet]
+          require 'kitchen/provisioner/puppet/librarian'
+          debug("Puppetfile found at #{puppetfile}, loading Librarian-Puppet")
+          Puppet::Librarian.load!(logger)
+        elsif config[:resolve_with_r10k]
+          require 'kitchen/provisioner/puppet/r10k'
+          debug("Puppetfile found at #{puppetfile}, loading R10K")
+          Puppet::R10K.load!(logger)
+        end
       end
 
       def tmpmodules_dir
@@ -898,6 +906,10 @@ module Kitchen
 
       def librarian_puppet_ssl_file
         config[:librarian_puppet_ssl_file]
+      end
+
+      def r10k_ssl_file
+        config[:r10k_puppet_ssl_file] || config[:librarian_puppet_ssl_file]
       end
 
       def puppet_cmd
@@ -1259,6 +1271,7 @@ module Kitchen
 
         FileUtils.mkdir_p(tmpmodules_dir)
         resolve_with_librarian if File.exist?(puppetfile) && config[:resolve_with_librarian_puppet]
+        resolve_with_r10k if File.exist?(puppetfile) && config[:resolve_with_r10k] && !config[:resolve_with_librarian_puppet]
         modules_to_copy = {}
 
         # If root dir (.) is a module, add it for copying
@@ -1408,10 +1421,20 @@ module Kitchen
       end
 
       def resolve_with_librarian
+        require 'kitchen/provisioner/puppet/librarian'
         Kitchen.mutex.synchronize do
           ENV['SSL_CERT_FILE'] = librarian_puppet_ssl_file if librarian_puppet_ssl_file
           Puppet::Librarian.new(puppetfile, tmpmodules_dir, logger).resolve
           ENV['SSL_CERT_FILE'] = '' if librarian_puppet_ssl_file
+        end
+      end
+
+      def resolve_with_r10k
+        require 'kitchen/provisioner/puppet/r10k'
+        Kitchen.mutex.synchronize do
+          ENV['SSL_CERT_FILE'] = r10k_ssl_file if r10k_ssl_file
+          Puppet::R10K.new(puppetfile, tmpmodules_dir, logger).resolve
+          ENV['SSL_CERT_FILE'] = '' if r10k_ssl_file
         end
       end
 

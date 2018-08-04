@@ -59,6 +59,7 @@ ignore_spec_fixtures | false | don't copy spec/fixtures to avoid problems with s
 install_custom_facts| false | Install custom facts to yaml file at "/tmp/kitchen/facter/kitchen.rb"
 install_hiera | false | Installs `hiera-puppet` package. Not needed for puppet > 3.x.x
 librarian_puppet_ssl_file | nil | ssl certificate file for librarian-puppet
+r10k_ssl_file | nil | ssl certificate file for r10k
 manifest | puppet parses every .pp file in the manifests_path directory and its subdirectories | manifest(s) for puppet apply to run. If set to a file like 'site.pp' it will use the file in the mainfests_path.
 manifests_path | 'mainfests' | puppet repo manifests directory
 max_retries| 1 | maximum number of retry attempts of converge command
@@ -110,6 +111,7 @@ require_puppet_collections | true | Set if using puppet collections install (Pup
 require_puppet_omnibus | false | Set if using omnibus puppet install
 require_puppet_repo | true | Set if using a puppet install from yum or apt repo
 resolve_with_librarian_puppet | true | Use librarian_puppet to resolve modules if a Puppetfile is found
+resolve_with_r10k | true | Use r10k to resolve modules if a Puppetfile is found
 retry_on_exit_code| [] | Array of exit codes to retry converge command against
 update_package_repos| true| update OS repository metadata
 wait_for_retry| 30 | number of seconds to wait before retrying converge command
