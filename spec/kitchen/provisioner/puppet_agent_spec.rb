@@ -16,17 +16,18 @@ describe Kitchen::Busser do
 end
 
 describe Kitchen::Provisioner::PuppetAgent do
-  let(:logged_output) { StringIO.new }
-  let(:logger)        { Logger.new(logged_output) }
-  let(:config)        { { test_base_path: '/kitchen' } }
-  let(:platform)      { Kitchen::Platform.new(name: 'ubuntu-14.04') }
-  let(:suite)         { Kitchen::Suite.new(name: 'suitey') }
-  let(:verifier)      { Kitchen::Verifier::Dummy.new }
-  let(:transport)     { Kitchen::Transport::Dummy.new }
-  let(:state_file)    { double('state_file') }
-  let(:state)         { {} }
-  let(:env)           { {} }
-  let(:driver) { Kitchen::Driver::Dummy.new }
+  let(:logged_output)   { StringIO.new }
+  let(:logger)          { Logger.new(logged_output) }
+  let(:config)          { { test_base_path: '/kitchen' } }
+  let(:platform)        { Kitchen::Platform.new(name: 'ubuntu-14.04') }
+  let(:suite)           { Kitchen::Suite.new(name: 'suitey') }
+  let(:verifier)        { Kitchen::Verifier::Dummy.new }
+  let(:transport)       { Kitchen::Transport::Dummy.new }
+  let(:lifecycle_hooks) { Kitchen::LifecycleHooks.new(config) }
+  let(:state_file)      { double('state_file') }
+  let(:state)           { {} }
+  let(:env)             { {} }
+  let(:driver)          { Kitchen::Driver::Dummy.new }
 
   let(:provisioner_object) { Kitchen::Provisioner::PuppetAgent.new(config) }
 
@@ -42,6 +43,7 @@ describe Kitchen::Provisioner::PuppetAgent do
     Kitchen::Instance.new(
       verifier: verifier,
       driver: driver,
+      lifecycle_hooks: lifecycle_hooks,
       logger: logger,
       suite: suite,
       platform: platform,
