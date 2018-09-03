@@ -19,6 +19,7 @@
 
 require 'kitchen/errors'
 require 'kitchen/logging'
+require 'librarian/ui'
 
 module Kitchen
   module Provisioner
@@ -28,6 +29,34 @@ module Kitchen
       #
       class Librarian
         include Logging
+
+        class LoggerUI < ::Librarian::UI
+          attr_writer :logger
+
+          def initialize(logger)
+            @logger = logger
+          end
+
+          def warn(message = nil)
+            @logger.warn(message || yield)
+          end
+
+          def debug(message = nil)
+            @logger.debug(message || yield)
+          end
+
+          def error(message = nil)
+            @logger.error(message || yield)
+          end
+
+          def info(message = nil)
+            @logger.info(message || yield)
+          end
+
+          def confirm(message = nil)
+            @logger.info(message || yield)
+          end
+        end
 
         def initialize(puppetfile, path, logger = Kitchen.logger)
           @puppetfile = puppetfile
@@ -47,6 +76,7 @@ module Kitchen
           env = ::Librarian::Puppet::Environment.new(
             project_path: File.expand_path(File.dirname(puppetfile))
           )
+          env.ui = LoggerUI.new(@logger)
 
           env.config_db.local['path'] = path
           ::Librarian::Action::Resolve.new(env).run
