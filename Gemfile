@@ -5,6 +5,7 @@ source 'https://rubygems.org'
 gemspec
 
 gem 'kitchen-docker', '~> 2.6.0'
+gem 'librarian-puppet', '~> 3.0.0'
 gem 'rake', '~> 10.4.2'
 gem 'rspec', '~> 3.3.0'
 gem 'rubocop', '~> 0.49.0'
