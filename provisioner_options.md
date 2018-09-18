@@ -75,6 +75,7 @@ puppet_apt_collections_repo | http://apt.puppetlabs.com/ puppet5-release-wheezy.
 _for Ubuntu14 change to_ |      http://apt.puppetlabs.com/ puppet5-release-trusty.deb |
 _for Ubuntu15 change to_ | http://apt.puppetlabs.com/ puppet5-release-jessie.deb |
 _for Ubuntu16.04 change to_ |   http://apt.puppetlabs.com/ puppet5-release-xenial.deb |
+puppet_binary | 'puppet' | puppet default binary
 puppet_coll_remote_path | "/opt/puppetlabs" | Server Installation location of a puppet collections install.
 puppet_config_path | | path of custom puppet.conf file
 puppet_debug| false| Enable full debugging logging on puppet run

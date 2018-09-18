@@ -95,6 +95,7 @@ module Kitchen
       default_config :ignored_paths_from_root, ['spec']
       default_config :hiera_data_remote_path, nil
       default_config :manifest, ''
+      default_config :puppet_binary, 'puppet'
 
       default_config :manifests_path do |provisioner|
         provisioner.calculate_path('manifests') ||
@@ -915,7 +916,7 @@ module Kitchen
       def puppet_cmd
         return '& "C:\Program Files\Puppet Labs\Puppet\bin\puppet"' if powershell?
 
-        puppet_bin = config[:require_puppet_collections] ? "#{config[:puppet_coll_remote_path]}/bin/puppet" : 'puppet'
+        puppet_bin = config[:require_puppet_collections] ? "#{config[:puppet_coll_remote_path]}/bin/puppet" : config[:puppet_binary]
 
         if config[:puppet_no_sudo]
           puppet_bin
