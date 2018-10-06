@@ -46,7 +46,7 @@ module Kitchen
       attr_accessor :tmp_dir
 
       default_config :require_puppet_collections, true
-      default_config :puppet_yum_collections_repo, 'http://yum.puppetlabs.com/puppet5/puppet-release-el-6.noarch.rpm'
+      default_config :puppet_yum_collections_repo, 'http://yum.puppetlabs.com/puppet5/puppet5-release-el-6.noarch.rpm'
       default_config :puppet_apt_collections_repo, 'http://apt.puppetlabs.com/puppet5-release-wheezy.deb'
       default_config :puppet_coll_remote_path, '/opt/puppetlabs'
       default_config :puppet_version, nil
