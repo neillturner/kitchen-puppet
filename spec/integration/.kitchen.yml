@@ -18,7 +18,7 @@ platforms:
   - name: fake
     driver:
       image: devopsil/puppet
-      platform: rhel
+      platform: redhat
 
 suites:
   - name: default
