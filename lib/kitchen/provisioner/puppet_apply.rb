@@ -332,7 +332,7 @@ module Kitchen
           #{custom_pre_install_command}
           if [ ! -d "#{config[:puppet_coll_remote_path]}" ]; then
             echo "-----> #{sudo_env('yum')} -y install #{config[:puppet_yum_collections_repo]}"
-            #{sudo_env('yum')} -y --nogpgcheck install #{config[:puppet_yum_collections_repo]}
+            #{sudo_env('yum')} -y install #{config[:puppet_yum_collections_repo]}
             #{sudo_env('yum')} -y --nogpgcheck install puppet-agent#{puppet_redhat_version}
           fi
           #{install_eyaml("#{config[:puppet_coll_remote_path]}/puppet/bin/gem")}
@@ -373,7 +373,7 @@ module Kitchen
               if [ -f /etc/centos-release ] || [ -f /etc/redhat-release ] || [ -f /etc/oracle-release ] || \
                  [ -f /etc/system-release ] || [ grep -q 'Amazon Linux' /etc/system-release ]; then
                 echo "-----> #{sudo_env('yum')} -y install #{config[:puppet_yum_collections_repo]}"
-                #{sudo_env('yum')} -y --nogpgcheck install #{config[:puppet_yum_collections_repo]}
+                #{sudo_env('yum')} -y install #{config[:puppet_yum_collections_repo]}
                 #{sudo_env('yum')} -y --nogpgcheck install puppet-agent#{puppet_redhat_version}
               else
                 #{sudo('apt-get')} -y install wget
@@ -522,7 +522,7 @@ module Kitchen
           else
             #{sudo('rpm')} -ivh #{proxy_parm} #{puppet_yum_repo}
             #{update_packages_redhat_cmd}
-            #{sudo_env('yum')} -y install puppet#{puppet_redhat_version}
+            #{sudo_env('yum')} -y --nogpgcheck install puppet#{puppet_redhat_version}
           fi
         INSTALL
       end
