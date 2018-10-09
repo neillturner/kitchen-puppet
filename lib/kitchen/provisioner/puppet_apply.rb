@@ -332,6 +332,7 @@ module Kitchen
           #{custom_pre_install_command}
           if [ ! -d "#{config[:puppet_coll_remote_path]}" ]; then
             echo "-----> #{sudo_env('yum')} -y --nogpgcheck install #{config[:puppet_yum_collections_repo]}"
+            #{sudo_env('yum')} clean all
             #{sudo_env('yum')} -y --nogpgcheck install #{config[:puppet_yum_collections_repo]}
             #{sudo_env('yum')} -y --nogpgcheck install puppet-agent#{puppet_redhat_version}
           fi
