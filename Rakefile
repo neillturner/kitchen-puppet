@@ -18,7 +18,7 @@ namespace :integration do
   desc 'Run integration tests with docker'
   task :docker do
     sh %(cd spec/integration && \
-         bundle exec 'kitchen verify')
+         bundle exec 'kitchen verify -l debug')
   end
   task :clean do
     sh %(cd spec/integration && \
