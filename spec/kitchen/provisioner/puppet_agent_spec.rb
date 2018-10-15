@@ -500,7 +500,7 @@ describe Kitchen::Provisioner::PuppetAgent do
     end
 
     # currently windows is not fully supported with puppet_agent
-    xit 'exports custom_facts' do
+    it 'exports custom_facts' do
       config[:custom_facts] = { fact1: 'value1', fact2: 'value2' }
       expect(provisioner.run_command).to include("\$env:FACTER_fact1='value1'; \$env:FACTER_fact2='value2';")
     end
