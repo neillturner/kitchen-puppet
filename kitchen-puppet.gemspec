@@ -18,7 +18,7 @@ Gem::Specification.new do |s|
   s.rubyforge_project = '[none]'
   s.required_ruby_version = '>= 2.1'
   s.add_dependency 'net-ssh', '>= 3'
-  s.add_dependency 'test-kitchen', '~> 1.4'
+  s.add_dependency 'test-kitchen', '>= 1.4', '< 3.0'
   s.description = <<-TEXT
   == DESCRIPTION:
 
