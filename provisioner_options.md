@@ -92,9 +92,10 @@ puppet_future_parser | false | Run puppet with the future parser enabled  (see h
 puppet_git_init | nil | initialize puppet from GIT repository, e.g. "git@github.com:example/puppet-repo.git"
 puppet_git_pr | nil | checkout specific Pull Request from repository specified in puppet_git_init, e.g. "324"
 puppet_logdest | nil | _Array_ of log destinations. Include 'console' if wanted
-puppet_omnibus_url | https://raw.githubusercontent.com/ petems/puppet-install-shell/ master/install_puppet_5_agent.sh | omnibus puppet v5 install location.
+puppet_omnibus_url | https://raw.githubusercontent.com/ petems/puppet-install-shell/ master/install_puppet_6_agent.sh | omnibus puppet v5 install location.
 _for puppet v3 change to_ | https://raw.githubusercontent.com/ petems/puppet-install-shell/ master/install_puppet.sh |
 _for puppet v4 change to_ | https://raw.githubusercontent.com/ petems/puppet-install-shell/ master/install_puppet_agent.sh |
+_for puppet v5 change to_ | https://raw.githubusercontent.com/ petems/puppet-install-shell/ master/install_puppet_5_agent.sh |
 puppet_noop| false| puppet runs in a no-op or dry-run mode
 puppet_no_sudo | false | allow puppet command to run without sudo if required
 puppet_verbose| false| Extra information logging on puppet run

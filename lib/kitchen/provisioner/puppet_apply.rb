@@ -79,7 +79,7 @@ module Kitchen
       default_config :custom_post_apply_command, nil
       default_config :puppet_whitelist_exit_code, nil
       default_config :require_puppet_omnibus, false
-      default_config :puppet_omnibus_url, 'https://raw.githubusercontent.com/petems/puppet-install-shell/master/install_puppet_5_agent.sh'
+      default_config :puppet_omnibus_url, 'https://raw.githubusercontent.com/petems/puppet-install-shell/master/install_puppet_6_agent.sh'
       default_config :puppet_enc, nil
       default_config :ignore_spec_fixtures, false
 
