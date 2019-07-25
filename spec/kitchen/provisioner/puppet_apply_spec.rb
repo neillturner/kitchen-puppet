@@ -73,7 +73,7 @@ describe Kitchen::Provisioner::PuppetApply do
       end
 
       it 'should set yum collections repo' do
-        expect(provisioner[:puppet_yum_collections_repo]).to eq('http://yum.puppetlabs.com/puppet5/puppet5-release-el-6.noarch.rpm')
+        expect(provisioner[:puppet_yum_collections_repo]).to eq('https://yum.puppetlabs.com/puppet5/puppet5-release-el-6.noarch.rpm')
       end
 
       it 'should set apt collections repo' do
