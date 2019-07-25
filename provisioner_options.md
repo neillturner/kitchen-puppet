@@ -104,8 +104,8 @@ puppet_version | "latest"| desired version, affects apt and most installs.
 puppet_whitelist_exit_code | nil | Whitelist exit code expected from puppet run. Intended to be used together with `puppet_detailed_exitcodes`. You can also specify a yaml list here (you should use 0 and 2 for `puppet_detailed_exitcodes` to capture puppet runtime errors and allow multiple converge runs (without changes)).
 puppet_yum_repo | https://yum.puppetlabs.com/ puppetlabs-release-el-6.noarch.rpm | yum repo RH/Centos6
 _for RH/Centos7 change to_ | https://yum.puppetlabs.com/ puppetlabs-release-el-7.noarch.rpm |
-puppet_yum_collections_repo | http://yum.puppetlabs.com/ puppet5/puppet-release-el-6.noarch.rpm | yum collections repo RH/Centos6
-_for RH/Centos7 change to_ | http://yum.puppetlabs.com/ puppet5/puppet-release-el-7.noarch.rpm |
+puppet_yum_collections_repo | https://yum.puppetlabs.com/ puppet5/puppet-release-el-6.noarch.rpm | yum collections repo RH/Centos6
+_for RH/Centos7 change to_ | https://yum.puppetlabs.com/ puppet5/puppet-release-el-7.noarch.rpm |
 puppetfile_path | | Path to Puppetfile
 remove_puppet_repo | false | remove copy of puppet repository and puppet configuration on server after running puppet
 require_chef_for_busser | true | Install chef as currently needed by busser to run tests
