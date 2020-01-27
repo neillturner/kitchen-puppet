@@ -276,7 +276,7 @@ module Kitchen
                 if [ -f /etc/centos-release ] || [ -f /etc/redhat-release ] || [ -f /etc/oracle-release ]; then
                     #{install_puppet_yum_repo}
                 else
-                  if [ -f /etc/system-release ] || [ grep -q 'Amazon Linux' /etc/system-release ]; then
+                  if [ -f /etc/system-release ] || grep -q 'Amazon Linux' /etc/system-release; then
                      #{install_puppet_yum_repo}
                   else
                     #{sudo('apt-get')} -y install wget
@@ -372,7 +372,7 @@ module Kitchen
             #{custom_pre_install_command}
             if [ ! -d "#{config[:puppet_coll_remote_path]}" ]; then
               if [ -f /etc/centos-release ] || [ -f /etc/redhat-release ] || [ -f /etc/oracle-release ] || \
-                 [ -f /etc/system-release ] || [ grep -q 'Amazon Linux' /etc/system-release ]; then
+                 [ -f /etc/system-release ] || grep -q 'Amazon Linux' /etc/system-release; then
                 echo "-----> #{sudo_env('yum')} -y --nogpgcheck install #{config[:puppet_yum_collections_repo]}"
                 #{sudo_env('yum')} -y --nogpgcheck install #{config[:puppet_yum_collections_repo]}
                 #{sudo_env('yum')} -y --nogpgcheck install puppet-agent#{puppet_redhat_version}
