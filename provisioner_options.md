@@ -187,11 +187,11 @@ To override a setting at the suite-level, specify the setting name under the sui
 
 It can be beneficial to keep different Puppet layouts for different suites. Rather than having to specify the manifest, modules, etc for each suite, you can create the following directory structure and they will automatically be found:
 
-    $kitchen_root/puppet/$suite_name/manifests
-    $kitchen_root/puppet/$suite_name/modules
-    $kitchen_root/puppet/$suite_name/hiera
-    $kitchen_root/puppet/$suite_name/hiera.yaml
-    $kitchen_root/puppet/$suite_name/Puppetfile
+    $kitchen_root/$suite_name/puppet/manifests
+    $kitchen_root/$suite_name/puppet/modules
+    $kitchen_root/$suite_name/puppet/hiera
+    $kitchen_root/$suite_name/puppet/hiera.yaml
+    $kitchen_root/$suite_name/puppet/Puppetfile
 
 ### Puppet Version
 When specifying a puppet version, you must use this format: "3.6.2-1puppetlabs1". I have
