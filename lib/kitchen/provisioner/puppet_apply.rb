@@ -251,7 +251,7 @@ module Kitchen
               if(Get-Command puppet -ErrorAction 0) { return; }
               $architecture = if( [Environment]::Is64BitOperatingSystem ) { '-x64' } else { '' }
               if( '#{puppet_windows_version}' -eq 'latest' ) {
-                  $MsiUrl = "https://downloads.puppetlabs.com/windows/puppet-agent-${architecture}-latest.msi"
+                  $MsiUrl = "https://downloads.puppetlabs.com/windows/puppet-agent${architecture}-latest.msi"
               } elseif( '#{puppet_windows_version}' -like '5.*' ) {
                   $MsiUrl = "https://downloads.puppetlabs.com/windows/puppet5/puppet-agent-#{puppet_windows_version}-${architecture}.msi"
               } else {
