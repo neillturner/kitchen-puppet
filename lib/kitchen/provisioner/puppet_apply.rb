@@ -248,6 +248,7 @@ module Kitchen
             info("Installing puppet on #{puppet_platform}")
             info('Powershell is not recognised by core test-kitchen assuming it is present') unless powershell_shell?
             <<-INSTALL
+              #{custom_pre_install_command}
               if(Get-Command puppet -ErrorAction 0) { return; }
               $architecture = if( [Environment]::Is64BitOperatingSystem ) { 'x64' } else { 'x86' }
               if( '#{puppet_windows_version}' -eq 'latest' ) {
@@ -265,6 +266,7 @@ module Kitchen
               }
 
               #{install_busser}
+              #{custom_install_command}
             INSTALL
           else
             info('Installing puppet, will try to determine platform os')
@@ -346,6 +348,7 @@ module Kitchen
           info("Installing Puppet Collections on #{puppet_platform}")
           info('Powershell is not recognised by core test-kitchen assuming it is present') unless powershell_shell?
           <<-INSTALL
+            #{custom_pre_install_command}
             if(Get-Command puppet -ErrorAction 0) { return; }
             $architecture = if( [Environment]::Is64BitOperatingSystem ) { 'x64' } else { 'x86' }
             if( '#{puppet_windows_version}' -eq 'latest' ) {
@@ -363,6 +366,7 @@ module Kitchen
             }
 
             #{install_busser}
+            #{custom_install_command}
           INSTALL
         else
           info('Installing Puppet Collections, will try to determine platform os')
