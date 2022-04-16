@@ -264,7 +264,6 @@ module Kitchen
                   Write-Host "Installer failed."
                   Exit 1
               }
-
               #{install_busser}
               #{custom_install_command}
             INSTALL
@@ -364,7 +363,6 @@ module Kitchen
                 Write-Host "Installer failed."
                 Exit 1
             }
-
             #{install_busser}
             #{custom_install_command}
           INSTALL
