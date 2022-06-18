@@ -248,12 +248,13 @@ module Kitchen
             info("Installing puppet on #{puppet_platform}")
             info('Powershell is not recognised by core test-kitchen assuming it is present') unless powershell_shell?
             <<-INSTALL
+              #{custom_pre_install_command}
               if(Get-Command puppet -ErrorAction 0) { return; }
-              $architecture = if( [Environment]::Is64BitOperatingSystem ) { '-x64' } else { '' }
+              $architecture = if( [Environment]::Is64BitOperatingSystem ) { 'x64' } else { 'x86' }
               if( '#{puppet_windows_version}' -eq 'latest' ) {
                   $MsiUrl = "https://downloads.puppetlabs.com/windows/puppet-agent-${architecture}-latest.msi"
-              } elseif( '#{puppet_windows_version}' -like '5.*' ) {
-                  $MsiUrl = "https://downloads.puppetlabs.com/windows/puppet5/puppet-agent-#{puppet_windows_version}-${architecture}.msi"
+              } elseif( '#{puppet_windows_version}' -match '(\\d)\\.' ) {
+                  $MsiUrl = "https://downloads.puppetlabs.com/windows/puppet$($Matches[1])/puppet-agent-#{puppet_windows_version}-${architecture}.msi"
               } else {
                   $MsiUrl = "https://downloads.puppetlabs.com/windows/puppet-#{puppet_windows_version}${architecture}.msi"
               }
@@ -263,8 +264,8 @@ module Kitchen
                   Write-Host "Installer failed."
                   Exit 1
               }
-
               #{install_busser}
+              #{custom_install_command}
             INSTALL
           else
             info('Installing puppet, will try to determine platform os')
@@ -346,14 +347,15 @@ module Kitchen
           info("Installing Puppet Collections on #{puppet_platform}")
           info('Powershell is not recognised by core test-kitchen assuming it is present') unless powershell_shell?
           <<-INSTALL
+            #{custom_pre_install_command}
             if(Get-Command puppet -ErrorAction 0) { return; }
             $architecture = if( [Environment]::Is64BitOperatingSystem ) { 'x64' } else { 'x86' }
             if( '#{puppet_windows_version}' -eq 'latest' ) {
                 $MsiUrl = "https://downloads.puppetlabs.com/windows/puppet-agent-${architecture}-latest.msi"
-            } elseif( '#{puppet_windows_version}' -like '5.*' ) {
-                $MsiUrl = "https://downloads.puppetlabs.com/windows/puppet5/puppet-agent-#{puppet_windows_version}-${architecture}.msi"
+            } elseif( '#{puppet_windows_version}' -match '(\\d)\\.' ) {
+                $MsiUrl = "https://downloads.puppetlabs.com/windows/puppet$($Matches[1])/puppet-agent-#{puppet_windows_version}-${architecture}.msi"
             } else {
-                $MsiUrl = "https://downloads.puppetlabs.com/windows/puppet-agent-#{puppet_windows_version}${architecture}.msi"
+                $MsiUrl = "https://downloads.puppetlabs.com/windows/puppet-agent-#{puppet_windows_version}-${architecture}.msi"
             }
             Invoke-WebRequest $MsiUrl -UseBasicParsing -OutFile "C:/puppet-agent.msi" #{posh_proxy_parm}
             $process = Start-Process -FilePath msiexec.exe -Wait -PassThru -ArgumentList '/qn', '/norestart', '/i', 'C:\\puppet-agent.msi'
@@ -361,8 +363,8 @@ module Kitchen
                 Write-Host "Installer failed."
                 Exit 1
             }
-
             #{install_busser}
+            #{custom_install_command}
           INSTALL
         else
           info('Installing Puppet Collections, will try to determine platform os')
