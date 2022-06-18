@@ -215,6 +215,7 @@ module Kitchen
               #{custom_pre_install_command}
               if [ ! $(which puppet) ]; then
                 #{sudo('apt-get')} -y install wget
+                #{sudo('apt-get')} -y install apt-transport-https
                 #{sudo('wget')} #{wget_proxy_parm} #{puppet_apt_repo}
                 #{sudo('dpkg')} -i #{puppet_apt_repo_file}
                 #{update_packages_debian_cmd}
@@ -281,6 +282,7 @@ module Kitchen
                      #{install_puppet_yum_repo}
                   else
                     #{sudo('apt-get')} -y install wget
+                    #{sudo('apt-get')} -y install apt-transport-https
                     #{sudo('wget')} #{wget_proxy_parm} #{puppet_apt_repo}
                     #{sudo('dpkg')} -i #{puppet_apt_repo_file}
                     #{update_packages_debian_cmd}
@@ -313,6 +315,7 @@ module Kitchen
           if [ ! -d "#{config[:puppet_coll_remote_path]}" ]; then
             if [ ! -f "#{config[:puppet_apt_collections_repo]}" ]; then
               #{sudo('apt-get')} -y install wget
+              #{sudo('apt-get')} -y install apt-transport-https
               #{sudo('wget')} #{wget_proxy_parm} #{config[:puppet_apt_collections_repo]}
             fi
             #{sudo('dpkg')} -i #{puppet_apt_coll_repo_file}
@@ -380,6 +383,7 @@ module Kitchen
                 #{sudo_env('yum')} -y --nogpgcheck install puppet-agent#{puppet_redhat_version}
               else
                 #{sudo('apt-get')} -y install wget
+                #{sudo('apt-get')} -y install apt-transport-https
                 #{sudo('wget')} #{wget_proxy_parm} #{config[:puppet_apt_collections_repo]}
                 #{sudo('dpkg')} -i #{puppet_apt_coll_repo_file}
                 #{sudo('apt-get')} update
@@ -1113,6 +1117,15 @@ module Kitchen
         case puppet_platform
         when 'ubuntu'
           case platform_version
+	  when '20.04'
+            # focal Repo
+            'https://apt.puppetlabs.com/puppet-release-focal.deb'
+          when '18.04'
+            # bionic Repo
+            'https://apt.puppetlabs.com/puppet-release-bionic.deb'
+          when '16.04'
+            # xenial Repo
+            'https://apt.puppetlabs.com/puppet-release-xenial.deb'          
           when '14.10'
             # Utopic Repo
             'https://apt.puppetlabs.com/puppetlabs-release-utopic.deb'
@@ -1128,6 +1141,12 @@ module Kitchen
           end
         when 'debian'
           case platform_version.gsub(/\..*/, '')
+ 	   when '10'
+             # Debian buster
+             'https://apt.puppetlabs.com/puppet-tools-release-buster.deb'
+           when '9'
+             # Debian xenial
+            'https://apt.puppetlabs.com/puppet-tools-release-stretch.deb'
           when '8'
             # Debian Jessie
             'https://apt.puppetlabs.com/puppetlabs-release-jessie.deb'
