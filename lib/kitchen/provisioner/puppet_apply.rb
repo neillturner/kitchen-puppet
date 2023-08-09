@@ -72,6 +72,7 @@ module Kitchen
       default_config :puppet_apt_repo, 'http://apt.puppetlabs.com/puppetlabs-release-precise.deb'
       default_config :puppet_yum_repo, 'https://yum.puppetlabs.com/puppetlabs-release-el-6.noarch.rpm'
       default_config :chef_bootstrap_url, 'https://www.chef.io/chef/install.sh'
+      default_config :puppet_windows_msi_url, nil
       default_config :puppet_logdest, nil
       default_config :custom_install_command, nil
       default_config :custom_pre_install_command, nil
@@ -251,13 +252,19 @@ module Kitchen
             <<-INSTALL
               #{custom_pre_install_command}
               if(Get-Command puppet -ErrorAction 0) { return; }
-              $architecture = if( [Environment]::Is64BitOperatingSystem ) { 'x64' } else { 'x86' }
-              if( '#{puppet_windows_version}' -eq 'latest' ) {
-                  $MsiUrl = "https://downloads.puppetlabs.com/windows/puppet-agent-${architecture}-latest.msi"
-              } elseif( '#{puppet_windows_version}' -match '(\\d)\\.' ) {
-                  $MsiUrl = "https://downloads.puppetlabs.com/windows/puppet$($Matches[1])/puppet-agent-#{puppet_windows_version}-${architecture}.msi"
-              } else {
-                  $MsiUrl = "https://downloads.puppetlabs.com/windows/puppet-#{puppet_windows_version}${architecture}.msi"
+              if( '#{puppet_windows_msi_url}' -ne '') {
+                $MsiUrl = '#{puppet_windows_msi_url}'
+              }
+              else
+              {
+                $architecture = if( [Environment]::Is64BitOperatingSystem ) { 'x64' } else { 'x86' }
+                if( '#{puppet_windows_version}' -eq 'latest' ) {
+                    $MsiUrl = "https://downloads.puppetlabs.com/windows/puppet-agent-${architecture}-latest.msi"
+                } elseif( '#{puppet_windows_version}' -match '(\\d)\\.' ) {
+                    $MsiUrl = "https://downloads.puppetlabs.com/windows/puppet$($Matches[1])/puppet-agent-#{puppet_windows_version}-${architecture}.msi"
+                } else {
+                    $MsiUrl = "https://downloads.puppetlabs.com/windows/puppet-#{puppet_windows_version}${architecture}.msi"
+                }
               }
               Invoke-WebRequest $MsiUrl -UseBasicParsing -OutFile "C:/puppet.msi" #{posh_proxy_parm}
               $process = Start-Process -FilePath msiexec.exe -Wait -PassThru -ArgumentList '/qn', '/norestart', '/i', 'C:\\puppet.msi'
@@ -352,13 +359,19 @@ module Kitchen
           <<-INSTALL
             #{custom_pre_install_command}
             if(Get-Command puppet -ErrorAction 0) { return; }
-            $architecture = if( [Environment]::Is64BitOperatingSystem ) { 'x64' } else { 'x86' }
-            if( '#{puppet_windows_version}' -eq 'latest' ) {
-                $MsiUrl = "https://downloads.puppetlabs.com/windows/puppet-agent-${architecture}-latest.msi"
-            } elseif( '#{puppet_windows_version}' -match '(\\d)\\.' ) {
-                $MsiUrl = "https://downloads.puppetlabs.com/windows/puppet$($Matches[1])/puppet-agent-#{puppet_windows_version}-${architecture}.msi"
-            } else {
-                $MsiUrl = "https://downloads.puppetlabs.com/windows/puppet-agent-#{puppet_windows_version}-${architecture}.msi"
+            if( '#{puppet_windows_msi_url}' -ne '') {
+              $MsiUrl = '#{puppet_windows_msi_url}'
+            }
+            else
+            {
+              $architecture = if( [Environment]::Is64BitOperatingSystem ) { 'x64' } else { 'x86' }
+              if( '#{puppet_windows_version}' -eq 'latest' ) {
+                  $MsiUrl = "https://downloads.puppetlabs.com/windows/puppet-agent-${architecture}-latest.msi"
+              } elseif( '#{puppet_windows_version}' -match '(\\d)\\.' ) {
+                  $MsiUrl = "https://downloads.puppetlabs.com/windows/puppet$($Matches[1])/puppet-agent-#{puppet_windows_version}-${architecture}.msi"
+              } else {
+                  $MsiUrl = "https://downloads.puppetlabs.com/windows/puppet-agent-#{puppet_windows_version}-${architecture}.msi"
+              }
             }
             Invoke-WebRequest $MsiUrl -UseBasicParsing -OutFile "C:/puppet-agent.msi" #{posh_proxy_parm}
             $process = Start-Process -FilePath msiexec.exe -Wait -PassThru -ArgumentList '/qn', '/norestart', '/i', 'C:\\puppet-agent.msi'
@@ -973,6 +986,10 @@ module Kitchen
 
       def puppet_windows_version
         config[:puppet_version] ? config[:puppet_version].to_s : 'latest'
+      end
+
+      def puppet_windows_msi_url
+        config[:puppet_windows_msi_url]
       end
 
       def puppet_environment_flag
